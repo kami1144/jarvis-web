@@ -1,119 +1,207 @@
 /**
- * J.A.R.V.I.S. Data Layer
- * 财务/任务/预警数据管理 + localStorage 持久化
+ * J.A.R.V.I.S. Data Layer v2
+ * 实时动态数据联动系统
+ * HP ← 健康 | 能量 ← 情绪 | 金币 ← 财务 | 经验值 ← 综合
  */
 
-const JAVIS_DATA_KEY = 'jarvis_data';
+const JAVIS_DATA_KEY = 'jarvis_data_v2';
+const UPDATE_INTERVAL = 3000; // 3秒更新一次
 
-// 初始化数据结构
+// ==========================================
+// 动态数据源（实时计算）
+// ==========================================
+
+const DataSources = {
+  // HP数据源：健康状态
+  health: {
+    lastUpdated: null,
+    data: {
+      sleepHours: 7,        // 睡眠小时
+      sleepQuality: 80,     // 睡眠质量 %
+      exerciseMinutes: 30,  // 运动分钟
+      stressLevel: 40,      // 压力等级 0-100
+      illnessDays: 0        // 最近生病天数
+    },
+    // 计算HP：基于睡眠、运动、压力、疾病
+    calculate() {
+      const h = this.data;
+      let hp = 100;
+      
+      // 睡眠影响 (理想7-8小时)
+      const sleepDiff = Math.abs(h.sleepHours - 7.5);
+      hp -= sleepDiff * 5;
+      
+      // 睡眠质量影响
+      hp -= (100 - h.sleepQuality) * 0.15;
+      
+      // 运动影响 (理想每天30分钟)
+      if (h.exerciseMinutes < 15) hp -= 10;
+      else if (h.exerciseMinutes >= 30) hp += 5;
+      
+      // 压力影响
+      hp -= h.stressLevel * 0.3;
+      
+      // 疾病影响
+      hp -= h.illnessDays * 10;
+      
+      return Math.max(0, Math.min(100, Math.round(hp)));
+    }
+  },
+  
+  // 能量数据源：精神/情绪状态
+  mood: {
+    lastUpdated: null,
+    data: {
+      // 基于最近活动的情绪评分
+      recentActivities: [
+        { type: 'work', valence: 0.7 },   // 工作完成 = 正向
+        { type: 'learning', valence: 0.8 }, // 学习 = 正向
+        { type: 'social', valence: 0.5 },  // 社交 = 中性
+        { type: 'rest', valence: 0.6 }     // 休息 = 正向
+      ],
+      // 聊天情绪记录（模拟）
+      chatMoodScores: [0.7, 0.8, 0.6, 0.75, 0.65, 0.8],
+      // 能量衰减率
+      hoursSinceRest: 4,
+      contextWindows: 3  // 上下文窗口数（越多越累）
+    },
+    // 计算能量：基于活动+聊天情绪+疲劳
+    calculate() {
+      const m = this.data;
+      
+      // 活动情绪平均
+      const activityAvg = m.recentActivities.reduce((a, b) => a + b.valence, 0) / m.recentActivities.length;
+      
+      // 聊天情绪（最近7次）
+      const chatAvg = m.chatMoodScores.slice(-7).reduce((a, b) => a + b, 0) / Math.min(m.chatMoodScores.length, 7);
+      
+      // 疲劳衰减
+      let fatigue = m.hoursSinceRest * 3; // 每小时-3%
+      fatigue += m.contextWindows * 5;       // 每个上下文窗口-5%
+      
+      // 综合能量
+      let energy = (activityAvg * 0.3 + chatAvg * 0.4 + 0.3) * 100;
+      energy -= fatigue;
+      
+      return Math.max(0, Math.min(100, Math.round(energy)));
+    }
+  },
+  
+  // 金币数据源：财务状态
+  finance: {
+    lastUpdated: null,
+    data: {
+      // 收入流水
+      incomeFlow: [
+        { amount: 0, source: 'adult-shop', date: new Date().toISOString() },
+        { amount: 0, source: '接单', date: new Date().toISOString() }
+      ],
+      // 支出流水
+      expensesFlow: [
+        { amount: 20000, category: '生活', date: new Date().toISOString() }
+      ],
+      // 资产
+      assets: {
+        availableCash: 500000,     // 可用现金
+        frozen: 0,                 // 冻结资金
+        investments: 0,            // 投资
+        receivables: 0             // 应收
+      },
+      // 负债
+      liabilities: {
+        creditCard: 0,
+        loans: 0
+      }
+    },
+    // 计算金币：当前净资产
+    calculate() {
+      const f = this.data;
+      const totalAssets = f.assets.availableCash + f.assets.frozen + f.assets.investments + f.assets.receivables;
+      const totalLiabilities = f.liabilities.creditCard + f.liabilities.loans;
+      const netWorth = totalAssets - totalLiabilities;
+      
+      // 归一化到0-100范围（设定净资产500万为100%）
+      return Math.min(100, Math.round((netWorth / 5000000) * 100));
+    },
+    // 获取金币原始值（日元）
+    getRawGold() {
+      const f = this.data;
+      return f.assets.availableCash - f.liabilities.creditCard - f.liabilities.loans;
+    }
+  },
+  
+  // 经验值数据源：综合评分
+  experience: {
+    // 组成权重
+    weights: {
+      hp: 0.25,        // HP权重25%
+      mood: 0.20,       // 情绪权重20%
+      skills: 0.25,     // 技能权重25%
+      projects: 0.30    // 项目进度权重30%
+    },
+    data: {
+      // 技能进度
+      skills: [
+        { name: 'AI工具', level: 3, maxLevel: 10, category: 'tech' },
+        { name: '电商运营', level: 2, maxLevel: 10, category: 'business' },
+        { name: '日语', level: 8, maxLevel: 10, category: 'language' },
+        { name: '中文', level: 10, maxLevel: 10, category: 'language' },
+        { name: '韩语', level: 6, maxLevel: 10, category: 'language' }
+      ],
+      // 项目进度
+      projects: [
+        { id: 'adult-shop', progress: 70, weight: 0.5 },
+        { id: 'jarvis-web', progress: 40, weight: 0.3 },
+        { id: 'manga-studio', progress: 30, weight: 0.2 }
+      ]
+    },
+    // 计算经验值：综合HP+情绪+技能+项目
+    calculate(hpValue, moodValue) {
+      const e = this.data;
+      
+      // 技能完成度
+      const skillProgress = e.skills.reduce((sum, s) => sum + (s.level / s.maxLevel), 0) / e.skills.length;
+      
+      // 项目完成度（加权平均）
+      const projectProgress = e.projects.reduce((sum, p) => sum + p.progress * p.weight, 0);
+      
+      // 综合经验
+      const exp = (
+        hpValue * this.weights.hp +
+        moodValue * this.weights.mood +
+        skillProgress * 100 * this.weights.skills +
+        projectProgress * this.weights.projects
+      );
+      
+      return Math.max(0, Math.min(100, Math.round(exp)));
+    },
+    // 获取等级
+    getLevel(expValue) {
+      // 每20%经验 = 1级，共5级
+      return Math.max(1, Math.min(100, Math.ceil(expValue / 20)));
+    }
+  }
+};
+
+// ==========================================
+// 数据持久层
+// ==========================================
+
 const defaultData = {
   character: {
     name: 'Kim Kami',
     type: '探索型大脑',
-    level: 12,
-    hp: { current: 85, max: 100 },
-    energy: { current: 60, max: 100 },
-    gold: { current: 500000, max: 2000000 },
-    exp: { current: 35, max: 100 }
+    lastUpdate: null
   },
-  finance: {
-    monthlyIncome: 0,
-    monthlyExpense: 20000,
-    availableFund: 500000,
-    currency: 'JPY'
-  },
-  quests: [
-    {
-      id: 'quest_001',
-      name: 'adult-shop 上线',
-      icon: '⚔️',
-      progress: 70,
-      status: 'in_progress',
-      subtasks: [
-        { id: 'st_001', name: '网站技术', completed: true },
-        { id: 'st_002', name: 'AI功能', completed: true },
-        { id: 'st_003', name: '工厂确认', completed: false, inProgress: true },
-        { id: 'st_004', name: 'PayPal配置', completed: false },
-        { id: 'st_005', name: '产品上架', completed: false }
-      ],
-      deadline: '2026-05-10',
-      owner: '团队'
-    },
-    {
-      id: 'quest_002',
-      name: 'J.A.R.V.I.S. Web面板',
-      icon: '🎮',
-      progress: 20,
-      status: 'in_progress',
-      subtasks: [
-        { id: 'st_010', name: 'HTML结构', completed: true },
-        { id: 'st_011', name: 'CSS样式', completed: true },
-        { id: 'st_012', name: 'JavaScript', completed: false },
-        { id: 'st_013', name: '数据层', completed: false },
-        { id: 'st_014', name: '部署上线', completed: false }
-      ],
-      deadline: '2026-05-07',
-      owner: '小新+3号'
-    },
-    {
-      id: 'quest_003',
-      name: '星火人才 战略规划',
-      icon: '📚',
-      progress: 0,
-      status: 'pending',
-      subtasks: [],
-      deadline: null,
-      owner: '4号'
-    }
-  ],
-  alerts: [
-    {
-      id: 'alert_001',
-      level: 'critical',
-      title: '有限公司执照',
-      description: '无执照，无法正规运营成人用品电商',
-      suggestion: '立即处理营业执照问题',
-      dismissed: false,
-      createdAt: '2026-04-30'
-    },
-    {
-      id: 'alert_002',
-      level: 'warning',
-      title: '资金缓冲期',
-      description: '月可用2万，约3个月缓冲期（无收入情况下）',
-      suggestion: '加快变现速度',
-      dismissed: false,
-      createdAt: '2026-04-30'
-    },
-    {
-      id: 'alert_003',
-      level: 'info',
-      title: '域名待注册',
-      description: '品牌名确定后需立即注册',
-      suggestion: '确认 felic 品牌名后注册 .com 域名',
-      dismissed: false,
-      createdAt: '2026-04-30'
-    }
-  ],
-  radar: {
-    opportunities: [
-      { id: 'opp_001', name: '日本电商', emoji: '🇯🇵', angle: 0, distance: 30 },
-      { id: 'opp_002', name: 'AI工具', emoji: '🤖', angle: 72, distance: 60 },
-      { id: 'opp_003', name: '内容创作', emoji: '📱', angle: 144, distance: 45 },
-      { id: 'opp_004', name: '中国制造', emoji: '🏭', angle: 216, distance: 80 },
-      { id: 'opp_005', name: '接单平台', emoji: '💼', angle: 288, distance: 55 }
-    ]
-  },
-  aiAdvices: [
-    '根据当前资源状态，建议优先确保 adult-shop 第一笔收入。金币缓冲期仅剩3个月，每一天都在消耗战斗值。',
-    'J.A.R.V.I.S. Web面板开发中，预计本周内可上线，届时可以实时监控所有项目状态。',
-    '成人用品电商在日本市场有稳定需求，但需要尽快解决执照问题才能正规运营。',
-    'MangaStudio 项目技术问题正在解决，JSON格式统一后可以大幅提升排版效率。'
-  ],
+  healthData: { ...DataSources.health.data },
+  moodData: { ...DataSources.mood.data },
+  financeData: { ...DataSources.finance.data },
+  skillData: { ...DataSources.experience.data.skills },
+  projectData: { ...DataSources.experience.data.projects },
   settings: {
+    updateInterval: UPDATE_INTERVAL,
     theme: 'light',
-    notifications: true,
-    language: 'ja'
+    notifications: true
   }
 };
 
@@ -123,8 +211,8 @@ function loadData() {
     const stored = localStorage.getItem(JAVIS_DATA_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      // 合并默认数据，确保新字段存在
-      return { ...defaultData, ...parsed };
+      // 合并默认数据
+      return deepMerge(defaultData, parsed);
     }
   } catch (e) {
     console.warn('Failed to load J.A.R.V.I.S. data:', e);
@@ -141,168 +229,229 @@ function saveData(data) {
   }
 }
 
-// 获取所有数据
-function getAllData() {
-  return loadData();
-}
-
-// 更新角色数据
-function updateCharacter(updates) {
-  const data = loadData();
-  data.character = { ...data.character, ...updates };
-  saveData(data);
-  return data.character;
-}
-
-// 更新财务数据
-function updateFinance(updates) {
-  const data = loadData();
-  data.finance = { ...data.finance, ...updates };
-  saveData(data);
-  return data.finance;
-}
-
-// 添加收入记录
-function addIncome(amount, description = '') {
-  const data = loadData();
-  data.finance.monthlyIncome += amount;
-  data.finance.availableFund += amount;
-  saveData(data);
-  return data.finance;
-}
-
-// 添加支出记录
-function addExpense(amount, description = '') {
-  const data = loadData();
-  data.finance.monthlyExpense += amount;
-  data.finance.availableFund -= amount;
-  saveData(data);
-  return data.finance;
-}
-
-// 更新任务进度
-function updateQuest(questId, updates) {
-  const data = loadData();
-  const quest = data.quests.find(q => q.id === questId);
-  if (quest) {
-    Object.assign(quest, updates);
-    // 自动计算进度
-    if (quest.subtasks && quest.subtasks.length > 0) {
-      const completed = quest.subtasks.filter(st => st.completed).length;
-      quest.progress = Math.round((completed / quest.subtasks.length) * 100);
-      quest.status = completed === quest.subtasks.length ? 'completed' : 'in_progress';
+// 深度合并
+function deepMerge(target, source) {
+  const result = { ...target };
+  for (const key in source) {
+    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      result[key] = deepMerge(target[key] || {}, source[key]);
+    } else {
+      result[key] = source[key];
     }
-    saveData(data);
   }
-  return quest;
+  return result;
 }
 
-// 完成任务子项
-function completeSubtask(questId, subtaskId) {
-  const data = loadData();
-  const quest = data.quests.find(q => q.id === questId);
-  if (quest && quest.subtasks) {
-    const subtask = quest.subtasks.find(st => st.id === subtaskId);
-    if (subtask) {
-      subtask.completed = true;
-      subtask.inProgress = false;
-      // 重新计算进度
-      const completed = quest.subtasks.filter(st => st.completed).length;
-      quest.progress = Math.round((completed / quest.subtasks.length) * 100);
-      quest.status = completed === quest.subtasks.length ? 'completed' : 'in_progress';
+// ==========================================
+// 实时计算引擎
+// ==========================================
+
+const ComputeEngine = {
+  cachedValues: null,
+  lastComputeTime: null,
+  
+  // 执行完整计算
+  compute() {
+    const data = loadData();
+    
+    // 更新数据源
+    DataSources.health.data = { ...data.healthData };
+    DataSources.mood.data = { 
+      ...data.moodData,
+      chatMoodScores: data.moodData.chatMoodScores || DataSources.mood.data.chatMoodScores
+    };
+    DataSources.finance.data = { ...data.financeData };
+    DataSources.experience.data = {
+      skills: data.skillData || DataSources.experience.data.skills,
+      projects: data.projectData || DataSources.experience.data.projects
+    };
+    
+    // 计算各维度
+    const hp = DataSources.health.calculate();
+    const mood = DataSources.mood.calculate();
+    const gold = DataSources.finance.calculate();
+    const rawGold = DataSources.finance.getRawGold();
+    const exp = DataSources.experience.calculate(hp, mood);
+    const level = DataSources.experience.getLevel(exp);
+    
+    const result = {
+      hp: { current: hp, max: 100 },
+      energy: { current: mood, max: 100 },
+      gold: { current: gold, max: 100, raw: rawGold },
+      exp: { current: exp, max: 100 },
+      level,
+      timestamp: new Date().toISOString()
+    };
+    
+    this.cachedValues = result;
+    this.lastComputeTime = Date.now();
+    
+    return result;
+  },
+  
+  // 获取当前值（带缓存）
+  getValues() {
+    if (!this.cachedValues || Date.now() - this.lastComputeTime > UPDATE_INTERVAL) {
+      return this.compute();
+    }
+    return this.cachedValues;
+  }
+};
+
+// ==========================================
+// 数据更新API
+// ==========================================
+
+const JARVIS = {
+  // 健康数据更新
+  updateHealth(updates) {
+    const data = loadData();
+    data.healthData = { ...data.healthData, ...updates };
+    DataSources.health.data = data.healthData;
+    saveData(data);
+    return DataSources.health.data;
+  },
+  
+  // 情绪数据更新
+  updateMood(updates) {
+    const data = loadData();
+    data.moodData = { ...data.moodData, ...updates };
+    DataSources.mood.data = data.moodData;
+    saveData(data);
+    return DataSources.mood.data;
+  },
+  
+  // 添加聊天情绪记录
+  addChatMood(score) {
+    const data = loadData();
+    if (!data.moodData.chatMoodScores) data.moodData.chatMoodScores = [];
+    data.moodData.chatMoodScores.push(Math.max(0, Math.min(1, score)));
+    // 只保留最近20条
+    if (data.moodData.chatMoodScores.length > 20) {
+      data.moodData.chatMoodScores = data.moodData.chatMoodScores.slice(-20);
+    }
+    DataSources.mood.data = data.moodData;
+    saveData(data);
+    return data.moodData.chatMoodScores;
+  },
+  
+  // 财务数据更新
+  updateFinance(updates) {
+    const data = loadData();
+    if (updates.assets) {
+      data.financeData.assets = { ...data.financeData.assets, ...updates.assets };
+    } else {
+      data.financeData = { ...data.financeData, ...updates };
+    }
+    DataSources.finance.data = data.financeData;
+    saveData(data);
+    return DataSources.finance.data;
+  },
+  
+  // 添加收入
+  addIncome(amount, source = 'other') {
+    const data = loadData();
+    data.financeData.incomeFlow.unshift({
+      amount,
+      source,
+      date: new Date().toISOString()
+    });
+    data.financeData.assets.availableCash += amount;
+    DataSources.finance.data = data.financeData;
+    saveData(data);
+    return data.financeData;
+  },
+  
+  // 添加支出
+  addExpense(amount, category = 'other') {
+    const data = loadData();
+    data.financeData.expensesFlow.unshift({
+      amount,
+      category,
+      date: new Date().toISOString()
+    });
+    data.financeData.assets.availableCash -= amount;
+    DataSources.finance.data = data.financeData;
+    saveData(data);
+    return data.financeData;
+  },
+  
+  // 技能升级
+  upgradeSkill(skillName, increment = 1) {
+    const data = loadData();
+    const skill = data.skillData.find(s => s.name === skillName);
+    if (skill) {
+      skill.level = Math.min(skill.maxLevel, skill.level + increment);
+      DataSources.experience.data.skills = data.skillData;
       saveData(data);
     }
+    return data.skillData;
+  },
+  
+  // 项目进度更新
+  updateProjectProgress(projectId, progress) {
+    const data = loadData();
+    const project = data.projectData.find(p => p.id === projectId);
+    if (project) {
+      project.progress = Math.max(0, Math.min(100, progress));
+      DataSources.experience.data.projects = data.projectData;
+      saveData(data);
+    }
+    return data.projectData;
+  },
+  
+  // 获取实时数据
+  getRealtimeData() {
+    return ComputeEngine.getValues();
+  },
+  
+  // 强制刷新计算
+  refresh() {
+    return ComputeEngine.compute();
+  },
+  
+  // 获取所有原始数据
+  getAllData() {
+    return loadData();
+  },
+  
+  // 获取数据源状态
+  getDataSourceStatus() {
+    return {
+      health: {
+        ...DataSources.health.data,
+        computedHP: DataSources.health.calculate()
+      },
+      mood: {
+        ...DataSources.mood.data,
+        computedEnergy: DataSources.mood.calculate()
+      },
+      finance: {
+        ...DataSources.finance.data,
+        computedGold: DataSources.finance.calculate(),
+        rawGold: DataSources.finance.getRawGold()
+      },
+      skills: DataSources.experience.data.skills,
+      projects: DataSources.experience.data.projects
+    };
+  },
+  
+  // 导出数据
+  exportData() {
+    return JSON.stringify({
+      stored: loadData(),
+      computed: ComputeEngine.compute()
+    }, null, 2);
+  },
+  
+  // 重置数据
+  resetData() {
+    localStorage.removeItem(JAVIS_DATA_KEY);
+    return loadData();
   }
-  return quest;
-}
-
-// 忽略预警
-function dismissAlert(alertId) {
-  const data = loadData();
-  const alert = data.alerts.find(a => a.id === alertId);
-  if (alert) {
-    alert.dismissed = true;
-    saveData(data);
-  }
-  return alert;
-}
-
-// 添加新预警
-function addAlert(alert) {
-  const data = loadData();
-  const newAlert = {
-    id: `alert_${Date.now()}`,
-    dismissed: false,
-    createdAt: new Date().toISOString().split('T')[0],
-    ...alert
-  };
-  data.alerts.unshift(newAlert);
-  saveData(data);
-  return newAlert;
-}
-
-// 获取随机AI建议
-function getRandomAdvice() {
-  const data = loadData();
-  const advices = data.aiAdvices;
-  return advices[Math.floor(Math.random() * advices.length)];
-}
-
-// 导出数据（用于调试）
-function exportData() {
-  return JSON.stringify(loadData(), null, 2);
-}
-
-// 导入数据
-function importData(jsonStr) {
-  try {
-    const imported = JSON.parse(jsonStr);
-    saveData(imported);
-    return true;
-  } catch (e) {
-    console.error('Failed to import data:', e);
-    return false;
-  }
-}
-
-// 重置为默认数据
-function resetData() {
-  saveData(defaultData);
-  return defaultData;
-}
-
-// 财务记录（详细）
-function addTransaction(type, amount, category, description = '') {
-  const data = loadData();
-  if (!data.transactions) data.transactions = [];
-  data.transactions.unshift({
-    id: `txn_${Date.now()}`,
-    type,
-    amount,
-    category,
-    description,
-    date: new Date().toISOString()
-  });
-  saveData(data);
-  return data.transactions;
-}
-
-// 导出给全局使用
-window.JARVIS = {
-  loadData,
-  saveData,
-  getAllData,
-  updateCharacter,
-  updateFinance,
-  addIncome,
-  addExpense,
-  updateQuest,
-  completeSubtask,
-  dismissAlert,
-  addAlert,
-  getRandomAdvice,
-  exportData,
-  importData,
-  resetData,
-  addTransaction
 };
+
+// 导出给全局
+window.JARVIS = JARVIS;
+window.ComputeEngine = ComputeEngine;
+window.DataSources = DataSources;

@@ -16,6 +16,10 @@
         <span class="subtitle">人生游戏操控台</span>
       </div>
       <div class="header-right">
+        <span class="live-indicator">
+          <span class="live-dot"></span>
+          <span id="liveStatus">实时联动</span>
+        </span>
         <span class="date" id="currentDate"></span>
       </div>
     </header>
@@ -26,7 +30,7 @@
       <div class="row row-2col">
         <!-- Character Card -->
         <section class="card character-card">
-          <h2 class="card-title">🧙 角色状态</h2>
+          <h2 class="card-title">🧙 角色状态 <span class="update-badge" id="charUpdateBadge"></span></h2>
           <div class="character-info">
             <div class="character-name">Kim Kami</div>
             <div class="character-type">探索型大脑</div>
@@ -35,31 +39,56 @@
             <div class="stat">
               <label>💗 HP</label>
               <div class="progress-bar">
-                <div class="progress-fill hp-fill" style="width: 85%"></div>
+                <div class="progress-fill hp-fill" id="hpFill" style="width: 85%"></div>
               </div>
-              <span class="stat-value">85/100</span>
+              <span class="stat-value" id="hpValue">85/100</span>
             </div>
             <div class="stat">
               <label>⚡ 能量</label>
               <div class="progress-bar">
-                <div class="progress-fill energy-fill" style="width: 60%"></div>
+                <div class="progress-fill energy-fill" id="energyFill" style="width: 60%"></div>
               </div>
-              <span class="stat-value">60/100</span>
+              <span class="stat-value" id="energyValue">60/100</span>
             </div>
             <div class="stat">
               <label>🪙 金币</label>
               <div class="progress-bar">
-                <div class="progress-fill gold-fill" style="width: 50%"></div>
+                <div class="progress-fill gold-fill" id="goldFill" style="width: 50%"></div>
               </div>
-              <span class="stat-value">¥50万 / ¥200万</span>
+              <span class="stat-value" id="goldValue">¥50万</span>
             </div>
             <div class="stat">
               <label>⭐ 经验</label>
               <div class="progress-bar">
-                <div class="progress-fill exp-fill" style="width: 35%"></div>
+                <div class="progress-fill exp-fill" id="expFill" style="width: 35%"></div>
               </div>
-              <span class="stat-value">Lv.12</span>
+              <span class="stat-value" id="expValue">Lv.12</span>
             </div>
+          </div>
+          <!-- 数据来源指示器 -->
+          <div class="data-sources">
+            <div class="source-tag health" title="HP数据来源">
+              <span class="source-icon">🏥</span>
+              <span class="source-label">健康</span>
+              <span class="source-value" id="healthSource">睡眠7h</span>
+            </div>
+            <div class="source-tag mood" title="能量数据来源">
+              <span class="source-icon">🧠</span>
+              <span class="source-label">情绪</span>
+              <span class="source-value" id="moodSource">聊天气氛</span>
+            </div>
+            <div class="source-tag finance" title="金币数据来源">
+              <span class="source-icon">💰</span>
+              <span class="source-label">净资产</span>
+              <span class="source-value" id="financeSource">¥50万</span>
+            </div>
+          </div>
+          <!-- 演示快捷操作 -->
+          <div class="demo-controls">
+            <button class="demo-btn" onclick="simulateWork()">⚡工作</button>
+            <button class="demo-btn" onclick="simulateRest()">😴休息</button>
+            <button class="demo-btn income" onclick="simulateIncome(10000)">💰收</button>
+            <button class="demo-btn expense" onclick="simulateExpense(5000)">💸支</button>
           </div>
         </section>
 
@@ -80,6 +109,21 @@
               <span class="finance-value gold" id="availableFund">¥50万</span>
             </div>
           </div>
+          <!-- 收支明细 -->
+          <div class="finance-flow">
+            <div class="flow-section">
+              <h4>📈 收入流水</h4>
+              <div class="flow-list" id="incomeFlowList">
+                <div class="flow-empty">暂无收入记录</div>
+              </div>
+            </div>
+            <div class="flow-section">
+              <h4>📉 支出流水</h4>
+              <div class="flow-list" id="expenseFlowList">
+                <div class="flow-item">生活开支 -¥2万</div>
+              </div>
+            </div>
+          </div>
           <div class="financial-detail">
             <a href="#" class="detail-link">📊 收支详情 →</a>
           </div>
@@ -89,13 +133,13 @@
       <!-- Row 2: Quest Tracker -->
       <div class="row">
         <section class="card quest-card">
-          <h2 class="card-title">📜 任务追踪</h2>
+          <h2 class="card-title">📜 任务追踪 <span class="update-badge" id="questUpdateBadge"></span></h2>
           <div class="quest-list" id="questList">
             <div class="quest-item in-progress">
               <div class="quest-header">
                 <span class="quest-icon">⚔️</span>
                 <span class="quest-name">adult-shop 上线</span>
-                <span class="quest-status">进行中</span>
+                <span class="quest-status in-progress">进行中</span>
               </div>
               <div class="quest-progress">
                 <div class="progress-bar">
@@ -103,31 +147,31 @@
                 </div>
                 <span class="progress-text">70%</span>
               </div>
-              <div class="quest-subtasks">
-                <span class="subtask completed">✓ 网站技术</span>
-                <span class="subtask completed">✓ AI功能</span>
-                <span class="subtask in-progress">◐ 工厂确认</span>
-                <span class="subtask pending">○ PayPal配置</span>
-              </div>
             </div>
             <div class="quest-item in-progress">
               <div class="quest-header">
                 <span class="quest-icon">🎮</span>
                 <span class="quest-name">J.A.R.V.I.S. Web面板</span>
-                <span class="quest-status">进行中</span>
+                <span class="quest-status in-progress">进行中</span>
               </div>
               <div class="quest-progress">
                 <div class="progress-bar">
-                  <div class="progress-fill quest-fill" style="width: 20%"></div>
+                  <div class="progress-fill quest-fill" style="width: 40%"></div>
                 </div>
-                <span class="progress-text">20%</span>
+                <span class="progress-text">40%</span>
               </div>
             </div>
             <div class="quest-item pending">
               <div class="quest-header">
                 <span class="quest-icon">📚</span>
-                <span class="quest-name">星火人才 战略规划</span>
-                <span class="quest-status">待指示</span>
+                <span class="quest-name">MangaStudio</span>
+                <span class="quest-status pending">待开始</span>
+              </div>
+              <div class="quest-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill quest-fill" style="width: 30%"></div>
+                </div>
+                <span class="progress-text">30%</span>
               </div>
             </div>
           </div>
@@ -140,25 +184,11 @@
         <section class="card alert-card">
           <h2 class="card-title">🚨 预警系统</h2>
           <div class="alert-list" id="alertList">
-            <div class="alert-item critical">
-              <span class="alert-level">🔴</span>
-              <div class="alert-content">
-                <div class="alert-title">有限公司执照</div>
-                <div class="alert-desc">无执照，无法正规运营成人用品电商</div>
-              </div>
-            </div>
-            <div class="alert-item warning">
-              <span class="alert-level">🟠</span>
-              <div class="alert-content">
-                <div class="alert-title">资金缓冲期</div>
-                <div class="alert-desc">月可用2万，约3个月缓冲期</div>
-              </div>
-            </div>
             <div class="alert-item info">
               <span class="alert-level">🔵</span>
               <div class="alert-content">
-                <div class="alert-title">域名待注册</div>
-                <div class="alert-desc">品牌名确定后需立即注册</div>
+                <div class="alert-title">📈 收入为零</div>
+                <div class="alert-desc">本月暂无收入记录</div>
               </div>
             </div>
           </div>
@@ -172,7 +202,7 @@
               <div class="radar-ring ring-1"></div>
               <div class="radar-ring ring-2"></div>
               <div class="radar-ring ring-3"></div>
-              <div class="radar-blips">
+              <div class="radar-blips" id="radarBlips">
                 <div class="blip" style="--angle: 0deg; --dist: 30%;" title="日本电商">🇯🇵</div>
                 <div class="blip" style="--angle: 72deg; --dist: 60%;" title="AI工具">🤖</div>
                 <div class="blip" style="--angle: 144deg; --dist: 45%;" title="内容创作">📱</div>
@@ -181,7 +211,7 @@
               </div>
             </div>
           </div>
-          <div class="radar-legend">
+          <div class="radar-legend" id="radarLegend">
             <span class="legend-item">🇯🇵 日本电商</span>
             <span class="legend-item">🤖 AI工具</span>
             <span class="legend-item">💼 接单</span>
