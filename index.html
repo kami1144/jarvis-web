@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J.A.R.V.I.S. 人生仪表盘</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1 class="logo">⚔️ J.A.R.V.I.S.</h1>
+        <span class="subtitle">人生游戏操控台</span>
+      </div>
+      <div class="header-right">
+        <span class="date" id="currentDate"></span>
+      </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+      <!-- Row 1: Character + Financial -->
+      <div class="row row-2col">
+        <!-- Character Card -->
+        <section class="card character-card">
+          <h2 class="card-title">🧙 角色状态</h2>
+          <div class="character-info">
+            <div class="character-name">Kim Kami</div>
+            <div class="character-type">探索型大脑</div>
+          </div>
+          <div class="character-stats">
+            <div class="stat">
+              <label>💗 HP</label>
+              <div class="progress-bar">
+                <div class="progress-fill hp-fill" style="width: 85%"></div>
+              </div>
+              <span class="stat-value">85/100</span>
+            </div>
+            <div class="stat">
+              <label>⚡ 能量</label>
+              <div class="progress-bar">
+                <div class="progress-fill energy-fill" style="width: 60%"></div>
+              </div>
+              <span class="stat-value">60/100</span>
+            </div>
+            <div class="stat">
+              <label>🪙 金币</label>
+              <div class="progress-bar">
+                <div class="progress-fill gold-fill" style="width: 50%"></div>
+              </div>
+              <span class="stat-value">¥50万 / ¥200万</span>
+            </div>
+            <div class="stat">
+              <label>⭐ 经验</label>
+              <div class="progress-bar">
+                <div class="progress-fill exp-fill" style="width: 35%"></div>
+              </div>
+              <span class="stat-value">Lv.12</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Financial Dashboard -->
+        <section class="card financial-card">
+          <h2 class="card-title">💰 财务仪表盘</h2>
+          <div class="financial-summary">
+            <div class="finance-item income">
+              <span class="finance-label">本月收入</span>
+              <span class="finance-value" id="monthlyIncome">¥0</span>
+            </div>
+            <div class="finance-item expense">
+              <span class="finance-label">本月支出</span>
+              <span class="finance-value" id="monthlyExpense">¥2万</span>
+            </div>
+            <div class="finance-item balance">
+              <span class="finance-label">可用资金</span>
+              <span class="finance-value gold" id="availableFund">¥50万</span>
+            </div>
+          </div>
+          <div class="financial-detail">
+            <a href="#" class="detail-link">📊 收支详情 →</a>
+          </div>
+        </section>
+      </div>
+
+      <!-- Row 2: Quest Tracker -->
+      <div class="row">
+        <section class="card quest-card">
+          <h2 class="card-title">📜 任务追踪</h2>
+          <div class="quest-list" id="questList">
+            <div class="quest-item in-progress">
+              <div class="quest-header">
+                <span class="quest-icon">⚔️</span>
+                <span class="quest-name">adult-shop 上线</span>
+                <span class="quest-status">进行中</span>
+              </div>
+              <div class="quest-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill quest-fill" style="width: 70%"></div>
+                </div>
+                <span class="progress-text">70%</span>
+              </div>
+              <div class="quest-subtasks">
+                <span class="subtask completed">✓ 网站技术</span>
+                <span class="subtask completed">✓ AI功能</span>
+                <span class="subtask in-progress">◐ 工厂确认</span>
+                <span class="subtask pending">○ PayPal配置</span>
+              </div>
+            </div>
+            <div class="quest-item in-progress">
+              <div class="quest-header">
+                <span class="quest-icon">🎮</span>
+                <span class="quest-name">J.A.R.V.I.S. Web面板</span>
+                <span class="quest-status">进行中</span>
+              </div>
+              <div class="quest-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill quest-fill" style="width: 20%"></div>
+                </div>
+                <span class="progress-text">20%</span>
+              </div>
+            </div>
+            <div class="quest-item pending">
+              <div class="quest-header">
+                <span class="quest-icon">📚</span>
+                <span class="quest-name">星火人才 战略规划</span>
+                <span class="quest-status">待指示</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Row 3: Alert + Radar + AI -->
+      <div class="row row-3col">
+        <!-- Alert System -->
+        <section class="card alert-card">
+          <h2 class="card-title">🚨 预警系统</h2>
+          <div class="alert-list" id="alertList">
+            <div class="alert-item critical">
+              <span class="alert-level">🔴</span>
+              <div class="alert-content">
+                <div class="alert-title">有限公司执照</div>
+                <div class="alert-desc">无执照，无法正规运营成人用品电商</div>
+              </div>
+            </div>
+            <div class="alert-item warning">
+              <span class="alert-level">🟠</span>
+              <div class="alert-content">
+                <div class="alert-title">资金缓冲期</div>
+                <div class="alert-desc">月可用2万，约3个月缓冲期</div>
+              </div>
+            </div>
+            <div class="alert-item info">
+              <span class="alert-level">🔵</span>
+              <div class="alert-content">
+                <div class="alert-title">域名待注册</div>
+                <div class="alert-desc">品牌名确定后需立即注册</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Opportunity Radar -->
+        <section class="card radar-card">
+          <h2 class="card-title">🗺️ 机会雷达</h2>
+          <div class="radar-visual">
+            <div class="radar-grid">
+              <div class="radar-ring ring-1"></div>
+              <div class="radar-ring ring-2"></div>
+              <div class="radar-ring ring-3"></div>
+              <div class="radar-blips">
+                <div class="blip" style="--angle: 0deg; --dist: 30%;" title="日本电商">🇯🇵</div>
+                <div class="blip" style="--angle: 72deg; --dist: 60%;" title="AI工具">🤖</div>
+                <div class="blip" style="--angle: 144deg; --dist: 45%;" title="内容创作">📱</div>
+                <div class="blip" style="--angle: 216deg; --dist: 80%;" title="中国制造">🏭</div>
+                <div class="blip" style="--angle: 288deg; --dist: 55%;" title="接单平台">💼</div>
+              </div>
+            </div>
+          </div>
+          <div class="radar-legend">
+            <span class="legend-item">🇯🇵 日本电商</span>
+            <span class="legend-item">🤖 AI工具</span>
+            <span class="legend-item">💼 接单</span>
+          </div>
+        </section>
+
+        <!-- AI Advisor -->
+        <section class="card ai-card">
+          <h2 class="card-title">🤖 AI 助手</h2>
+          <div class="ai-advice" id="aiAdvice">
+            <div class="advice-item">
+              <p>「根据当前资源状态，建议优先确保 adult-shop 第一笔收入。金币缓冲期仅剩3个月，每一天都在消耗战斗值。」</p>
+            </div>
+          </div>
+          <div class="ai-actions">
+            <button class="ai-btn" onclick="requestAdvice()">🔮 获取建议</button>
+            <button class="ai-btn secondary" onclick="openChat()">💬 对话</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Tab Bar (Mobile) -->
+    <nav class="tab-bar">
+      <button class="tab active" data-tab="dashboard">📊</button>
+      <button class="tab" data-tab="quests">📜</button>
+      <button class="tab" data-tab="finance">💰</button>
+      <button class="tab" data-tab="alerts">🚨</button>
+      <button class="tab" data-tab="ai">🤖</button>
+    </nav>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
