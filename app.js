@@ -37,12 +37,19 @@ function renderAll() {
   setCurrentDate();
   const data = JARVIS.getAllData();
   const computed = JARVIS.getRealtimeData();
-  
+
+  // 记录历史数据点
+  HistoryTracker.recordSnapshot(computed);
+
   renderCharacter(computed, data);
   renderFinance(data.finance);
   renderQuests(data.projects);
   renderAlerts(computed, data);
   renderSkills(data.skills);
+  renderTasks();
+  renderEnvironment();
+  renderHistoryChart(7);
+  initAIAdvice();
 }
 
 // 渲染角色卡片
@@ -227,7 +234,7 @@ function renderAlerts(computed, data) {
 function renderSkills(skills) {
   const skillsList = document.getElementById('skillsList');
   if (!skillsList) return;
-  
+
   if (!skills || skills.length === 0) {
     // 默认技能
     skills = [
@@ -238,7 +245,7 @@ function renderSkills(skills) {
       { name: '韩语', level: 6, maxLevel: 10 }
     ];
   }
-  
+
   skillsList.innerHTML = skills.map(s => `
     <div class="skill-item">
       <span class="skill-name">${s.name}</span>
@@ -248,6 +255,514 @@ function renderSkills(skills) {
       <span class="skill-level">Lv.${s.level}</span>
     </div>
   `).join('');
+}
+
+// ==========================================
+// 预警系统渲染
+// ==========================================
+
+function renderAlerts(computed, data) {
+  const alertList = document.getElementById('alertList');
+  if (!alertList) return;
+
+  // 使用新的AlertSystem生成预警
+  const alerts = AlertSystem.generateAlerts(data, computed);
+
+  // 过滤未确认的预警
+  const activeAlerts = alerts.filter(a => !a.acknowledged);
+
+  if (activeAlerts.length === 0) {
+    alertList.innerHTML = `
+      <div class="alert-item info">
+        <span class="alert-level">✅</span>
+        <div class="alert-content">
+          <div class="alert-title">状态良好</div>
+          <div class="alert-desc">各项指标正常，无预警</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const levelIcon = { critical: '🔴', warning: '🟡', info: '🔵' };
+  alertList.innerHTML = activeAlerts.slice(0, 5).map(a => `
+    <div class="alert-item ${a.level}" onclick="showAlertDetail('${a.id}')" style="cursor:pointer;">
+      <span class="alert-level">${levelIcon[a.level]}</span>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-desc">${a.description}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showAlertDetail(alertId) {
+  const alerts = AlertSystem.loadAlerts();
+  const data = JARVIS.getAllData();
+  const computed = JARVIS.getRealtimeData();
+  const allAlerts = AlertSystem.generateAlerts(data, computed);
+  const alert = allAlerts.find(a => a.id === alertId);
+
+  if (!alert) return;
+
+  // 创建详情模态框
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'alertDetailModal';
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  };
+
+  const trendIcon = { worsening: '📉', stable: '➡️', improving: '📈' };
+  const categoryLabel = {
+    financial: '💰 财务',
+    health: '💗 健康',
+    relationship: '👥 人际关系',
+    project: '📜 项目'
+  };
+
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>${categoryLabel[alert.category]} 预警详情</h3>
+        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert-detail-content">
+          <div class="alert-detail-row">
+            <span class="alert-detail-label">预警等级</span>
+            <span class="alert-detail-value">${alert.level === 'critical' ? '🔴 严重' : alert.level === 'warning' ? '🟡 警告' : '🔵 信息'}</span>
+          </div>
+          <div class="alert-detail-row">
+            <span class="alert-detail-label">趋势</span>
+            <span class="alert-detail-value">${trendIcon[alert.trend]} ${alert.trend === 'worsening' ? '恶化' : alert.trend === 'stable' ? '稳定' : '改善'}</span>
+          </div>
+          <div class="alert-detail-row">
+            <span class="alert-detail-label">当前值</span>
+            <span class="alert-detail-value">${alert.currentValue}</span>
+          </div>
+          <div class="alert-detail-row">
+            <span class="alert-detail-label">阈值</span>
+            <span class="alert-detail-value">${alert.threshold}</span>
+          </div>
+          <div class="alert-detail-suggestion">
+            <strong>💡 建议：</strong>${alert.suggestion}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="this.closest('.modal').remove()">关闭</button>
+        <button class="btn primary" onclick="acknowledgeAlert('${alert.id}')">知道了</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
+function acknowledgeAlert(alertId) {
+  AlertSystem.acknowledgeAlert(alertId);
+  document.getElementById('alertDetailModal')?.remove();
+  showNotification('✅ 预警已确认', 'success');
+  renderAll();
+}
+
+// ==========================================
+// 任务追踪器渲染
+// ==========================================
+
+function renderTasks() {
+  const taskList = document.getElementById('taskList');
+  if (!taskList) return;
+
+  const tasks = TaskTracker.loadTasks();
+
+  if (tasks.length === 0) {
+    taskList.innerHTML = '<div class="task-empty">暂无任务，点击「➕ 添加任务」创建</div>';
+    return;
+  }
+
+  const statusMap = {
+    in_progress: { label: '进行中', class: 'in_progress' },
+    pending: { label: '待开始', class: 'pending' },
+    completed: { label: '已完成', class: 'completed' },
+    blocked: { label: '阻塞', class: 'blocked' }
+  };
+
+  const projectIcon = {
+    'adult-shop': '⚔️',
+    'jarvis-web': '🎮',
+    'manga-studio': '📚',
+    'other': '📋'
+  };
+
+  taskList.innerHTML = tasks.map(task => {
+    const status = statusMap[task.status] || statusMap.pending;
+    const deadline = task.deadline ? new Date(task.deadline) : null;
+    const now = new Date();
+    let deadlineClass = '';
+    let deadlineText = '';
+
+    if (deadline) {
+      const daysLeft = Math.ceil((deadline - now) / (24 * 60 * 60 * 1000));
+      if (daysLeft < 0) {
+        deadlineClass = 'overdue';
+        deadlineText = '已过期';
+      } else if (daysLeft <= 3) {
+        deadlineClass = 'overdue';
+        deadlineText = `${daysLeft}天后截止`;
+      } else {
+        deadlineText = deadline.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+      }
+    }
+
+    return `
+      <div class="task-item ${status.class}">
+        <div class="task-header">
+          <span class="task-name">${task.name}</span>
+          <span class="task-project">${projectIcon[task.project] || '📋'} ${task.project}</span>
+          <button class="task-delete" onclick="deleteTask('${task.id}')">🗑️</button>
+        </div>
+        <div class="task-meta">
+          <span>👤 ${task.owner}</span>
+          ${deadline ? `<span class="task-deadline ${deadlineClass}">📅 ${deadlineText}</span>` : ''}
+        </div>
+        <div class="task-progress">
+          <div class="progress-bar">
+            <div class="progress-fill quest-fill" style="width: ${task.progress}%"></div>
+          </div>
+          <span class="progress-text">${task.progress}%</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openTaskInput() {
+  // 设置默认截止日期为7天后
+  const defaultDeadline = new Date();
+  defaultDeadline.setDate(defaultDeadline.getDate() + 7);
+  document.getElementById('taskDeadlineInput').value = defaultDeadline.toISOString().split('T')[0];
+  document.getElementById('taskProgressValue').textContent = '0%';
+
+  openModal('taskModal');
+}
+
+function saveTask() {
+  const name = document.getElementById('taskNameInput').value.trim();
+  const project = document.getElementById('taskProjectInput').value;
+  const owner = document.getElementById('taskOwnerInput').value.trim() || 'Kim';
+  const deadline = document.getElementById('taskDeadlineInput').value || null;
+  const progress = parseInt(document.getElementById('taskProgressInput').value) || 0;
+  const status = document.getElementById('taskStatusInput').value;
+
+  if (!name) {
+    showNotification('请输入任务名称', 'warning');
+    return;
+  }
+
+  TaskTracker.addTask({ name, project, owner, deadline, progress, status });
+  closeModal('taskModal');
+  showNotification('✅ 任务已添加', 'success');
+  renderTasks();
+}
+
+function deleteTask(taskId) {
+  if (confirm('确定要删除这个任务吗？')) {
+    TaskTracker.deleteTask(taskId);
+    showNotification('🗑️ 任务已删除', 'info');
+    renderTasks();
+  }
+}
+
+// 进度滑块事件
+document.getElementById('taskProgressInput')?.addEventListener('input', (e) => {
+  document.getElementById('taskProgressValue').textContent = e.target.value + '%';
+});
+
+// ==========================================
+// 历史图表渲染
+// ==========================================
+
+let historyChart = null;
+
+function renderHistoryChart(days) {
+  const ctx = document.getElementById('historyChart');
+  if (!ctx) return;
+
+  const history = HistoryTracker.getHistory(days);
+
+  // 如果没有历史数据，生成模拟数据
+  let labels = [];
+  let hpData = [];
+  let energyData = [];
+  let goldData = [];
+
+  if (history.length === 0) {
+    // 生成过去N天的模拟数据
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      labels.push(date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
+
+      // 模拟波动数据
+      hpData.push(60 + Math.random() * 30);
+      energyData.push(50 + Math.random() * 40);
+      goldData.push(40 + Math.random() * 40);
+    }
+  } else {
+    // 使用真实历史数据
+    history.forEach(h => {
+      const date = new Date(h.timestamp);
+      labels.push(date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
+      hpData.push(h.hp);
+      energyData.push(h.energy);
+      goldData.push(h.gold);
+    });
+    labels = labels.reverse();
+    hpData = hpData.reverse();
+    energyData = energyData.reverse();
+    goldData = goldData.reverse();
+  }
+
+  // 销毁旧图表
+  if (historyChart) {
+    historyChart.destroy();
+  }
+
+  // 创建新图表
+  historyChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'HP',
+          data: hpData,
+          borderColor: '#FF6B6B',
+          backgroundColor: 'rgba(255, 107, 107, 0.1)',
+          tension: 0.4,
+          fill: true
+        },
+        {
+          label: '能量',
+          data: energyData,
+          borderColor: '#7C4DFF',
+          backgroundColor: 'rgba(124, 77, 255, 0.1)',
+          tension: 0.4,
+          fill: true
+        },
+        {
+          label: '金币',
+          data: goldData,
+          borderColor: '#FFD700',
+          backgroundColor: 'rgba(255, 215, 0, 0.1)',
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            padding: 20,
+            font: { size: 11 }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        x: {
+          grid: { display: false }
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      }
+    }
+  });
+}
+
+// Chart tabs 事件绑定
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('chart-tab')) {
+    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    const days = parseInt(e.target.dataset.range);
+    renderHistoryChart(days);
+  }
+});
+
+// ==========================================
+// 环境感知渲染
+// ==========================================
+
+function renderEnvironment() {
+  renderIndustryList();
+  renderPolicyList();
+  renderRelationshipList();
+  renderContactWarnings();
+}
+
+function renderIndustryList() {
+  const list = document.getElementById('industryList');
+  if (!list) return;
+
+  const items = EnvironmentTracker.loadEnvData().industry.slice(0, 10);
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="env-item"><span class="env-item-text" style="color:#999;">暂无记录</span></div>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => `
+    <div class="env-item">
+      <div class="env-item-content">
+        <span class="env-item-text">${item.text}</span>
+        <span class="env-item-time">${formatTime(item.createdAt)}</span>
+      </div>
+      <button class="env-item-delete" onclick="deleteIndustry('${item.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+function renderPolicyList() {
+  const list = document.getElementById('policyList');
+  if (!list) return;
+
+  const items = EnvironmentTracker.loadEnvData().policy.slice(0, 10);
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="env-item"><span class="env-item-text" style="color:#999;">暂无记录</span></div>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => `
+    <div class="env-item">
+      <div class="env-item-content">
+        <span class="env-item-text">${item.text}</span>
+        <span class="env-item-time">${formatTime(item.createdAt)}</span>
+      </div>
+      <button class="env-item-delete" onclick="deletePolicy('${item.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+function renderRelationshipList() {
+  const list = document.getElementById('relationshipList');
+  if (!list) return;
+
+  const items = EnvironmentTracker.loadEnvData().relationships.slice(0, 10);
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="env-item"><span class="env-item-text" style="color:#999;">暂无记录</span></div>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => `
+    <div class="env-item">
+      <div class="env-item-content">
+        <span class="env-item-text">${item.name}: ${item.text}</span>
+        <span class="env-item-time">${formatTime(item.createdAt)}</span>
+      </div>
+      <button class="env-item-delete" onclick="deleteRelationship('${item.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+function renderContactWarnings() {
+  const container = document.getElementById('contactWarnings');
+  if (!container) return;
+
+  const warnings = EnvironmentTracker.getContactWarnings();
+
+  if (warnings.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = warnings.map(c => `
+    <div class="contact-warning">
+      <span>⚠️</span>
+      <span>${c.name} 已超过30天无联系</span>
+    </div>
+  `).join('');
+}
+
+function formatTime(timestamp) {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diff = now - date;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 60) return `${minutes}分钟前`;
+  if (hours < 24) return `${hours}小时前`;
+  if (days < 7) return `${days}天前`;
+  return date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+}
+
+// 环境感知添加函数
+function addIndustry() {
+  const input = document.getElementById('industryInput');
+  const text = input.value.trim();
+  if (text) {
+    EnvironmentTracker.addIndustry(text);
+    input.value = '';
+    renderIndustryList();
+    showNotification('✅ 行业动态已添加', 'success');
+  }
+}
+
+function deleteIndustry(id) {
+  EnvironmentTracker.deleteIndustry(id);
+  renderIndustryList();
+}
+
+function addPolicy() {
+  const input = document.getElementById('policyInput');
+  const text = input.value.trim();
+  if (text) {
+    EnvironmentTracker.addPolicy(text);
+    input.value = '';
+    renderPolicyList();
+    showNotification('✅ 政策变化已添加', 'success');
+  }
+}
+
+function deletePolicy(id) {
+  EnvironmentTracker.deletePolicy(id);
+  renderPolicyList();
+}
+
+function addRelationship() {
+  const input = document.getElementById('relationshipInput');
+  const text = input.value.trim();
+  if (text) {
+    EnvironmentTracker.addRelationship(text);
+    input.value = '';
+    renderRelationshipList();
+    renderContactWarnings();
+    showNotification('✅ 人际关系动态已添加', 'success');
+  }
+}
+
+function deleteRelationship(id) {
+  EnvironmentTracker.deleteRelationship(id);
+  renderRelationshipList();
 }
 
 // ==========================================
@@ -511,8 +1026,9 @@ function requestAdvice() {
   const data = JARVIS.getAllData();
   const computed = JARVIS.getRealtimeData();
   const advices = [];
-  
-  if (computed.hp.current < 60) {
+
+  // 基于当前数据的智能建议
+  if (computed.hp.current < 50) {
     advices.push('💗 HP偏低：保证睡眠，减少加班，适度运动');
   }
   if (computed.energy.current < 50) {
@@ -521,16 +1037,50 @@ function requestAdvice() {
   if (data.finance?.assets?.cash < 300000) {
     advices.push('💸 资金储备不足：加快 adult-shop 变现速度');
   }
-  
+
   const exerciseProgress = (data.health?.exercisePlan?.weeklyCompleted / data.health?.exercisePlan?.weeklyGoal * 100) || 0;
   if (exerciseProgress < 50) {
     advices.push('🏃 运动计划未达标：本週目标完成 ' + Math.round(exerciseProgress) + '%');
   }
-  
-  advices.push('🎯 继续保持，J.A.R.V.I.S. 实时监控你的状态');
-  
+
+  // 如果没有特殊建议，使用默认建议
+  if (advices.length === 0) {
+    advices.push('🎯 继续保持，J.A.R.V.I.S. 实时监控你的状态');
+  }
+
   const advice = advices[Math.floor(Math.random() * advices.length)];
   document.getElementById('aiAdvice').innerHTML = `<div class="advice-item"><p>「${advice}</p></div>`;
+}
+
+// 初始化AI建议（简化版）
+function initAIAdvice() {
+  const data = JARVIS.getAllData();
+  const computed = JARVIS.getRealtimeData();
+
+  // 根据数据生成建议
+  let advice = '基于当前数据，建议：';
+
+  if (computed.hp.current < 60) {
+    advice += '保证睡眠，';
+  }
+
+  if (computed.energy.current < 50) {
+    advice += '减少非必要支出，';
+  }
+
+  if (data.finance?.assets?.cash < 500000) {
+    advice += '关注财务状况，';
+  }
+
+  // 移除末尾的逗号并添加句号
+  advice = advice.replace(/，$/, '。');
+
+  // 如果建议没有实际内容，使用默认
+  if (advice === '基于当前数据，建议：') {
+    advice = '基于当前数据，建议：保证睡眠，减少非必要支出';
+  }
+
+  document.getElementById('aiAdvice').innerHTML = `<div class="advice-item"><p>「${advice}」</p></div>`;
 }
 
 function openChat() {
@@ -569,24 +1119,44 @@ function bindEvents() {
       }
     });
   });
+
+  // 环境感知输入框回车事件
+  document.getElementById('industryInput')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addIndustry();
+  });
+  document.getElementById('policyInput')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addPolicy();
+  });
+  document.getElementById('relationshipInput')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addRelationship();
+  });
 }
 
 function switchTab(tabName) {
   document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.tab === tabName);
   });
-  
-  const cards = document.querySelectorAll('.card');
-  const targetMap = { dashboard: 0, quests: 1, finance: 0, alerts: 2, ai: 2 };
-  const targetIndex = targetMap[tabName] ?? 0;
-  
+
+  // 移动端卡片显示逻辑
   if (window.innerWidth < 768) {
-    cards.forEach((card, i) => {
-      card.style.display = (i === targetIndex) ? 'block' : 'none';
+    const cardGroups = {
+      dashboard: ['.character-card', '.financial-card'],
+      quests: ['.quest-card'],
+      tasks: ['.task-card'],
+      charts: ['.chart-card'],
+      alerts: ['.alert-card', '.skills-card'],
+      env: ['.env-card', '.relationship-card'],
+      ai: ['.ai-card']
+    };
+
+    const showCards = cardGroups[tabName] || cardGroups.dashboard;
+
+    document.querySelectorAll('.card').forEach(card => {
+      const shouldShow = showCards.some(selector => card.matches(selector));
+      card.style.display = shouldShow ? 'block' : 'none';
     });
   } else {
-    cards.forEach(card => card.style.display = 'block');
-    cards[targetIndex]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.card').forEach(card => card.style.display = 'block');
   }
 }
 

@@ -576,6 +576,244 @@ body {
 .notification-error { background: var(--color-danger); }
 .notification-info { background: var(--color-in-progress); }
 
+/* Task Tracker */
+.task-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 20px;
+  font-size: 0.875rem;
+}
+
+.task-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg);
+  border-left: 4px solid var(--color-text-secondary);
+}
+
+.task-item.in_progress { border-left-color: var(--color-in-progress); }
+.task-item.completed { border-left-color: var(--color-success); }
+.task-item.blocked { border-left-color: var(--color-danger); }
+.task-item.pending { border-left-color: var(--color-text-secondary); }
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-name {
+  flex: 1;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.task-project {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--color-secondary);
+  color: white;
+}
+
+.task-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.task-deadline.overdue { color: var(--color-danger); font-weight: 600; }
+
+.task-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-progress .progress-bar { flex: 1; }
+
+.task-delete {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 4px;
+}
+
+.task-delete:hover { color: var(--color-danger); }
+
+/* Chart */
+.chart-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.chart-tab {
+  padding: 6px 16px;
+  border: 2px solid var(--color-secondary);
+  background: white;
+  color: var(--color-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chart-tab:hover,
+.chart-tab.active {
+  background: var(--color-secondary);
+  color: white;
+}
+
+.chart-container {
+  position: relative;
+  height: 250px;
+}
+
+/* Environment */
+.env-section {
+  margin-bottom: 16px;
+}
+
+.env-section h4 {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.env-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.env-input-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.env-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.env-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--color-bg);
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.env-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.env-item-text {
+  color: var(--color-text);
+}
+
+.env-item-time {
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+}
+
+.env-item-delete {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 0.8rem;
+}
+
+.env-item-delete:hover { color: var(--color-danger); }
+
+/* Contact Warnings */
+.contact-warnings {
+  margin-top: 12px;
+}
+
+.contact-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #FFF3E0;
+  border-left: 3px solid var(--color-warning);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+}
+
+/* Alert Detail Modal */
+.alert-detail-content {
+  padding: 12px 0;
+}
+
+.alert-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.875rem;
+}
+
+.alert-detail-row:last-child { border-bottom: none; }
+.alert-detail-label { color: var(--color-text-secondary); }
+.alert-detail-value { font-weight: 500; }
+.alert-detail-suggestion {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--color-bg);
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.alert-ack-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.alert-ack-btn:hover { opacity: 0.9; }
+
 /* Responsive */
 @media (max-width: 768px) {
   .row-2col, .row-3col { grid-template-columns: 1fr; }

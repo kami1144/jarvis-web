@@ -1,9 +1,10 @@
 /**
- * J.A.R.V.I.S. Data Layer v3
- * 手动输入 + Obsidian 联动
+ * J.A.R.V.I.S. Data Layer v3.1
+ * 手动输入 + Obsidian 联动 + 预警系统 + 任务追踪
  */
 
 const JAVIS_DATA_KEY = 'jarvis_data_v3';
+const JAVIS_DATA_KEY_V31 = 'jarvis_data_v31';
 const OBSIDIAN_DATA_KEY = 'jarvis_obsidian_data';
 const UPDATE_INTERVAL = 5000; // 5秒更新
 
@@ -457,6 +458,486 @@ const JARVIS = {
   }
 };
 
+// ==========================================
+// 预警系统 (Alert System)
+// ==========================================
+
+const AlertSystem = {
+  // 加载预警数据
+  loadAlerts() {
+    try {
+      const stored = localStorage.getItem(JAVIS_DATA_KEY_V31);
+      if (stored) {
+        const data = JSON.parse(stored);
+        return data.alerts || [];
+      }
+    } catch (e) {}
+    return [];
+  },
+
+  // 保存预警数据
+  saveAlerts(alerts) {
+    try {
+      const stored = localStorage.getItem(JAVIS_DATA_KEY_V31);
+      const data = stored ? JSON.parse(stored) : {};
+      data.alerts = alerts;
+      localStorage.setItem(JAVIS_DATA_KEY_V31, JSON.stringify(data));
+    } catch (e) {}
+  },
+
+  // 生成预警
+  generateAlerts(data, computed) {
+    const alerts = [];
+    const now = new Date();
+
+    // ===== 财务预警 =====
+    const monthlyExpenses = data.finance?.monthly?.expenses || 20000;
+    const cash = data.finance?.assets?.cash || 0;
+    const monthlyIncome = data.finance?.monthly?.income || 0;
+
+    // 🔴 现金流低于安全线（< 3个月支出）
+    const safeCash = monthlyExpenses * 3;
+    if (cash < safeCash && cash > 0) {
+      alerts.push({
+        id: 'cash_critical',
+        category: 'financial',
+        level: 'critical',
+        title: '现金流紧张',
+        description: `可用现金 ¥${(cash/10000).toFixed(1)}万，低于3个月支出安全线 ¥${(safeCash/10000).toFixed(1)}万`,
+        currentValue: cash,
+        threshold: safeCash,
+        trend: 'worsening',
+        suggestion: '加快 adult-shop 变现，控制非必要支出，考虑增加收入来源',
+        createdAt: now.toISOString(),
+        acknowledged: false
+      });
+    }
+
+    // 🟡 收入连续下降（需历史数据判断）
+    const incomeHistory = data.finance?.monthly?.incomeHistory || [];
+    if (incomeHistory.length >= 2) {
+      const recentIncome = incomeHistory.slice(0, 2);
+      if (recentIncome[0] < recentIncome[1] * 0.8) {
+        alerts.push({
+          id: 'income_decline',
+          category: 'financial',
+          level: 'warning',
+          title: '收入下降',
+          description: `本月收入 ¥${(monthlyIncome/10000).toFixed(1)}万，较上月下降`,
+          currentValue: monthlyIncome,
+          threshold: monthlyIncome * 1.2,
+          trend: 'worsening',
+          suggestion: '关注收入来源稳定性，考虑拓展新渠道',
+          createdAt: now.toISOString(),
+          acknowledged: false
+        });
+      }
+    }
+
+    // 🟡 支出超出预算20%+
+    const budget = data.finance?.monthly?.budget || monthlyExpenses;
+    if (monthlyExpenses > budget * 1.2 && budget > 0) {
+      alerts.push({
+        id: 'expense_over',
+        category: 'financial',
+        level: 'warning',
+        title: '支出超预算',
+        description: `本月支出 ¥${(monthlyExpenses/10000).toFixed(1)}万，超出预算20%`,
+        currentValue: monthlyExpenses,
+        threshold: budget * 1.2,
+        trend: 'worsening',
+        suggestion: '审查非必要支出，下调可选消费',
+        createdAt: now.toISOString(),
+        acknowledged: false
+      });
+    }
+
+    // ===== 健康预警 =====
+    const hp = computed.hp?.current || 100;
+
+    // 🔴 HP < 30
+    if (hp < 30) {
+      alerts.push({
+        id: 'hp_critical',
+        category: 'health',
+        level: 'critical',
+        title: 'HP严重不足',
+        description: `当前HP: ${hp}/100，身体状况警示`,
+        currentValue: hp,
+        threshold: 30,
+        trend: 'worsening',
+        suggestion: '立即休息，保证充足睡眠，减少工作强度',
+        createdAt: now.toISOString(),
+        acknowledged: false
+      });
+    }
+
+    // 🟡 HP < 50
+    if (hp < 50 && hp >= 30) {
+      alerts.push({
+        id: 'hp_warning',
+        category: 'health',
+        level: 'warning',
+        title: 'HP偏低',
+        description: `当前HP: ${hp}/100，需要注意健康`,
+        currentValue: hp,
+        threshold: 50,
+        trend: hp < 40 ? 'worsening' : 'stable',
+        suggestion: '保证睡眠，适度运动，关注身体状态',
+        createdAt: now.toISOString(),
+        acknowledged: false
+      });
+    }
+
+    // 🟡 连续3天睡眠 < 5小时
+    const sleepHistory = data.health?.daily?.sleepHistory || [];
+    const lowSleepDays = sleepHistory.filter(s => s.hours < 5).length;
+    if (lowSleepDays >= 3) {
+      alerts.push({
+        id: 'sleep_deficit',
+        category: 'health',
+        level: 'warning',
+        title: '睡眠不足',
+        description: `已连续${lowSleepDays}天睡眠不足5小时`,
+        currentValue: lowSleepDays,
+        threshold: 3,
+        trend: 'worsening',
+        suggestion: '优先保证睡眠时间，避免熬夜',
+        createdAt: now.toISOString(),
+        acknowledged: false
+      });
+    }
+
+    // ===== 人际关系预警 =====
+    const contacts = data.relationships?.contacts || [];
+    const nowTime = now.getTime();
+    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+
+    contacts.forEach(contact => {
+      const lastContact = new Date(contact.lastContact).getTime();
+      const daysSince = (nowTime - lastContact) / (24 * 60 * 60 * 1000);
+
+      if (contact.importance === 'core' && daysSince > 30) {
+        alerts.push({
+          id: `contact_${contact.id}`,
+          category: 'relationship',
+          level: 'warning',
+          title: `核心人脉远离: ${contact.name}`,
+          description: `与${contact.name}已${Math.floor(daysSince)}天无联系`,
+          currentValue: daysSince,
+          threshold: 30,
+          trend: 'worsening',
+          suggestion: `主动联系${contact.name}，维护重要关系`,
+          createdAt: now.toISOString(),
+          acknowledged: false
+        });
+      }
+    });
+
+    // ===== 项目阻塞预警 =====
+    const projects = data.projects || [];
+    projects.forEach(project => {
+      if (project.status === 'blocked') {
+        alerts.push({
+          id: `project_blocked_${project.id}`,
+          category: 'project',
+          level: 'warning',
+          title: `任务阻塞: ${project.name}`,
+          description: `${project.name} 处于阻塞状态`,
+          currentValue: 0,
+          threshold: 1,
+          trend: 'stable',
+          suggestion: '排查阻塞原因，寻求帮助解决',
+          createdAt: now.toISOString(),
+          acknowledged: false
+        });
+      }
+
+      // 截止日期 < 3天
+      if (project.deadline) {
+        const deadline = new Date(project.deadline).getTime();
+        const daysLeft = (deadline - nowTime) / (24 * 60 * 60 * 1000);
+        if (daysLeft > 0 && daysLeft < 3) {
+          alerts.push({
+            id: `deadline_${project.id}`,
+            category: 'project',
+            level: daysLeft < 1 ? 'critical' : 'warning',
+            title: `截止临近: ${project.name}`,
+            description: `距离截止还有${Math.ceil(daysLeft)}天`,
+            currentValue: daysLeft,
+            threshold: 3,
+            trend: 'stable',
+            suggestion: '优先处理，确保按时完成',
+            createdAt: now.toISOString(),
+            acknowledged: false
+          });
+        }
+      }
+    });
+
+    // 排序：critical > warning > info
+    const levelOrder = { critical: 0, warning: 1, info: 2 };
+    return alerts.sort((a, b) => levelOrder[a.level] - levelOrder[b.level]);
+  },
+
+  // 确认预警
+  acknowledgeAlert(alertId) {
+    const alerts = this.loadAlerts();
+    const index = alerts.findIndex(a => a.id === alertId);
+    if (index !== -1) {
+      alerts[index].acknowledged = true;
+      this.saveAlerts(alerts);
+    }
+    return alerts;
+  }
+};
+
+// ==========================================
+// 任务追踪器 (Task Tracker)
+// ==========================================
+
+const TaskTracker = {
+  // 加载任务
+  loadTasks() {
+    try {
+      const stored = localStorage.getItem(JAVIS_DATA_KEY_V31);
+      if (stored) {
+        const data = JSON.parse(stored);
+        return data.tasks || [];
+      }
+    } catch (e) {}
+    return [];
+  },
+
+  // 保存任务
+  saveTasks(tasks) {
+    try {
+      const stored = localStorage.getItem(JAVIS_DATA_KEY_V31);
+      const data = stored ? JSON.parse(stored) : {};
+      data.tasks = tasks;
+      localStorage.setItem(JAVIS_DATA_KEY_V31, JSON.stringify(data));
+    } catch (e) {}
+  },
+
+  // 添加任务
+  addTask(task) {
+    const tasks = this.loadTasks();
+    const newTask = {
+      id: 'task_' + Date.now(),
+      name: task.name,
+      project: task.project,
+      progress: task.progress || 0,
+      status: task.status || 'pending',
+      deadline: task.deadline || null,
+      owner: task.owner || 'Kim',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    tasks.unshift(newTask);
+    this.saveTasks(tasks);
+    return tasks;
+  },
+
+  // 更新任务
+  updateTask(taskId, updates) {
+    const tasks = this.loadTasks();
+    const index = tasks.findIndex(t => t.id === taskId);
+    if (index !== -1) {
+      tasks[index] = { ...tasks[index], ...updates, updatedAt: new Date().toISOString() };
+      this.saveTasks(tasks);
+    }
+    return tasks;
+  },
+
+  // 删除任务
+  deleteTask(taskId) {
+    const tasks = this.loadTasks();
+    const filtered = tasks.filter(t => t.id !== taskId);
+    this.saveTasks(filtered);
+    return filtered;
+  }
+};
+
+// ==========================================
+// 历史数据 (History Charts)
+// ==========================================
+
+const HistoryTracker = {
+  // 记录历史数据点
+  recordSnapshot(computed) {
+    try {
+      const stored = localStorage.getItem(JAVIS_DATA_KEY_V31);
+      const data = stored ? JSON.parse(stored) : {};
+      const history = data.history || [];
+
+      const snapshot = {
+        timestamp: new Date().toISOString(),
+        hp: computed.hp?.current || 0,
+        energy: computed.energy?.current || 0,
+        gold: computed.gold?.current || 0,
+        level: computed.level || 1
+      };
+
+      history.unshift(snapshot);
+
+      // 保留90天数据
+      const ninetyDaysAgo = new Date();
+      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+      const filtered = history.filter(h => new Date(h.timestamp) > ninetyDaysAgo);
+
+      data.history = filtered;
+      localStorage.setItem(JAVIS_DATA_KEY_V31, JSON.stringify(data));
+    } catch (e) {}
+  },
+
+  // 获取历史数据
+  getHistory(days = 7) {
+    try {
+      const stored = localStorage.getItem(JAVIS_DATA_KEY_V31);
+      if (!stored) return [];
+
+      const data = JSON.parse(stored);
+      const history = data.history || [];
+
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+
+      return history.filter(h => new Date(h.timestamp) > cutoff);
+    } catch (e) {}
+    return [];
+  }
+};
+
+// ==========================================
+// 环境感知模块 (Environment Perception)
+// ==========================================
+
+const EnvironmentTracker = {
+  // 加载环境数据
+  loadEnvData() {
+    try {
+      const stored = localStorage.getItem(JAVIS_DATA_KEY_V31);
+      if (stored) {
+        const data = JSON.parse(stored);
+        return {
+          industry: data.industry || [],
+          policy: data.policy || [],
+          relationships: data.relationships?.items || []
+        };
+      }
+    } catch (e) {}
+    return { industry: [], policy: [], relationships: [] };
+  },
+
+  // 保存环境数据
+  saveEnvData(envData) {
+    try {
+      const stored = localStorage.getItem(JAVIS_DATA_KEY_V31);
+      const data = stored ? JSON.parse(stored) : {};
+      data.industry = envData.industry;
+      data.policy = envData.policy;
+      if (!data.relationships) data.relationships = {};
+      data.relationships.items = envData.relationships;
+      localStorage.setItem(JAVIS_DATA_KEY_V31, JSON.stringify(data));
+    } catch (e) {}
+  },
+
+  // 添加行业动态
+  addIndustry(text) {
+    const envData = this.loadEnvData();
+    envData.industry.unshift({
+      id: 'ind_' + Date.now(),
+      text,
+      createdAt: new Date().toISOString()
+    });
+    // 保留最新50条
+    envData.industry = envData.industry.slice(0, 50);
+    this.saveEnvData(envData);
+    return envData.industry;
+  },
+
+  // 删除行业动态
+  deleteIndustry(id) {
+    const envData = this.loadEnvData();
+    envData.industry = envData.industry.filter(i => i.id !== id);
+    this.saveEnvData(envData);
+    return envData.industry;
+  },
+
+  // 添加政策变化
+  addPolicy(text) {
+    const envData = this.loadEnvData();
+    envData.policy.unshift({
+      id: 'pol_' + Date.now(),
+      text,
+      createdAt: new Date().toISOString()
+    });
+    envData.policy = envData.policy.slice(0, 50);
+    this.saveEnvData(envData);
+    return envData.policy;
+  },
+
+  // 删除政策变化
+  deletePolicy(id) {
+    const envData = this.loadEnvData();
+    envData.policy = envData.policy.filter(p => p.id !== id);
+    this.saveEnvData(envData);
+    return envData.policy;
+  },
+
+  // 添加人际关系动态
+  addRelationship(text) {
+    const envData = this.loadEnvData();
+    // 解析联系人名称（格式：姓名 + 动态）
+    const match = text.match(/^([^：:]+)[:：]\s*(.+)$/);
+    const name = match ? match[1].trim() : '未知联系人';
+    const content = match ? match[2].trim() : text;
+
+    if (!envData.relationships) envData.relationships = { items: [], contacts: [] };
+
+    // 更新或添加联系人
+    let contact = envData.relationships.contacts.find(c => c.name === name);
+    if (!contact) {
+      contact = { id: 'contact_' + Date.now(), name, importance: 'normal', lastContact: new Date().toISOString() };
+      envData.relationships.contacts.push(contact);
+    }
+    contact.lastContact = new Date().toISOString();
+
+    envData.relationships.items.unshift({
+      id: 'rel_' + Date.now(),
+      name,
+      text: content,
+      createdAt: new Date().toISOString()
+    });
+    envData.relationships.items = envData.relationships.items.slice(0, 50);
+    this.saveEnvData(envData);
+    return envData.relationships.items;
+  },
+
+  // 删除人际关系动态
+  deleteRelationship(id) {
+    const envData = this.loadEnvData();
+    if (envData.relationships) {
+      envData.relationships.items = envData.relationships.items.filter(r => r.id !== id);
+      this.saveEnvData(envData);
+    }
+    return envData.relationships?.items || [];
+  },
+
+  // 获取联系人预警（30天无联系的核心联系人）
+  getContactWarnings() {
+    const envData = this.loadEnvData();
+    const contacts = envData.relationships?.contacts || [];
+    const now = new Date().getTime();
+    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+
+    return contacts.filter(c => {
+      const lastContact = new Date(c.lastContact).getTime();
+      return c.importance === 'core' && (now - lastContact) > thirtyDaysMs;
+    });
+  }
+};
+
 // 导出
 window.JARVIS = JARVIS;
 window.ComputeEngine = ComputeEngine;
@@ -465,3 +946,7 @@ window.HealthData = HealthData;
 window.MoodData = MoodData;
 window.FinanceData = FinanceData;
 window.ExperienceData = ExperienceData;
+window.AlertSystem = AlertSystem;
+window.TaskTracker = TaskTracker;
+window.HistoryTracker = HistoryTracker;
+window.EnvironmentTracker = EnvironmentTracker;

@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>J.A.R.V.I.S. 人生仪表盘</title>
   <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <div class="app">
@@ -244,14 +245,80 @@
           </div>
         </section>
       </div>
+
+      <!-- Row 4: Task Tracker -->
+      <div class="row">
+        <section class="card task-card">
+          <h2 class="card-title">📋 任务追踪 <span class="update-badge" id="taskSource">本地</span></h2>
+          <div class="task-controls" style="margin-bottom: 12px;">
+            <button class="btn secondary" onclick="openTaskInput()">➕ 添加任务</button>
+            <button class="btn secondary" onclick="syncFromObsidian()">📓 同步Obsidian</button>
+          </div>
+          <div class="task-list" id="taskList">
+            <div class="task-empty">暂无任务，点击「➕ 添加任务」创建</div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Row 5: History Charts -->
+      <div class="row">
+        <section class="card chart-card">
+          <h2 class="card-title">📈 历史趋势</h2>
+          <div class="chart-tabs">
+            <button class="chart-tab active" data-range="7">7天</button>
+            <button class="chart-tab" data-range="30">30天</button>
+            <button class="chart-tab" data-range="90">90天</button>
+          </div>
+          <div class="chart-container">
+            <canvas id="historyChart"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <!-- Row 6: Environment Perception -->
+      <div class="row row-2col">
+        <section class="card env-card">
+          <h2 class="card-title">🌍 环境感知</h2>
+          <div class="env-section">
+            <h4>📰 行业动态</h4>
+            <div class="env-input-row">
+              <input type="text" id="industryInput" placeholder="输入行业动态...">
+              <button class="btn primary" onclick="addIndustry()">添加</button>
+            </div>
+            <div class="env-list" id="industryList"></div>
+          </div>
+          <div class="env-section">
+            <h4>📜 政策变化</h4>
+            <div class="env-input-row">
+              <input type="text" id="policyInput" placeholder="输入政策变化...">
+              <button class="btn primary" onclick="addPolicy()">添加</button>
+            </div>
+            <div class="env-list" id="policyList"></div>
+          </div>
+        </section>
+
+        <section class="card relationship-card">
+          <h2 class="card-title">👥 人际关系</h2>
+          <div class="env-section">
+            <h4>💬 关键对话</h4>
+            <div class="env-input-row">
+              <input type="text" id="relationshipInput" placeholder="输入联系人 + 动态...">
+              <button class="btn primary" onclick="addRelationship()">添加</button>
+            </div>
+            <div class="env-list" id="relationshipList"></div>
+          </div>
+          <div class="contact-warnings" id="contactWarnings"></div>
+        </section>
+      </div>
     </main>
 
     <!-- Tab Bar (Mobile) -->
     <nav class="tab-bar">
       <button class="tab active" data-tab="dashboard">📊</button>
       <button class="tab" data-tab="quests">📜</button>
-      <button class="tab" data-tab="finance">💰</button>
-      <button class="tab" data-tab="alerts">🚨</button>
+      <button class="tab" data-tab="tasks">📋</button>
+      <button class="tab" data-tab="charts">📈</button>
+      <button class="tab" data-tab="env">🌍</button>
       <button class="tab" data-tab="ai">🤖</button>
     </nav>
   </div>
@@ -429,6 +496,59 @@
       <div class="modal-footer">
         <button class="btn secondary" onclick="closeModal('moodModal')">取消</button>
         <button class="btn primary" onclick="saveMoodData()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：任务输入 ========== -->
+  <div class="modal" id="taskModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📋 添加任务</h3>
+        <button class="modal-close" onclick="closeModal('taskModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <h4>任务信息</h4>
+          <div class="form-row">
+            <label>任务名称</label>
+            <input type="text" id="taskNameInput" placeholder="输入任务名称...">
+          </div>
+          <div class="form-row">
+            <label>所属项目</label>
+            <select id="taskProjectInput">
+              <option value="adult-shop">adult-shop</option>
+              <option value="jarvis-web">J.A.R.V.I.S.</option>
+              <option value="manga-studio">MangaStudio</option>
+              <option value="other">其他</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>负责人</label>
+            <input type="text" id="taskOwnerInput" placeholder="负责人..." value="Kim">
+          </div>
+          <div class="form-row">
+            <label>截止日期</label>
+            <input type="date" id="taskDeadlineInput">
+          </div>
+          <div class="form-row">
+            <label>进度 (0-100)</label>
+            <input type="range" id="taskProgressInput" value="0" min="0" max="100">
+            <span id="taskProgressValue">0%</span>
+          </div>
+          <div class="form-row">
+            <label>状态</label>
+            <select id="taskStatusInput">
+              <option value="pending">待开始</option>
+              <option value="in_progress">进行中</option>
+              <option value="blocked">阻塞</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('taskModal')">取消</button>
+        <button class="btn primary" onclick="saveTask()">保存</button>
       </div>
     </div>
   </div>
