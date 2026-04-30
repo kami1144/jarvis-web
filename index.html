@@ -30,7 +30,7 @@
       <div class="row row-2col">
         <!-- Character Card -->
         <section class="card character-card">
-          <h2 class="card-title">🧙 角色状态 <span class="update-badge" id="charUpdateBadge"></span></h2>
+          <h2 class="card-title">🧙 角色状态</h2>
           <div class="character-info">
             <div class="character-name">Kim Kami</div>
             <div class="character-type">探索型大脑</div>
@@ -65,30 +65,30 @@
               <span class="stat-value" id="expValue">Lv.12</span>
             </div>
           </div>
-          <!-- 数据来源指示器 -->
+          <!-- 数据来源 -->
           <div class="data-sources">
-            <div class="source-tag health" title="HP数据来源">
+            <div class="source-tag health" title="HP数据来源：健康体检+运动计划">
               <span class="source-icon">🏥</span>
-              <span class="source-label">健康</span>
-              <span class="source-value" id="healthSource">睡眠7h</span>
+              <span class="source-label">体检</span>
+              <span class="source-value" id="checkupDate">04-01</span>
             </div>
-            <div class="source-tag mood" title="能量数据来源">
+            <div class="source-tag mood" title="能量数据来源：Hermes聊天分析">
               <span class="source-icon">🧠</span>
               <span class="source-label">情绪</span>
-              <span class="source-value" id="moodSource">聊天气氛</span>
+              <span class="source-value" id="moodStatus">待分析</span>
             </div>
-            <div class="source-tag finance" title="金币数据来源">
+            <div class="source-tag finance" title="金币数据来源：手动输入">
               <span class="source-icon">💰</span>
               <span class="source-label">净资产</span>
-              <span class="source-value" id="financeSource">¥50万</span>
+              <span class="source-value" id="netWorth">¥50万</span>
             </div>
           </div>
-          <!-- 演示快捷操作 -->
+          <!-- 快捷操作 -->
           <div class="demo-controls">
-            <button class="demo-btn" onclick="simulateWork()">⚡工作</button>
-            <button class="demo-btn" onclick="simulateRest()">😴休息</button>
-            <button class="demo-btn income" onclick="simulateIncome(10000)">💰收</button>
-            <button class="demo-btn expense" onclick="simulateExpense(5000)">💸支</button>
+            <button class="demo-btn" onclick="openHealthInput()">🏥 健康</button>
+            <button class="demo-btn" onclick="openFinanceInput()">💰 财务</button>
+            <button class="demo-btn" onclick="openMoodInput()">🧠 情绪</button>
+            <button class="demo-btn" onclick="syncFromObsidian()">📓 Obsidian</button>
           </div>
         </section>
 
@@ -98,14 +98,14 @@
           <div class="financial-summary">
             <div class="finance-item income">
               <span class="finance-label">本月收入</span>
-              <span class="finance-value" id="monthlyIncome">¥0</span>
+              <span class="finance-value income" id="monthlyIncome">¥0</span>
             </div>
             <div class="finance-item expense">
               <span class="finance-label">本月支出</span>
               <span class="finance-value" id="monthlyExpense">¥2万</span>
             </div>
             <div class="finance-item balance">
-              <span class="finance-label">可用资金</span>
+              <span class="finance-label">净资产</span>
               <span class="finance-value gold" id="availableFund">¥50万</span>
             </div>
           </div>
@@ -120,12 +120,9 @@
             <div class="flow-section">
               <h4>📉 支出流水</h4>
               <div class="flow-list" id="expenseFlowList">
-                <div class="flow-item">生活开支 -¥2万</div>
+                <div class="flow-item expense">生活开支 -¥2万</div>
               </div>
             </div>
-          </div>
-          <div class="financial-detail">
-            <a href="#" class="detail-link">📊 收支详情 →</a>
           </div>
         </section>
       </div>
@@ -133,52 +130,49 @@
       <!-- Row 2: Quest Tracker -->
       <div class="row">
         <section class="card quest-card">
-          <h2 class="card-title">📜 任务追踪 <span class="update-badge" id="questUpdateBadge"></span></h2>
+          <h2 class="card-title">📜 任务追踪 <span class="update-badge" id="questSource">📓 Obsidian</span></h2>
           <div class="quest-list" id="questList">
             <div class="quest-item in-progress">
               <div class="quest-header">
                 <span class="quest-icon">⚔️</span>
                 <span class="quest-name">adult-shop 上线</span>
-                <span class="quest-status in-progress">进行中</span>
+                <span class="quest-status in-progress">70%</span>
               </div>
               <div class="quest-progress">
                 <div class="progress-bar">
                   <div class="progress-fill quest-fill" style="width: 70%"></div>
                 </div>
-                <span class="progress-text">70%</span>
               </div>
             </div>
             <div class="quest-item in-progress">
               <div class="quest-header">
                 <span class="quest-icon">🎮</span>
                 <span class="quest-name">J.A.R.V.I.S. Web面板</span>
-                <span class="quest-status in-progress">进行中</span>
+                <span class="quest-status in-progress">40%</span>
               </div>
               <div class="quest-progress">
                 <div class="progress-bar">
                   <div class="progress-fill quest-fill" style="width: 40%"></div>
                 </div>
-                <span class="progress-text">40%</span>
               </div>
             </div>
             <div class="quest-item pending">
               <div class="quest-header">
                 <span class="quest-icon">📚</span>
                 <span class="quest-name">MangaStudio</span>
-                <span class="quest-status pending">待开始</span>
+                <span class="quest-status pending">30%</span>
               </div>
               <div class="quest-progress">
                 <div class="progress-bar">
                   <div class="progress-fill quest-fill" style="width: 30%"></div>
                 </div>
-                <span class="progress-text">30%</span>
               </div>
             </div>
           </div>
         </section>
       </div>
 
-      <!-- Row 3: Alert + Radar + AI -->
+      <!-- Row 3: Alert + Skills + AI -->
       <div class="row row-3col">
         <!-- Alert System -->
         <section class="card alert-card">
@@ -187,34 +181,52 @@
             <div class="alert-item info">
               <span class="alert-level">🔵</span>
               <div class="alert-content">
-                <div class="alert-title">📈 收入为零</div>
-                <div class="alert-desc">本月暂无收入记录</div>
+                <div class="alert-title">📝 待输入</div>
+                <div class="alert-desc">请手动输入健康和财务数据</div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Opportunity Radar -->
-        <section class="card radar-card">
-          <h2 class="card-title">🗺️ 机会雷达</h2>
-          <div class="radar-visual">
-            <div class="radar-grid">
-              <div class="radar-ring ring-1"></div>
-              <div class="radar-ring ring-2"></div>
-              <div class="radar-ring ring-3"></div>
-              <div class="radar-blips" id="radarBlips">
-                <div class="blip" style="--angle: 0deg; --dist: 30%;" title="日本电商">🇯🇵</div>
-                <div class="blip" style="--angle: 72deg; --dist: 60%;" title="AI工具">🤖</div>
-                <div class="blip" style="--angle: 144deg; --dist: 45%;" title="内容创作">📱</div>
-                <div class="blip" style="--angle: 216deg; --dist: 80%;" title="中国制造">🏭</div>
-                <div class="blip" style="--angle: 288deg; --dist: 55%;" title="接单平台">💼</div>
+        <!-- Skills Card -->
+        <section class="card skills-card">
+          <h2 class="card-title">🎯 技能等级</h2>
+          <div class="skills-list" id="skillsList">
+            <div class="skill-item">
+              <span class="skill-name">AI工具</span>
+              <div class="skill-bar">
+                <div class="skill-fill" style="width: 30%"></div>
               </div>
+              <span class="skill-level">Lv.3</span>
             </div>
-          </div>
-          <div class="radar-legend" id="radarLegend">
-            <span class="legend-item">🇯🇵 日本电商</span>
-            <span class="legend-item">🤖 AI工具</span>
-            <span class="legend-item">💼 接单</span>
+            <div class="skill-item">
+              <span class="skill-name">电商运营</span>
+              <div class="skill-bar">
+                <div class="skill-fill" style="width: 20%"></div>
+              </div>
+              <span class="skill-level">Lv.2</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">日语</span>
+              <div class="skill-bar">
+                <div class="skill-fill" style="width: 80%"></div>
+              </div>
+              <span class="skill-level">Lv.8</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">中文</span>
+              <div class="skill-bar">
+                <div class="skill-fill" style="width: 100%"></div>
+              </div>
+              <span class="skill-level">Lv.10</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">韩语</span>
+              <div class="skill-bar">
+                <div class="skill-fill" style="width: 60%"></div>
+              </div>
+              <span class="skill-level">Lv.6</span>
+            </div>
           </div>
         </section>
 
@@ -223,7 +235,7 @@
           <h2 class="card-title">🤖 AI 助手</h2>
           <div class="ai-advice" id="aiAdvice">
             <div class="advice-item">
-              <p>「根据当前资源状态，建议优先确保 adult-shop 第一笔收入。金币缓冲期仅剩3个月，每一天都在消耗战斗值。」</p>
+              <p>「请先手动输入健康数据和财务数据，J.A.R.V.I.S. 才能为你提供精准的建议。点击「🏥 健康」或「💰 财务」开始。」</p>
             </div>
           </div>
           <div class="ai-actions">
@@ -242,6 +254,183 @@
       <button class="tab" data-tab="alerts">🚨</button>
       <button class="tab" data-tab="ai">🤖</button>
     </nav>
+  </div>
+
+  <!-- ========== 模态框：健康输入 ========== -->
+  <div class="modal" id="healthModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🏥 健康数据输入</h3>
+        <button class="modal-close" onclick="closeModal('healthModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <h4>📋 最近体检数据</h4>
+          <div class="form-row">
+            <label>体检日期</label>
+            <input type="date" id="checkupDateInput" value="2026-04-01">
+          </div>
+          <div class="form-row">
+            <label>体重 (kg)</label>
+            <input type="number" id="weightInput" value="68" min="40" max="150">
+          </div>
+          <div class="form-row">
+            <label>BMI</label>
+            <input type="number" id="bmiInput" value="22.2" step="0.1" min="15" max="40">
+          </div>
+          <div class="form-row">
+            <label>体脂率 (%)</label>
+            <input type="number" id="bodyFatInput" value="18" min="5" max="50">
+          </div>
+          <div class="form-row">
+            <label>静心率 (bpm)</label>
+            <input type="number" id="heartRateInput" value="72" min="40" max="120">
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>🏃 今日运动</h4>
+          <div class="form-row">
+            <label>运动时长 (分钟)</label>
+            <input type="number" id="exerciseMinutesInput" value="30" min="0" max="300">
+          </div>
+          <div class="form-row">
+            <label>本周完成 (分钟)</label>
+            <input type="number" id="weeklyExerciseInput" value="60" min="0" max="1000">
+          </div>
+          <div class="form-row">
+            <label>周目标 (分钟)</label>
+            <input type="number" id="weeklyGoalInput" value="150" min="30" max="600">
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>😴 睡眠</h4>
+          <div class="form-row">
+            <label>睡眠时长 (小时)</label>
+            <input type="number" id="sleepHoursInput" value="7" min="0" max="12" step="0.5">
+          </div>
+          <div class="form-row">
+            <label>睡眠质量 (%)</label>
+            <input type="number" id="sleepQualityInput" value="80" min="0" max="100">
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>😰 压力</h4>
+          <div class="form-row">
+            <label>压力等级 (0-100)</label>
+            <input type="range" id="stressLevelInput" value="40" min="0" max="100">
+            <span id="stressValue">40</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('healthModal')">取消</button>
+        <button class="btn primary" onclick="saveHealthData()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：财务输入 ========== -->
+  <div class="modal" id="financeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>💰 财务数据输入</h3>
+        <button class="modal-close" onclick="closeModal('financeModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <h4>💵 资产</h4>
+          <div class="form-row">
+            <label>现金 (¥)</label>
+            <input type="number" id="cashInput" value="500000" min="0">
+          </div>
+          <div class="form-row">
+            <label>银行存款 (¥)</label>
+            <input type="number" id="bankInput" value="0" min="0">
+          </div>
+          <div class="form-row">
+            <label>投资 (¥)</label>
+            <input type="number" id="investmentsInput" value="0" min="0">
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>💳 负债</h4>
+          <div class="form-row">
+            <label>信用卡 (¥)</label>
+            <input type="number" id="creditCardInput" value="0" min="0">
+          </div>
+          <div class="form-row">
+            <label>贷款 (¥)</label>
+            <input type="number" id="loansInput" value="0" min="0">
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>📝 快速记录</h4>
+          <div class="quick-actions">
+            <button class="quick-btn income" onclick="quickAddIncome()">💰 收入</button>
+            <button class="quick-btn expense" onclick="quickAddExpense()">💸 支出</button>
+          </div>
+          <div class="form-row">
+            <label>金额 (¥)</label>
+            <input type="number" id="quickAmountInput" value="0" min="0">
+          </div>
+          <div class="form-row">
+            <label>来源/类别</label>
+            <input type="text" id="quickDescInput" placeholder="收入来源或支出类别">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('financeModal')">取消</button>
+        <button class="btn primary" onclick="saveFinanceData()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：情绪输入(Hermes) ========== -->
+  <div class="modal" id="moodModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🧠 情绪数据 (Hermes分析)</h3>
+        <button class="modal-close" onclick="closeModal('moodModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <h4>📊 今日聊天情绪分析</h4>
+          <div class="form-row">
+            <label>情绪分数 (0-1)</label>
+            <input type="range" id="moodScoreInput" value="0.75" min="0" max="1" step="0.05">
+            <span id="moodScoreValue">0.75</span>
+          </div>
+          <div class="form-row">
+            <label>主要情绪</label>
+            <select id="emotionSelect">
+              <option value="平静">平静</option>
+              <option value="积极">积极</option>
+              <option value="兴奋">兴奋</option>
+              <option value="焦虑">焦虑</option>
+              <option value="低落">低落</option>
+              <option value="疲惫">疲惫</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>精力值 (0-100)</label>
+            <input type="number" id="energyInput" value="70" min="0" max="100">
+          </div>
+          <div class="form-row">
+            <label>压力值 (0-100)</label>
+            <input type="number" id="moodStressInput" value="30" min="0" max="100">
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>📝 分析备注</h4>
+          <textarea id="moodSummaryInput" rows="3" placeholder="今日对话总结...">今日对话平稳，有建设性</textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('moodModal')">取消</button>
+        <button class="btn primary" onclick="saveMoodData()">保存</button>
+      </div>
+    </div>
   </div>
 
   <script src="data.js"></script>

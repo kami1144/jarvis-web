@@ -1,124 +1,91 @@
 /**
- * J.A.R.V.I.S. App Logic v2
- * 实时动态数据展示 + 自动刷新
+ * J.A.R.V.I.S. App Logic v3
+ * 手动输入 + Obsidian 联动
  */
 
-// 实时更新间隔（毫秒）
-const REFRESH_INTERVAL = 3000; // 3秒
+const REFRESH_INTERVAL = 5000;
 let refreshTimer = null;
 
-// DOM 加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
 });
 
 function initApp() {
-  // 设置当前日期
   setCurrentDate();
-  
-  // 初始渲染
   renderAll();
-  
-  // 启动实时更新
   startRealtimeUpdates();
-  
-  // 绑定事件
   bindEvents();
-  
-  // 初始化数据源状态面板
-  initDataSourcePanel();
-  
-  console.log('🎮 J.A.R.V.I.S. v2 初始化完成 - 实时数据联动');
+  console.log('🎮 J.A.R.V.I.S. v3 初始化完成 - 手动输入 + Obsidian联动');
 }
 
-// 启动实时更新
 function startRealtimeUpdates() {
-  // 立即执行一次
   renderAll();
-  
-  // 定时刷新
-  refreshTimer = setInterval(() => {
-    renderAll();
-  }, REFRESH_INTERVAL);
-  
+  refreshTimer = setInterval(renderAll, REFRESH_INTERVAL);
   console.log(`⏱️ 实时更新已启动 (${REFRESH_INTERVAL / 1000}秒间隔)`);
 }
 
-// 停止实时更新
-function stopRealtimeUpdates() {
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
-    refreshTimer = null;
-    console.log('⏹️ 实时更新已停止');
-  }
-}
-
-// 设置当前日期
 function setCurrentDate() {
   const now = new Date();
-  const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-  const dateStr = now.toLocaleDateString('ja-JP', options);
-  const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  document.getElementById('currentDate').textContent = `${dateStr} ${timeStr}`;
+  const dateStr = now.toLocaleDateString('ja-JP', { 
+    year: 'numeric', month: 'long', day: 'numeric', 
+    weekday: 'long', hour: '2-digit', minute: '2-digit' 
+  });
+  document.getElementById('currentDate').textContent = dateStr;
 }
 
-// 渲染所有模块
 function renderAll() {
-  // 更新日期时间
   setCurrentDate();
+  const data = JARVIS.getAllData();
+  const computed = JARVIS.getRealtimeData();
   
-  // 获取实时数据
-  const data = JARVIS.getRealtimeData();
-  const rawData = JARVIS.getAllData();
-  
-  // 渲染各模块
-  renderCharacter(data, rawData);
-  renderFinance(rawData.financeData);
-  renderQuests(rawData.projectData);
-  renderAlerts(rawData);
-  renderSkills(rawData.skillData);
+  renderCharacter(computed, data);
+  renderFinance(data.finance);
+  renderQuests(data.projects);
+  renderAlerts(computed, data);
+  renderSkills(data.skills);
 }
 
-// 渲染角色卡片（动态数据联动）
-function renderCharacter(data, rawData) {
+// 渲染角色卡片
+function renderCharacter(computed, data) {
   const card = document.querySelector('.character-card');
   if (!card) return;
   
   // 基础信息
-  card.querySelector('.character-name').textContent = rawData.character?.name || 'Kim Kami';
-  card.querySelector('.character-type').textContent = rawData.character?.type || '探索型大脑';
+  card.querySelector('.character-name').textContent = data.character?.name || 'Kim Kami';
+  card.querySelector('.character-type').textContent = data.character?.type || '探索型大脑';
   
-  // HP进度条 - 颜色随值变化
+  // HP
   const hpFill = card.querySelector('.hp-fill');
-  const hpPercent = data.hp.current;
-  hpFill.style.width = `${hpPercent}%`;
-  hpFill.style.background = getHPColor(hpPercent);
-  card.querySelectorAll('.stat')[0].querySelector('.stat-value').textContent = `${data.hp.current}/${data.hp.max}`;
+  hpFill.style.width = `${computed.hp.current}%`;
+  hpFill.style.background = getHPColor(computed.hp.current);
+  card.querySelector('#hpValue').textContent = `${computed.hp.current}/${computed.hp.max}`;
   
-  // 能量进度条 - 随情绪变化
+  // 能量
   const energyFill = card.querySelector('.energy-fill');
-  const energyPercent = data.energy.current;
-  energyFill.style.width = `${energyPercent}%`;
-  energyFill.style.background = getEnergyColor(energyPercent);
-  card.querySelectorAll('.stat')[1].querySelector('.stat-value').textContent = `${data.energy.current}/${data.energy.max}`;
+  energyFill.style.width = `${computed.energy.current}%`;
+  energyFill.style.background = getEnergyColor(computed.energy.current);
+  card.querySelector('#energyValue').textContent = `${computed.energy.current}/${computed.energy.max}`;
   
-  // 金币进度条 - 随净资产变化
+  // 金币
   const goldFill = card.querySelector('.gold-fill');
-  const goldPercent = data.gold.current;
-  goldFill.style.width = `${Math.min(100, goldPercent)}%`;
-  card.querySelectorAll('.stat')[2].querySelector('.stat-value').textContent = `¥${(data.gold.raw / 10000).toFixed(0)}万`;
+  goldFill.style.width = `${Math.min(100, computed.gold.current)}%`;
+  card.querySelector('#goldValue').textContent = `¥${(computed.gold.raw / 10000).toFixed(0)}万`;
   
-  // 经验值进度条 - 综合评分
+  // 经验
   const expFill = card.querySelector('.exp-fill');
-  const expPercent = data.exp.current;
-  expFill.style.width = `${expPercent}%`;
-  card.querySelectorAll('.stat')[3].querySelector('.stat-value').textContent = `Lv.${data.level}`;
+  expFill.style.width = `${computed.exp.current}%`;
+  card.querySelector('#expValue').textContent = `Lv.${computed.level}`;
   
-  // 添加数值变化动画效果
-  animateValueChange(card);
+  // 数据来源显示
+  card.querySelector('#checkupDate').textContent = data.health?.checkup?.date?.slice(5) || '待输入';
+  
+  const moodStatus = data.mood?.todayMood?.dominantEmotion || '待分析';
+  card.querySelector('#moodStatus').textContent = moodStatus;
+  
+  const netWorth = (computed.gold.raw / 10000).toFixed(0);
+  card.querySelector('#netWorth').textContent = `¥${netWorth}万`;
 }
 
-// HP颜色：100=满血绿, 70+=黄, 40+=橙, <40=红
 function getHPColor(value) {
   if (value >= 80) return 'linear-gradient(90deg, #4CAF50, #45A049)';
   if (value >= 60) return 'linear-gradient(90deg, #8BC34A, #7CB342)';
@@ -126,234 +93,456 @@ function getHPColor(value) {
   return 'linear-gradient(90deg, #F44336, #E53935)';
 }
 
-// 能量颜色：高能量=蓝紫, 中=青绿, 低=灰
 function getEnergyColor(value) {
   if (value >= 70) return 'linear-gradient(90deg, #7C4DFF, #651FFF)';
   if (value >= 40) return 'linear-gradient(90deg, #00BCD4, #00ACC1)';
   return 'linear-gradient(90deg, #78909C, #607D8B)';
 }
 
-// 数值变化动画
-const lastValues = {};
-function animateValueChange(card) {
-  card.querySelectorAll('.stat').forEach((stat, i) => {
-    const valueEl = stat.querySelector('.stat-value');
-    const currentValue = valueEl.textContent;
-    
-    if (lastValues[i] !== currentValue) {
-      valueEl.classList.add('value-changed');
-      setTimeout(() => valueEl.classList.remove('value-changed'), 500);
-      lastValues[i] = currentValue;
-    }
-  });
-}
-
-// 渲染财务仪表盘
-function renderFinance(financeData) {
+// 渲染财务
+function renderFinance(finance) {
   const card = document.querySelector('.financial-card');
   if (!card) return;
   
-  // 计算月收入
-  const now = new Date();
-  const thisMonth = financeData.incomeFlow.filter(i => {
-    const d = new Date(i.date);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  });
-  const monthlyIncome = thisMonth.reduce((sum, i) => sum + i.amount, 0);
+  const income = finance.monthly?.income || 0;
+  const expenses = finance.monthly?.expenses || 0;
+  const cash = finance.assets?.cash || 0;
   
-  // 计算月支出
-  const thisMonthExp = financeData.expensesFlow.filter(e => {
-    const d = new Date(e.date);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  });
-  const monthlyExpense = thisMonthExp.reduce((sum, e) => sum + e.amount, 0);
+  card.querySelector('#monthlyIncome').textContent = income >= 10000 
+    ? `¥${(income / 10000).toFixed(0)}万` : `¥${income.toLocaleString()}`;
   
-  // 更新显示
-  const incomeEl = document.getElementById('monthlyIncome');
-  const expenseEl = document.getElementById('monthlyExpense');
-  const balanceEl = document.getElementById('availableFund');
+  card.querySelector('#monthlyExpense').textContent = expenses >= 10000 
+    ? `¥${(expenses / 10000).toFixed(0)}万` : `¥${expenses.toLocaleString()}`;
   
-  incomeEl.textContent = monthlyIncome >= 10000 
-    ? `¥${(monthlyIncome / 10000).toFixed(0)}万` 
-    : `¥${monthlyIncome.toLocaleString()}`;
-  incomeEl.className = 'finance-value income';
+  card.querySelector('#availableFund').textContent = `¥${(cash / 10000).toFixed(0)}万`;
   
-  expenseEl.textContent = monthlyExpense >= 10000 
-    ? `¥${(monthlyExpense / 10000).toFixed(0)}万` 
-    : `¥${monthlyExpense.toLocaleString()}`;
+  // 收支流水
+  const records = finance.monthly?.records || [];
+  const incomeRecords = records.filter(r => r.type === 'income');
+  const expenseRecords = records.filter(r => r.type === 'expense');
   
-  const available = financeData.assets.availableCash;
-  balanceEl.textContent = `¥${(available / 10000).toFixed(0)}万`;
+  const incomeList = card.querySelector('#incomeFlowList');
+  if (incomeRecords.length === 0) {
+    incomeList.innerHTML = '<div class="flow-empty">暂无收入记录</div>';
+  } else {
+    incomeList.innerHTML = incomeRecords.slice(0, 5).map(r => `
+      <div class="flow-item income">${r.source} +¥${r.amount.toLocaleString()}</div>
+    `).join('');
+  }
+  
+  const expenseList = card.querySelector('#expenseFlowList');
+  if (expenseRecords.length === 0) {
+    expenseList.innerHTML = '<div class="flow-empty">暂无支出记录</div>';
+  } else {
+    expenseList.innerHTML = expenseRecords.slice(0, 5).map(r => `
+      <div class="flow-item expense">${r.category} -¥${r.amount.toLocaleString()}</div>
+    `).join('');
+  }
 }
 
-// 渲染任务列表
+// 渲染任务（从Obsidian读取）
 function renderQuests(projects) {
   const questList = document.getElementById('questList');
   if (!questList) return;
   
-  const questMap = {
-    'adult-shop': { name: 'adult-shop 上线', icon: '⚔️', progress: 70 },
-    'jarvis-web': { name: 'J.A.R.V.I.S. Web面板', icon: '🎮', progress: 40 },
-    'manga-studio': { name: 'MangaStudio', icon: '📚', progress: 30 }
-  };
+  if (!projects || projects.length === 0) {
+    // 默认项目
+    projects = [
+      { id: 'adult-shop', name: 'adult-shop 上线', icon: '⚔️', progress: 70, status: 'in_progress' },
+      { id: 'jarvis-web', name: 'J.A.R.V.I.S. Web面板', icon: '🎮', progress: 40, status: 'in_progress' },
+      { id: 'manga-studio', name: 'MangaStudio', icon: '📚', progress: 30, status: 'pending' }
+    ];
+  }
   
-  // 合并项目进度
-  const quests = projects.map(p => ({
-    id: p.id,
-    name: questMap[p.id]?.name || p.id,
-    icon: questMap[p.id]?.icon || '📋',
-    progress: p.progress,
-    status: p.progress >= 100 ? 'completed' : p.progress > 0 ? 'in_progress' : 'pending'
-  }));
+  const statusMap = { in_progress: '进行中', completed: '完成', pending: '待开始' };
+  const statusClass = { in_progress: 'in-progress', completed: 'completed', pending: 'pending' };
   
-  questList.innerHTML = quests.map(quest => {
-    const statusLabel = { pending: '待开始', in_progress: '进行中', completed: '完成' };
-    const statusClass = { pending: 'pending', in_progress: 'in-progress', completed: 'completed' };
-    
-    return `
-      <div class="quest-item ${statusClass[quest.status]}" data-quest-id="${quest.id}">
-        <div class="quest-header">
-          <span class="quest-icon">${quest.icon}</span>
-          <span class="quest-name">${quest.name}</span>
-          <span class="quest-status ${statusClass[quest.status]}">${statusLabel[quest.status]}</span>
-        </div>
-        <div class="quest-progress">
-          <div class="progress-bar">
-            <div class="progress-fill quest-fill" style="width: ${quest.progress}%"></div>
-          </div>
-          <span class="progress-text">${quest.progress}%</span>
-        </div>
+  questList.innerHTML = projects.map(p => `
+    <div class="quest-item ${statusClass[p.status] || 'pending'}" data-quest-id="${p.id}">
+      <div class="quest-header">
+        <span class="quest-icon">${p.icon || '📋'}</span>
+        <span class="quest-name">${p.name}</span>
+        <span class="quest-status ${statusClass[p.status]}">${statusMap[p.status] || '未知'}</span>
       </div>
-    `;
-  }).join('');
-  
-  // 更新经验值中的项目进度
-  updateProjectProgressBars(quests);
+      <div class="quest-progress">
+        <div class="progress-bar">
+          <div class="progress-fill quest-fill" style="width: ${p.progress || 0}%"></div>
+        </div>
+        <span class="progress-text">${p.progress || 0}%</span>
+      </div>
+    </div>
+  `).join('');
 }
 
-// 更新项目进度条
-function updateProjectProgressBars(quests) {
-  // 经验值现在由data.js的ComputeEngine实时计算
-  // 这里只是辅助显示
-}
-
-// 渲染预警系统（基于实时数据）
-function renderAlerts(rawData) {
+// 渲染预警
+function renderAlerts(computed, data) {
   const alertList = document.getElementById('alertList');
   if (!alertList) return;
   
   const alerts = [];
   
-  // 财务预警
-  const finance = rawData.financeData;
-  const monthlyExpense = finance.expensesFlow.reduce((sum, e) => {
-    const d = new Date(e.date);
-    const now = new Date();
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() ? sum + e.amount : sum;
-  }, 0);
-  
-  const monthlyIncome = finance.incomeFlow.reduce((sum, i) => {
-    const d = new Date(i.date);
-    const now = new Date();
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() ? sum + i.amount : sum;
-  }, 0);
-  
-  // 资金预警
-  if (finance.assets.availableCash < 100000) {
-    alerts.push({
-      level: 'critical',
-      title: '💸 资金告急',
-      description: `可用资金仅剩¥${(finance.assets.availableCash / 10000).toFixed(0)}万`,
-      suggestion: '立即寻找收入来源'
-    });
-  } else if (monthlyExpense > monthlyIncome * 3 && monthlyIncome > 0) {
-    alerts.push({
-      level: 'warning',
-      title: '⚠️ 支出超标',
-      description: '月支出是收入的3倍以上',
-      suggestion: '控制非必要支出'
-    });
-  }
-  
   // HP预警
-  const hp = JARVIS.getRealtimeData().hp.current;
-  if (hp < 40) {
-    alerts.push({
-      level: 'critical',
-      title: '💗 健康预警',
-      description: 'HP过低，需要休息和调整',
-      suggestion: '保证睡眠，减少压力'
-    });
+  if (computed.hp.current < 50) {
+    alerts.push({ level: 'warning', title: '💗 HP偏低', desc: '注意休息和健康' });
   }
   
   // 能量预警
-  const energy = JARVIS.getRealtimeData().energy.current;
-  if (energy < 30) {
-    alerts.push({
-      level: 'warning',
-      title: '⚡ 能量不足',
-      description: '精神状态需要恢复',
-      suggestion: '适当休息，做喜欢的事'
-    });
+  if (computed.energy.current < 40) {
+    alerts.push({ level: 'warning', title: '⚡ 能量不足', desc: '需要恢复精力' });
   }
   
-  // 无收入预警
-  if (monthlyIncome === 0) {
-    alerts.push({
-      level: 'info',
-      title: '📈 收入为零',
-      description: '本月暂无收入记录',
-      suggestion: '加快变现项目进度'
-    });
+  // 财务预警
+  if (data.finance?.assets?.cash < 100000) {
+    alerts.push({ level: 'critical', title: '💸 资金紧张', desc: '可用资金低于10万' });
+  }
+  
+  // 检查数据是否已输入
+  const hasHealth = data.health?.checkup?.date;
+  const hasFinance = data.finance?.assets?.cash > 0;
+  
+  if (!hasHealth) {
+    alerts.push({ level: 'info', title: '🏥 待输入', desc: '请输入健康体检数据' });
+  }
+  if (!hasFinance) {
+    alerts.push({ level: 'info', title: '💰 待输入', desc: '请输入财务数据' });
   }
   
   if (alerts.length === 0) {
-    alerts.push({
-      level: 'info',
-      title: '🎉 状态良好',
-      description: '各项指标正常',
-      suggestion: '继续保持'
-    });
+    alerts.push({ level: 'info', title: '🎉 状态良好', desc: '各项指标正常' });
   }
   
-  alertList.innerHTML = alerts.map(alert => {
-    const levelIcon = { critical: '🔴', warning: '🟠', info: '🔵' };
-    return `
-      <div class="alert-item ${alert.level}">
-        <span class="alert-level">${levelIcon[alert.level]}</span>
-        <div class="alert-content">
-          <div class="alert-title">${alert.title}</div>
-          <div class="alert-desc">${alert.description}</div>
-        </div>
+  const levelIcon = { critical: '🔴', warning: '🟠', info: '🔵' };
+  alertList.innerHTML = alerts.map(a => `
+    <div class="alert-item ${a.level}">
+      <span class="alert-level">${levelIcon[a.level]}</span>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-desc">${a.desc}</div>
       </div>
-    `;
-  }).join('');
+    </div>
+  `).join('');
 }
 
-// 渲染技能数据
+// 渲染技能
 function renderSkills(skills) {
-  // 技能显示在经验值的子项中
-  // 如果有技能卡片区域就更新
+  const skillsList = document.getElementById('skillsList');
+  if (!skillsList) return;
+  
+  if (!skills || skills.length === 0) {
+    // 默认技能
+    skills = [
+      { name: 'AI工具', level: 3, maxLevel: 10 },
+      { name: '电商运营', level: 2, maxLevel: 10 },
+      { name: '日语', level: 8, maxLevel: 10 },
+      { name: '中文', level: 10, maxLevel: 10 },
+      { name: '韩语', level: 6, maxLevel: 10 }
+    ];
+  }
+  
+  skillsList.innerHTML = skills.map(s => `
+    <div class="skill-item">
+      <span class="skill-name">${s.name}</span>
+      <div class="skill-bar">
+        <div class="skill-fill" style="width: ${(s.level / s.maxLevel) * 100}%"></div>
+      </div>
+      <span class="skill-level">Lv.${s.level}</span>
+    </div>
+  `).join('');
 }
 
-// 初始化数据源状态面板（开发调试用）
-function initDataSourcePanel() {
-  // 定期输出数据源状态到控制台
-  setInterval(() => {
-    const status = JARVIS.getDataSourceStatus();
-    console.log('📊 数据源状态:', {
-      HP: status.health.computedHP,
-      能量: status.mood.computedEnergy,
-      金币: `${status.finance.computedGold}% (¥${(status.finance.rawGold / 10000).toFixed(0)}万)`,
-      技能: status.skills.map(s => `${s.name} Lv.${s.level}`).join(', '),
-      项目: status.projects.map(p => `${p.id}:${p.progress}%`).join(', ')
-    });
-  }, 10000); // 每10秒输出一次
+// ==========================================
+// 模态框控制
+// ==========================================
+
+function openModal(modalId) {
+  document.getElementById(modalId).classList.add('active');
+  document.body.style.overflow = 'hidden';
 }
 
-// 绑定事件
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function openHealthInput() {
+  const data = JARVIS.getAllData();
+  const h = data.health;
+  
+  // 填充现有数据
+  document.getElementById('checkupDateInput').value = h.checkup?.date || '2026-04-01';
+  document.getElementById('weightInput').value = h.checkup?.weight || 68;
+  document.getElementById('bmiInput').value = h.checkup?.bmi || 22.2;
+  document.getElementById('bodyFatInput').value = h.checkup?.bodyFat || 18;
+  document.getElementById('heartRateInput').value = h.checkup?.heartRate || 72;
+  document.getElementById('exerciseMinutesInput').value = h.exercisePlan?.todayCompleted || 30;
+  document.getElementById('weeklyExerciseInput').value = h.exercisePlan?.weeklyCompleted || 60;
+  document.getElementById('weeklyGoalInput').value = h.exercisePlan?.weeklyGoal || 150;
+  document.getElementById('sleepHoursInput').value = h.daily?.sleepHours || 7;
+  document.getElementById('sleepQualityInput').value = h.daily?.sleepQuality || 80;
+  document.getElementById('stressLevelInput').value = h.daily?.stressLevel || 40;
+  document.getElementById('stressValue').textContent = h.daily?.stressLevel || 40;
+  
+  openModal('healthModal');
+}
+
+function openFinanceInput() {
+  const data = JARVIS.getAllData();
+  const f = data.finance;
+  
+  document.getElementById('cashInput').value = f.assets?.cash || 500000;
+  document.getElementById('bankInput').value = f.assets?.bank || 0;
+  document.getElementById('investmentsInput').value = f.assets?.investments || 0;
+  document.getElementById('creditCardInput').value = f.liabilities?.creditCard || 0;
+  document.getElementById('loansInput').value = f.liabilities?.loans || 0;
+  
+  openModal('financeModal');
+}
+
+function openMoodInput() {
+  const data = JARVIS.getAllData();
+  const m = data.mood?.todayMood;
+  
+  document.getElementById('moodScoreInput').value = m?.score || 0.75;
+  document.getElementById('moodScoreValue').textContent = m?.score || 0.75;
+  document.getElementById('emotionSelect').value = m?.dominantEmotion || '平静';
+  document.getElementById('energyInput').value = m?.energy || 70;
+  document.getElementById('moodStressInput').value = m?.stress || 30;
+  document.getElementById('moodSummaryInput').value = m?.summary || '';
+  
+  openModal('moodModal');
+}
+
+// ==========================================
+// 保存数据
+// ==========================================
+
+function saveHealthData() {
+  const healthData = {
+    checkup: {
+      date: document.getElementById('checkupDateInput').value,
+      weight: parseFloat(document.getElementById('weightInput').value),
+      bmi: parseFloat(document.getElementById('bmiInput').value),
+      bodyFat: parseFloat(document.getElementById('bodyFatInput').value),
+      heartRate: parseInt(document.getElementById('heartRateInput').value)
+    },
+    exercisePlan: {
+      todayCompleted: parseInt(document.getElementById('exerciseMinutesInput').value),
+      weeklyCompleted: parseInt(document.getElementById('weeklyExerciseInput').value),
+      weeklyGoal: parseInt(document.getElementById('weeklyGoalInput').value)
+    },
+    daily: {
+      sleepHours: parseFloat(document.getElementById('sleepHoursInput').value),
+      sleepQuality: parseInt(document.getElementById('sleepQualityInput').value),
+      stressLevel: parseInt(document.getElementById('stressLevelInput').value)
+    }
+  };
+  
+  JARVIS.updateHealth(healthData);
+  closeModal('healthModal');
+  showNotification('🏥 健康数据已保存', 'success');
+  renderAll();
+}
+
+function saveFinanceData() {
+  const financeData = {
+    assets: {
+      cash: parseInt(document.getElementById('cashInput').value) || 0,
+      bank: parseInt(document.getElementById('bankInput').value) || 0,
+      investments: parseInt(document.getElementById('investmentsInput').value) || 0
+    },
+    liabilities: {
+      creditCard: parseInt(document.getElementById('creditCardInput').value) || 0,
+      loans: parseInt(document.getElementById('loansInput').value) || 0
+    }
+  };
+  
+  JARVIS.updateFinance(financeData);
+  closeModal('financeModal');
+  showNotification('💰 财务数据已保存', 'success');
+  renderAll();
+}
+
+function saveMoodData() {
+  const moodData = {
+    score: parseFloat(document.getElementById('moodScoreInput').value),
+    dominantEmotion: document.getElementById('emotionSelect').value,
+    energy: parseInt(document.getElementById('energyInput').value),
+    stress: parseInt(document.getElementById('moodStressInput').value),
+    summary: document.getElementById('moodSummaryInput').value
+  };
+  
+  JARVIS.updateMoodFromHermes(moodData);
+  closeModal('moodModal');
+  showNotification('🧠 情绪数据已保存', 'success');
+  renderAll();
+}
+
+function quickAddIncome() {
+  const amount = parseInt(document.getElementById('quickAmountInput').value) || 0;
+  const desc = document.getElementById('quickDescInput').value || '收入';
+  if (amount > 0) {
+    JARVIS.addIncome(amount, desc);
+    showNotification(`💰 +¥${amount.toLocaleString()} 收入已记录`, 'success');
+    renderAll();
+  }
+}
+
+function quickAddExpense() {
+  const amount = parseInt(document.getElementById('quickAmountInput').value) || 0;
+  const desc = document.getElementById('quickDescInput').value || '支出';
+  if (amount > 0) {
+    JARVIS.addExpense(amount, desc);
+    showNotification(`💸 -¥${amount.toLocaleString()} 支出已记录`, 'warning');
+    renderAll();
+  }
+}
+
+// ==========================================
+// Obsidian 同步
+// ==========================================
+
+async function syncFromObsidian() {
+  showNotification('📓 正在同步 Obsidian 数据...', 'info');
+  
+  try {
+    // 模拟从 Obsidian 读取（实际通过 API）
+    // 这里读取本地的 task-board.json
+    const response = await fetch('/task-board.json');
+    let taskBoard = null;
+    if (response.ok) {
+      taskBoard = await response.json();
+    }
+    
+    // 如果读取失败，使用模拟数据
+    if (!taskBoard) {
+      // 模拟 task-board 数据
+      taskBoard = {
+        projects: [
+          { id: 'adult-shop', name: 'adult-shop 上线', icon: '⚔️', progress: 70, status: 'in_progress', weight: 0.5 },
+          { id: 'jarvis-web', name: 'J.A.R.V.I.S. Web面板', icon: '🎮', progress: 40, status: 'in_progress', weight: 0.3 },
+          { id: 'manga-studio', name: 'MangaStudio', icon: '📚', progress: 30, status: 'pending', weight: 0.2 }
+        ]
+      };
+    }
+    
+    // 转换任务数据
+    const projects = [];
+    
+    // adult-shop
+    if (taskBoard['adult-shop']) {
+      const as = taskBoard['adult-shop'];
+      projects.push({
+        id: 'adult-shop',
+        name: 'adult-shop 上线',
+        icon: '⚔️',
+        progress: calculateAdultShopProgress(as),
+        status: as.factory?.进度 === '✅ 完成' ? 'completed' : 'in_progress',
+        weight: 0.5
+      });
+    }
+    
+    // 其他项目
+    if (taskBoard['MangaStudio']) {
+      projects.push({
+        id: 'manga-studio',
+        name: 'MangaStudio',
+        icon: '📚',
+        progress: 30,
+        status: 'in_progress',
+        weight: 0.2
+      });
+    }
+    
+    // J.A.R.V.I.S. 项目
+    if (taskBoard['J-A-R-V-I-S']) {
+      projects.push({
+        id: 'jarvis-web',
+        name: 'J.A.R.V.I.S. Web面板',
+        icon: '🎮',
+        progress: 40,
+        status: 'in_progress',
+        weight: 0.3
+      });
+    }
+    
+    // 更新数据
+    JARVIS.updateProjects(projects);
+    
+    // 更新来源标签
+    document.getElementById('questSource').textContent = '📓 已同步';
+    
+    showNotification('✅ Obsidian 数据同步完成', 'success');
+    renderAll();
+    
+  } catch (e) {
+    console.warn('Obsidian 同步失败:', e);
+    
+    // 使用默认数据
+    const defaultProjects = [
+      { id: 'adult-shop', name: 'adult-shop 上线', icon: '⚔️', progress: 70, status: 'in_progress', weight: 0.5 },
+      { id: 'jarvis-web', name: 'J.A.R.V.I.S. Web面板', icon: '🎮', progress: 40, status: 'in_progress', weight: 0.3 },
+      { id: 'manga-studio', name: 'MangaStudio', icon: '📚', progress: 30, status: 'pending', weight: 0.2 }
+    ];
+    
+    JARVIS.updateProjects(defaultProjects);
+    showNotification('📓 使用默认项目数据', 'info');
+    renderAll();
+  }
+}
+
+function calculateAdultShopProgress(as) {
+  if (!as) return 0;
+  let progress = 0;
+  if (as.website_tech?.进度 === '✅ 完成') progress += 25;
+  if (as.xiaohongshu?.进度 === '✅ 完成') progress += 15;
+  if (as.factory?.进度 === '✅ 完成') progress += 30;
+  if (as.domain?.进度 === '✅ 完成') progress += 10;
+  if (as.server?.进度 === '✅ 完成') progress += 10;
+  if (as.paypal?.进度 === '✅ 完成') progress += 5;
+  if (as.product_listing?.进度 === '✅ 完成') progress += 5;
+  return progress;
+}
+
+// ==========================================
+// AI 建议
+// ==========================================
+
+function requestAdvice() {
+  const data = JARVIS.getAllData();
+  const computed = JARVIS.getRealtimeData();
+  const advices = [];
+  
+  if (computed.hp.current < 60) {
+    advices.push('💗 HP偏低：保证睡眠，减少加班，适度运动');
+  }
+  if (computed.energy.current < 50) {
+    advices.push('⚡ 能量不足：建议短暂休息，做喜欢的事恢复精力');
+  }
+  if (data.finance?.assets?.cash < 300000) {
+    advices.push('💸 资金储备不足：加快 adult-shop 变现速度');
+  }
+  
+  const exerciseProgress = (data.health?.exercisePlan?.weeklyCompleted / data.health?.exercisePlan?.weeklyGoal * 100) || 0;
+  if (exerciseProgress < 50) {
+    advices.push('🏃 运动计划未达标：本週目标完成 ' + Math.round(exerciseProgress) + '%');
+  }
+  
+  advices.push('🎯 继续保持，J.A.R.V.I.S. 实时监控你的状态');
+  
+  const advice = advices[Math.floor(Math.random() * advices.length)];
+  document.getElementById('aiAdvice').innerHTML = `<div class="advice-item"><p>「${advice}</p></div>`;
+}
+
+function openChat() {
+  showNotification('💬 AI对话功能开发中...', 'info');
+}
+
+// ==========================================
+// Tab 切换
+// ==========================================
+
 function bindEvents() {
-  // Tab切换
+  // Tab 切换
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       const tabName = tab.dataset.tab;
@@ -361,99 +550,35 @@ function bindEvents() {
     });
   });
   
-  // AI建议按钮
-  window.requestAdvice = function() {
-    const data = JARVIS.getRealtimeData();
-    const advices = generateAdvices(data);
-    const advice = advices[Math.floor(Math.random() * advices.length)];
-    
-    const adviceEl = document.getElementById('aiAdvice');
-    if (adviceEl) {
-      adviceEl.innerHTML = `<div class="advice-item"><p>「${advice}</p></div>`;
-      adviceEl.style.animation = 'none';
-      adviceEl.offsetHeight;
-      adviceEl.style.animation = 'fadeIn 0.3s ease';
-    }
-  };
+  // 压力滑块
+  document.getElementById('stressLevelInput')?.addEventListener('input', (e) => {
+    document.getElementById('stressValue').textContent = e.target.value;
+  });
   
-  // AI对话按钮
-  window.openChat = function() {
-    showNotification('💬 AI对话功能开发中...', 'info');
-  };
+  // 情绪滑块
+  document.getElementById('moodScoreInput')?.addEventListener('input', (e) => {
+    document.getElementById('moodScoreValue').textContent = e.target.value;
+  });
   
-  // 快捷数据更新（演示用）
-  window.simulateIncome = function(amount) {
-    JARVIS.addIncome(amount, '模拟收入');
-    renderAll();
-    showNotification(`💰 +¥${amount.toLocaleString()} 收入已记录`, 'success');
-  };
-  
-  window.simulateExpense = function(amount) {
-    JARVIS.addExpense(amount, '模拟支出');
-    renderAll();
-    showNotification(`💸 -¥${amount.toLocaleString()} 支出已记录`, 'warning');
-  };
-  
-  window.simulateWork = function() {
-    JARVIS.addChatMood(0.8 + Math.random() * 0.2); // 高情绪
-    const data = JARVIS.getAllData();
-    data.moodData.hoursSinceRest = 0;
-    JARVIS.updateMood(data.moodData);
-    renderAll();
-    showNotification('⚡ 工作完成，能量+', 'success');
-  };
-  
-  window.simulateRest = function() {
-    const data = JARVIS.getAllData();
-    data.moodData.hoursSinceRest = 0;
-    data.moodData.contextWindows = 0;
-    JARVIS.updateMood(data.moodData);
-    renderAll();
-    showNotification('😴 休息完成，能量恢复', 'info');
-  };
+  // 点击模态框背景关闭
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  });
 }
 
-// 生成AI建议（基于实时数据）
-function generateAdvices(data) {
-  const advices = [];
-  
-  // HP相关
-  if (data.hp.current < 50) {
-    advices.push('🏥 HP偏低，建议保证充足睡眠，减少熬夜');
-  }
-  
-  // 能量相关
-  if (data.energy.current < 50) {
-    advices.push('⚡ 能量不足，可以尝试短暂休息或做喜欢的事恢复精力');
-  }
-  
-  // 财务相关
-  if (data.gold.raw < 300000) {
-    advices.push('💸 资金储备低于30万，建议加快变现项目');
-  }
-  
-  // 项目建议
-  if (data.level < 20) {
-    advices.push('📈 经验值积累中，持续学习新技能可加速升级');
-  }
-  
-  // 综合建议
-  advices.push('🎯 保持当前节奏，HP/能量/金币三位一体平衡发展');
-  advices.push('⚔️ adult-shop项目进度良好，争取本周完成工厂对接');
-  advices.push('🎮 J.A.R.V.I.S. Web面板已上线，持续迭代优化');
-  
-  return advices.length > 0 ? advices : ['🌟 状态良好，继续保持！'];
-}
-
-// Tab切换
 function switchTab(tabName) {
   document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.tab === tabName);
   });
   
-  const cardMap = { dashboard: 0, quests: 1, finance: 0, alerts: 2, ai: 2 };
   const cards = document.querySelectorAll('.card');
-  const targetIndex = cardMap[tabName];
+  const targetMap = { dashboard: 0, quests: 1, finance: 0, alerts: 2, ai: 2 };
+  const targetIndex = targetMap[tabName] ?? 0;
   
   if (window.innerWidth < 768) {
     cards.forEach((card, i) => {
@@ -465,7 +590,10 @@ function switchTab(tabName) {
   }
 }
 
+// ==========================================
 // 通知系统
+// ==========================================
+
 function showNotification(message, type = 'info') {
   const existing = document.querySelector('.notification');
   if (existing) existing.remove();
@@ -482,12 +610,13 @@ function showNotification(message, type = 'info') {
     color: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 1000;
+    z-index: 1001;
     animation: slideIn 0.3s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
   `;
   
   document.body.appendChild(notification);
-  
   setTimeout(() => {
     notification.style.animation = 'fadeOut 0.3s ease';
     setTimeout(() => notification.remove(), 300);
@@ -509,15 +638,177 @@ style.textContent = `
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .value-changed {
-    animation: valuePulse 0.5s ease;
-  }
-  @keyframes valuePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); color: #E8A87C; }
-  }
   .card { animation: fadeIn 0.3s ease; }
-  .income { color: #4CAF50 !important; }
+  .notification { animation: slideIn 0.3s ease; }
+  
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal.active { display: flex; }
+  .modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+  }
+  .modal-header h3 { font-size: 1rem; color: #2D5A4A; }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+  .modal-close:hover { color: #333; }
+  .modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #eee;
+    justify-content: flex-end;
+  }
+  
+  /* Form */
+  .form-section {
+    margin-bottom: 20px;
+  }
+  .form-section h4 {
+    font-size: 0.875rem;
+    color: #6B6B6B;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .form-row label {
+    flex: 0 0 100px;
+    font-size: 0.875rem;
+    color: #2C2C2C;
+  }
+  .form-row input,
+  .form-row select,
+  .form-row textarea {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-family: inherit;
+  }
+  .form-row input[type="range"] {
+    flex: 1;
+  }
+  .form-row textarea { resize: vertical; }
+  
+  /* Buttons */
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn.primary {
+    background: #2D5A4A;
+    color: white;
+  }
+  .btn.secondary {
+    background: #f0f0f0;
+    color: #2C2C2C;
+  }
+  
+  /* Quick Actions */
+  .quick-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .quick-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .quick-btn.income {
+    border-color: #4CAF50;
+    color: #4CAF50;
+  }
+  .quick-btn.income:hover { background: #4CAF50; color: white; }
+  .quick-btn.expense {
+    border-color: #FF9800;
+    color: #FF9800;
+  }
+  .quick-btn.expense:hover { background: #FF9800; color: white; }
+  
+  /* Skills */
+  .skill-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .skill-name {
+    flex: 0 0 80px;
+    font-size: 0.75rem;
+  }
+  .skill-bar {
+    flex: 1;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .skill-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #E8A87C, #D4956A);
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .skill-level {
+    flex: 0 0 35px;
+    font-size: 0.7rem;
+    color: #6B6B6B;
+    text-align: right;
+  }
 `;
 document.head.appendChild(style);
 
@@ -529,4 +820,4 @@ window.addEventListener('resize', () => {
 });
 
 // 导出
-window.JARVIS_APP = { renderAll, showNotification, switchTab, stopRealtimeUpdates, startRealtimeUpdates };
+window.JARVIS_APP = { renderAll, showNotification, syncFromObsidian };
