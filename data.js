@@ -63,7 +63,7 @@ const HealthData = {
     hp -= this.daily.illnessDays * 10;
     
     // 体检数据影响（过期或不正常）
-    const monthsSinceCheckup = this monthsSince(new Date(this.checkup.date));
+    const monthsSinceCheckup = this.monthsSince(new Date(this.checkup.date));
     if (monthsSinceCheckup > 6) hp -= 10;
     
     // BMI影响
