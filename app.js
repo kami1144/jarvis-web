@@ -997,11 +997,12 @@ function openHealthInput() {
 
 function openFinanceInput() {
   const data = JARVIS.getAllData();
-  const f = data.finance;
+  const f = data.finance || { assets: {}, liabilities: {} };
   
   document.getElementById('cashInput').value = f.assets?.cash || 500000;
-  document.getElementById('bankInput').value = f.assets?.bank || 0;
+  document.getElementById('bankInput').value = f.assets?.bankDeposits || 0;
   document.getElementById('investmentsInput').value = f.assets?.investments || 0;
+  document.getElementById('realEstateInput').value = f.assets?.realEstate || 0;
   document.getElementById('creditCardInput').value = f.liabilities?.creditCard || 0;
   document.getElementById('loansInput').value = f.liabilities?.loans || 0;
   
@@ -1057,8 +1058,9 @@ function saveFinanceData() {
   const financeData = {
     assets: {
       cash: parseInt(document.getElementById('cashInput').value) || 0,
-      bank: parseInt(document.getElementById('bankInput').value) || 0,
-      investments: parseInt(document.getElementById('investmentsInput').value) || 0
+      bankDeposits: parseInt(document.getElementById('bankInput').value) || 0,
+      investments: parseInt(document.getElementById('investmentsInput').value) || 0,
+      realEstate: parseInt(document.getElementById('realEstateInput').value) || 0
     },
     liabilities: {
       creditCard: parseInt(document.getElementById('creditCardInput').value) || 0,

@@ -411,6 +411,25 @@ function getDefaultData() {
       exercisePlan: { ...HealthData.exercisePlan },
       daily: { ...HealthData.daily }
     },
+    finance: {
+      assets: {
+        cash: 0,
+        bankDeposits: 0,
+        investments: 0,
+        realEstate: 0,
+        otherAssets: 0
+      },
+      liabilities: {
+        mortgage: 0,
+        loans: 0,
+        otherDebts: 0
+      },
+      monthly: {
+        income: 0,
+        expenses: 0,
+        records: []
+      }
+    },
     mood: {
       todayMood: { ...MoodData.todayMood },
       history: []
