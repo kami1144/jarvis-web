@@ -115,6 +115,37 @@ const MoodData = {
 };
 
 // ==========================================
+// 财务数据
+// ==========================================
+
+const FinanceData = {
+  // 计算净资产
+  getNetWorth() {
+    const data = loadData();
+    const assets = data.finance?.assets || {};
+    const liabilities = data.finance?.liabilities || {};
+    
+    // 资产合计
+    const totalAssets = (
+      (assets.cash || 0) +
+      (assets.bankDeposits || 0) +
+      (assets.investments || 0) +
+      (assets.realEstate || 0) +
+      (assets.otherAssets || 0)
+    );
+    
+    // 负债合计
+    const totalLiabilities = (
+      (liabilities.mortgage || 0) +
+      (liabilities.loans || 0) +
+      (liabilities.otherDebts || 0)
+    );
+    
+    return totalAssets - totalLiabilities;
+  }
+};
+
+// ==========================================
 // 思维模式数据
 // ==========================================
 
