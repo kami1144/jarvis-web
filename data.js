@@ -759,7 +759,7 @@ const AlertSystem = {
       });
     }
 
-    // 🟡 HP < 50
+    // 🟠 HP < 50
     if (hp < 50 && hp >= 30) {
       alerts.push({
         id: 'hp_warning',
@@ -771,6 +771,23 @@ const AlertSystem = {
         threshold: 50,
         trend: hp < 40 ? 'worsening' : 'stable',
         suggestion: '保证睡眠，适度运动，关注身体状态',
+        createdAt: now.toISOString(),
+        acknowledged: false
+      });
+    }
+
+    // 🟡 HP < 70
+    if (hp < 70 && hp >= 50) {
+      alerts.push({
+        id: 'hp_caution',
+        category: 'health',
+        level: 'info',
+        title: 'HP需要注意',
+        description: `当前HP: ${hp}/100，建议关注健康`,
+        currentValue: hp,
+        threshold: 70,
+        trend: hp < 60 ? 'worsening' : 'stable',
+        suggestion: '保持良好作息，适度运动',
         createdAt: now.toISOString(),
         acknowledged: false
       });
