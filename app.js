@@ -37,14 +37,12 @@ function renderAll() {
   setCurrentDate();
   const data = JARVIS.getAllData();
   const computed = JARVIS.getRealtimeData();
-
-  // 记录历史数据点
-  HistoryTracker.recordSnapshot(computed);
-
+  
   renderCharacter(computed, data);
   renderFamily(data.profile);
-  renderFinance(data.finance);
+  renderMindModel(data.mindModel);
   renderQuests(data.projects);
+  renderRadar(data.opportunities);
   renderAlerts(computed, data);
   renderSkills(data.skills);
   renderTasks();
@@ -89,16 +87,19 @@ function renderCharacter(computed, data) {
   hpFill.style.background = getHPColor(computed.hp.current);
   card.querySelector('#hpValue').textContent = `${computed.hp.current}/${computed.hp.max}`;
   
-  // 能量
+  // 能量 → 思维数据
   const energyFill = card.querySelector('.energy-fill');
-  energyFill.style.width = `${computed.energy.current}%`;
-  energyFill.style.background = getEnergyColor(computed.energy.current);
-  card.querySelector('#energyValue').textContent = `${computed.energy.current}/${computed.energy.max}`;
+  energyFill.style.width = `${Math.min(100, computed.mindScore.current)}%`;
+  energyFill.style.background = getEnergyColor(computed.mindScore.current);
+  card.querySelector('#energyValue').textContent = `${computed.mindScore.current}/${computed.mindScore.max}`;
   
-  // 金币
+  // 金币 → 财务数据
   const goldFill = card.querySelector('.gold-fill');
-  goldFill.style.width = `${Math.min(100, computed.gold.current)}%`;
-  card.querySelector('#goldValue').textContent = `¥${(computed.gold.raw / 10000).toFixed(0)}万`;
+  const financeNetWorth = FinanceData.getNetWorth();
+  const goldPercent = Math.min(100, Math.max(0, financeNetWorth / 1000000 * 100)); // 100万=100%
+  goldFill.style.width = `${goldPercent}%`;
+  goldFill.style.background = 'linear-gradient(90deg, #FFD700, #FFA500)';
+  card.querySelector('#goldValue').textContent = `${(financeNetWorth / 10000).toFixed(0)}万`;
   
   // 经验
   const expFill = card.querySelector('.exp-fill');
@@ -108,11 +109,13 @@ function renderCharacter(computed, data) {
   // 数据来源显示
   card.querySelector('#checkupDate').textContent = data.health?.checkup?.date?.slice(5) || '待输入';
   
-  const moodStatus = data.mood?.todayMood?.dominantEmotion || '待分析';
-  card.querySelector('#moodStatus').textContent = moodStatus;
+  // 净资产 → 思维得分（思维模式仪表盘）
+  const mindScore = computed.mindScore.current;
+  card.querySelector('#netWorth').textContent = `${mindScore}分`;
   
-  const netWorth = (computed.gold.raw / 10000).toFixed(0);
-  card.querySelector('#netWorth').textContent = `¥${netWorth}万`;
+  // 情绪 → 财务净资产
+  const moodStatus = data.mood?.todayMood?.dominantEmotion || '待分析';
+  card.querySelector('#moodStatus').textContent = `${(financeNetWorth / 10000).toFixed(0)}万`;
 }
 
 function getHPColor(value) {
@@ -128,44 +131,82 @@ function getEnergyColor(value) {
   return 'linear-gradient(90deg, #78909C, #607D8B)';
 }
 
-// 渲染财务
-function renderFinance(finance) {
-  const card = document.querySelector('.financial-card');
+// 渲染思维模式仪表盘
+function renderMindModel(mindData) {
+  const card = document.querySelector('.mind-model-card');
   if (!card) return;
   
-  const income = finance.monthly?.income || 0;
-  const expenses = finance.monthly?.expenses || 0;
-  const cash = finance.assets?.cash || 0;
+  const today = mindData?.today || MindModelData.today;
+  const wrongPatterns = mindData?.wrongPatterns || MindModelData.wrongPatterns;
+  const correctPatterns = mindData?.correctPatterns || MindModelData.correctPatterns;
   
-  card.querySelector('#monthlyIncome').textContent = income >= 10000 
-    ? `¥${(income / 10000).toFixed(0)}万` : `¥${income.toLocaleString()}`;
+  // 更新得分
+  const scoreEl = card.querySelector('.mind-score-value');
+  if (scoreEl) {
+    scoreEl.textContent = today.score || 75;
+  }
   
-  card.querySelector('#monthlyExpense').textContent = expenses >= 10000 
-    ? `¥${(expenses / 10000).toFixed(0)}万` : `¥${expenses.toLocaleString()}`;
-  
-  card.querySelector('#availableFund').textContent = `¥${(cash / 10000).toFixed(0)}万`;
-  
-  // 收支流水
-  const records = finance.monthly?.records || [];
-  const incomeRecords = records.filter(r => r.type === 'income');
-  const expenseRecords = records.filter(r => r.type === 'expense');
-  
-  const incomeList = card.querySelector('#incomeFlowList');
-  if (incomeRecords.length === 0) {
-    incomeList.innerHTML = '<div class="flow-empty">暂无收入记录</div>';
-  } else {
-    incomeList.innerHTML = incomeRecords.slice(0, 5).map(r => `
-      <div class="flow-item income">${r.source} +¥${r.amount.toLocaleString()}</div>
+  // 渲染当前模式状态
+  const patternsContainer = card.querySelector('.mind-patterns');
+  if (patternsContainer) {
+    const statusIcon = { good: '✅', warning: '⚠️', bad: '❌' };
+    const statusText = { good: '良好', warning: '注意', bad: '需纠正' };
+    patternsContainer.innerHTML = today.patterns.map(p => `
+      <div class="pattern-item ${p.status}">
+        <span class="pattern-icon">${statusIcon[p.status] || '➡️'}</span>
+        <div class="pattern-info">
+          <span class="pattern-name">${p.name}</span>
+          <span class="pattern-status">${statusText[p.status] || ''}</span>
+        </div>
+      </div>
     `).join('');
   }
   
-  const expenseList = card.querySelector('#expenseFlowList');
-  if (expenseRecords.length === 0) {
-    expenseList.innerHTML = '<div class="flow-empty">暂无支出记录</div>';
-  } else {
-    expenseList.innerHTML = expenseRecords.slice(0, 5).map(r => `
-      <div class="flow-item expense">${r.category} -¥${r.amount.toLocaleString()}</div>
+  // 渲染错误模式
+  const wrongContainer = card.querySelector('.wrong-patterns');
+  if (wrongContainer) {
+    wrongContainer.innerHTML = wrongPatterns.map(p => `
+      <div class="pattern-tag wrong" title="${p.desc}">
+        ${p.icon} ${p.name} <span class="freq">×${p.frequency}</span>
+      </div>
     `).join('');
+  }
+  
+  // 渲染正确模式
+  const correctContainer = card.querySelector('.correct-patterns');
+  if (correctContainer) {
+    correctContainer.innerHTML = correctPatterns.map(p => `
+      <div class="pattern-tag correct" title="${p.desc}">
+        ${p.icon} ${p.name}
+      </div>
+    `).join('');
+  }
+  
+  // 渲染今日练习
+  const exerciseContainer = card.querySelector('.mind-exercises');
+  if (exerciseContainer) {
+    exerciseContainer.innerHTML = today.exercises.map(e => `
+      <div class="exercise-item ${e.completed ? 'done' : ''}" data-id="${e.id}">
+        <span class="exercise-check">${e.completed ? '☑️' : '⬜'}</span>
+        <div class="exercise-info">
+          <span class="exercise-title">${e.title}</span>
+          <span class="exercise-desc">${e.desc}</span>
+        </div>
+      </div>
+    `).join('');
+    
+    // 绑定练习点击事件
+    exerciseContainer.querySelectorAll('.exercise-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.dataset.id;
+        const exercise = today.exercises.find(e => e.id === id);
+        if (exercise) {
+          exercise.completed = !exercise.completed;
+          saveCurrentUserData();
+          renderMindModel(data?.mindModel);
+        }
+      });
+    });
   }
 }
 
@@ -277,6 +318,137 @@ function renderSkills(skills) {
       <span class="skill-level">Lv.${s.level}</span>
     </div>
   `).join('');
+}
+
+// ==========================================
+// 机会雷达渲染
+// ==========================================
+
+function renderRadar(opportunities) {
+  const radarContainer = document.getElementById('radarContainer');
+  if (!radarContainer) return;
+
+  if (!opportunities || opportunities.length === 0) {
+    radarContainer.innerHTML = '<div class="radar-empty">暂无机会数据</div>';
+    return;
+  }
+
+  // 雷达参数
+  const centerX = 150;
+  const centerY = 120;
+  const maxRadius = 100;
+  
+  // 距离映射到半径
+  const distanceToRadius = {
+    near: maxRadius * 0.3,
+    medium: maxRadius * 0.6,
+    far: maxRadius * 0.9
+  };
+
+  // 角度分布（均匀分布在圆周上）
+  const angleStep = (2 * Math.PI) / Math.max(opportunities.length, 1);
+  const startAngle = -Math.PI / 2; // 从顶部开始
+
+  // 生成雷达背景圆
+  const radarBg = `
+    <svg class="radar-svg" viewBox="0 0 300 240">
+      <!-- 背景圆 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${maxRadius * 0.3}" fill="none" stroke="#333" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+      <circle cx="${centerX}" cy="${centerY}" r="${maxRadius * 0.6}" fill="none" stroke="#333" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+      <circle cx="${centerX}" cy="${centerY}" r="${maxRadius * 0.9}" fill="none" stroke="#333" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+      
+      <!-- 十字线 -->
+      <line x1="${centerX}" y1="${centerY - maxRadius}" x2="${centerX}" y2="${centerY + maxRadius}" stroke="#333" stroke-width="1" opacity="0.2"/>
+      <line x1="${centerX - maxRadius}" y1="${centerY}" x2="${centerX + maxRadius}" y2="${centerY}" stroke="#333" stroke-width="1" opacity="0.2"/>
+      
+      <!-- 中心点 -->
+      <circle cx="${centerX}" cy="${centerY}" r="4" fill="#7C4DFF"/>
+      
+      <!-- 距离标签 -->
+      <text x="${centerX + 5}" y="${centerY - maxRadius * 0.3}" class="radar-label">近</text>
+      <text x="${centerX + 5}" y="${centerY - maxRadius * 0.6}" class="radar-label">中</text>
+      <text x="${centerX + 5}" y="${centerY - maxRadius * 0.9}" class="radar-label">远</text>
+    </svg>
+  `;
+
+  // 生成机会点
+  const opportunityDots = opportunities.map((o, i) => {
+    const angle = startAngle + (i * angleStep);
+    const radius = distanceToRadius[o.distance] || maxRadius * 0.6;
+    const x = centerX + radius * Math.cos(angle);
+    const y = centerY + radius * Math.sin(angle);
+    const fillColor = o.type === 'project' ? '#4CAF50' : '#FF9800';
+    const isCompleted = o.status === 'completed';
+    const size = isCompleted ? 8 : 10;
+    
+    return `
+      <div class="radar-dot ${o.type} ${o.status}" 
+           style="left: ${x}px; top: ${y}px;"
+           data-id="${o.id}"
+           title="${o.name}">
+        <span class="radar-dot-icon">${o.icon}</span>
+      </div>
+    `;
+  }).join('');
+
+  // 生成图例
+  const legend = `
+    <div class="radar-legend">
+      <span class="legend-item"><span class="legend-dot project"></span>已验证项目</span>
+      <span class="legend-item"><span class="legend-dot opportunity"></span>机会点</span>
+    </div>
+  `;
+
+  radarContainer.innerHTML = `
+    ${radarBg}
+    <div class="radar-dots">${opportunityDots}</div>
+    ${legend}
+    <div class="radar-tooltip" id="radarTooltip"></div>
+  `;
+
+  // 绑定悬停事件
+  bindRadarEvents(opportunities);
+}
+
+function bindRadarEvents(opportunities) {
+  const dots = document.querySelectorAll('.radar-dot');
+  const tooltip = document.getElementById('radarTooltip');
+
+  dots.forEach(dot => {
+    const id = dot.dataset.id;
+    const opp = opportunities.find(o => o.id === id);
+    if (!opp) return;
+
+    dot.addEventListener('mouseenter', (e) => {
+      const rect = dot.getBoundingClientRect();
+      const containerRect = dot.closest('#radarContainer').getBoundingClientRect();
+      
+      tooltip.innerHTML = `
+        <div class="tooltip-title">${opp.icon} ${opp.name}</div>
+        <div class="tooltip-desc">${opp.description}</div>
+        <div class="tooltip-meta">
+          <span>进度: ${opp.progress}%</span>
+          <span>难度: ${opp.distance === 'near' ? '近' : opp.distance === 'medium' ? '中' : '远'}</span>
+        </div>
+        ${opp.link ? `<a href="${opp.link}" target="_blank" class="tooltip-link">访问 →</a>` : ''}
+      `;
+      tooltip.style.display = 'block';
+      tooltip.style.left = `${rect.left - containerRect.left + 20}px`;
+      tooltip.style.top = `${rect.top - containerRect.top - 10}px`;
+    });
+
+    dot.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+
+    // 点击打开链接
+    if (opp.link) {
+      dot.style.cursor = 'pointer';
+      dot.addEventListener('click', () => {
+        window.open(opp.link, '_blank');
+      });
+    }
+  });
 }
 
 // ==========================================

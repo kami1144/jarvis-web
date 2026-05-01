@@ -115,42 +115,103 @@ const MoodData = {
 };
 
 // ==========================================
-// 财务数据
+// 思维模式数据
 // ==========================================
 
-const FinanceData = {
-  // 资产
-  assets: {
-    cash: 500000,           // 现金
-    bank: 0,               // 银行存款
-    investments: 0,         // 投资
-    receivables: 0          // 应收
+const MindModelData = {
+  // 今日思维模式分析
+  today: {
+    date: new Date().toISOString().split('T')[0],
+    score: 75,              // 今日思维模式得分 0-100
+    patterns: [
+      { id: 'p1', name: '抽象建模', status: 'good', desc: '能够快速抓住本质' },
+      { id: 'p2', name: '过度思考', status: 'warning', desc: '想太多而行动不足' },
+      { id: 'p3', name: '模式识别', status: 'good', desc: '擅长发现规律和联系' }
+    ],
+    // 今日练习
+    exercises: [
+      { id: 'e1', title: '3秒决策练习', desc: '对小事3秒内做决定', completed: false },
+      { id: 'e2', title: '行动优先', desc: '先做再优化', completed: true }
+    ]
   },
   
-  // 负债
-  liabilities: {
-    creditCard: 0,
-    loans: 0
+  // 错误思维模式库
+  wrongPatterns: [
+    { id: 'wp1', name: '过度思考', icon: '🤔', desc: '想太多，行动太少', frequency: 3 },
+    { id: 'wp2', name: '非黑即白', icon: '⚫', desc: '思维二极管，没有中间地带', frequency: 2 },
+    { id: 'wp3', name: '灾难化', icon: '💥', desc: '小事想成大灾难', frequency: 1 }
+  ],
+  
+  // 正确思维模式
+  correctPatterns: [
+    { id: 'cp1', name: '概率思维', icon: '📊', desc: '用概率评估可能性，而非绝对' },
+    { id: 'cp2', name: '成长心态', icon: '🌱', desc: '相信能力和智力可以发展' },
+    { id: 'cp3', name: '实验思维', icon: '🧪', desc: '把每个决定当作实验' }
+  ],
+  
+  // 历史记录
+  history: [],
+  
+  // 计算思维模式得分
+  calculateScore() {
+    // 基于今日模式状态计算
+    const goodCount = this.today.patterns.filter(p => p.status === 'good').length;
+    const total = this.today.patterns.length;
+    const exerciseRate = this.today.exercises.filter(e => e.completed).length / this.today.exercises.length;
+    return Math.round((goodCount / total) * 70 + exerciseRate * 30);
+  }
+};
+
+// ==========================================
+// 机会雷达数据
+// ==========================================
+
+const OpportunityData = {
+  // 机会/项目列表
+  opportunities: [
+    {
+      id: 'adult-shop',
+      name: 'adult-shop',
+      icon: '🛒',
+      type: 'project',      // project = 已验证项目, opportunity = 机会点
+      status: 'active',      // active, paused, completed
+      distance: 'near',      // near, medium, far
+      description: '日本成人用品电商独立站',
+      progress: 35,
+      link: 'https://adult-shop-kami1144s-projects.vercel.app'
+    },
+    {
+      id: 'manga-studio',
+      name: 'MangaStudio',
+      icon: '📚',
+      type: 'project',
+      status: 'active',
+      distance: 'medium',
+      description: '成人漫画AI排版工具',
+      progress: 60,
+      link: null
+    },
+    {
+      id: 'star-talent',
+      name: '星火人才',
+      icon: '🔥',
+      type: 'opportunity',
+      status: 'planning',
+      distance: 'far',
+      description: 'AI+教育方向',
+      progress: 10,
+      link: null
+    }
+  ],
+  
+  // 获取当前活动项目
+  getActiveProjects() {
+    return this.opportunities.filter(o => o.type === 'project' && o.status === 'active');
   },
   
-  // 本月收支
-  monthly: {
-    income: 0,
-    expenses: 20000,
-    records: []
-  },
-  
-  // 计算净资产
-  getNetWorth() {
-    return Object.values(this.assets).reduce((a, b) => a + b, 0) - 
-           Object.values(this.liabilities).reduce((a, b) => a + b, 0);
-  },
-  
-  // 计算金币（归一化）
-  calculateGold() {
-    const netWorth = this.getNetWorth();
-    const maxGold = 5000000; // 500万为100%
-    return Math.min(100, Math.round((netWorth / maxGold) * 100));
+  // 获取机会点
+  getOpportunities() {
+    return this.opportunities.filter(o => o.type === 'opportunity');
   }
 };
 
@@ -281,7 +342,23 @@ const ProfileData = {
 function loadData() {
   try {
     const stored = localStorage.getItem(JAVIS_DATA_KEY);
-    if (stored) return JSON.parse(stored);
+    if (stored) {
+      const data = JSON.parse(stored);
+      // 确保新字段存在（迁移旧数据）
+      if (!data.opportunities) {
+        data.opportunities = [...OpportunityData.opportunities];
+      }
+      if (!data.mindModel) {
+        data.mindModel = {
+          today: { ...MindModelData.today },
+          wrongPatterns: [...MindModelData.wrongPatterns],
+          correctPatterns: [...MindModelData.correctPatterns],
+          history: []
+        };
+      }
+      saveData(data);
+      return data;
+    }
   } catch (e) {}
   return getDefaultData();
 }
@@ -307,13 +384,15 @@ function getDefaultData() {
       todayMood: { ...MoodData.todayMood },
       history: []
     },
-    finance: {
-      assets: { ...FinanceData.assets },
-      liabilities: { ...FinanceData.liabilities },
-      monthly: { ...FinanceData.monthly }
+    mindModel: {
+      today: { ...MindModelData.today },
+      wrongPatterns: [...MindModelData.wrongPatterns],
+      correctPatterns: [...MindModelData.correctPatterns],
+      history: []
     },
     skills: [],
     projects: [],
+    opportunities: [...OpportunityData.opportunities],
     lastUpdate: new Date().toISOString()
   };
 }
@@ -340,11 +419,9 @@ const ComputeEngine = {
     MoodData.todayMood = { ...moodData.todayMood };
     const energy = MoodData.calculateEnergy();
     
-    // 财务计算
-    FinanceData.assets = { ...data.finance.assets };
-    FinanceData.liabilities = { ...data.finance.liabilities };
-    const gold = FinanceData.calculateGold();
-    const rawGold = FinanceData.getNetWorth();
+    // 思维模式计算
+    MindModelData.today = { ...data.mindModel.today };
+    const mindScore = MindModelData.calculateScore();
     
     // 经验计算
     ExperienceData.skills = data.skills.length > 0 ? data.skills : (data._lastSkills || []);
@@ -355,7 +432,7 @@ const ComputeEngine = {
     this.cachedValues = {
       hp: { current: hp, max: 100 },
       energy: { current: energy, max: 100 },
-      gold: { current: gold, max: 100, raw: rawGold },
+      mindScore: { current: mindScore, max: 100 },
       exp: { current: exp, max: 100 },
       level,
       timestamp: new Date().toISOString()

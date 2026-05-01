@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
 <body>
   <div class="app">
@@ -52,11 +54,11 @@
               <span class="stat-value" id="energyValue">60/100</span>
             </div>
             <div class="stat">
-              <label>🪙 金币</label>
+              <label>🧠 思维</label>
               <div class="progress-bar">
                 <div class="progress-fill gold-fill" id="goldFill" style="width: 50%"></div>
               </div>
-              <span class="stat-value" id="goldValue">¥50万</span>
+              <span class="stat-value" id="goldValue">75分</span>
             </div>
             <div class="stat">
               <label>⭐ 经验</label>
@@ -78,10 +80,10 @@
               <span class="source-label">情绪</span>
               <span class="source-value" id="moodStatus">待分析</span>
             </div>
-            <div class="source-tag finance" title="金币数据来源：手动输入">
-              <span class="source-icon">💰</span>
-              <span class="source-label">净资产</span>
-              <span class="source-value" id="netWorth">¥50万</span>
+            <div class="source-tag finance" title="思维模式数据来源：每日分析">
+              <span class="source-icon">🧠</span>
+              <span class="source-label">思维</span>
+              <span class="source-value" id="netWorth">75分</span>
             </div>
           </div>
           <!-- 家庭成员 -->
@@ -92,41 +94,85 @@
           <!-- 快捷操作 -->
           <div class="demo-controls">
             <button class="demo-btn" onclick="openHealthInput()">🏥 健康</button>
-            <button class="demo-btn" onclick="openFinanceInput()">💰 财务</button>
-            <button class="demo-btn" onclick="openMoodInput()">🧠 情绪</button>
+            <button class="demo-btn" onclick="openMindModelInput()">🧠 思维</button>
+            <button class="demo-btn" onclick="openMoodInput()">💫 情绪</button>
             <button class="demo-btn" onclick="syncFromObsidian()">📓 Obsidian</button>
           </div>
         </section>
 
-        <!-- Financial Dashboard -->
-        <section class="card financial-card">
-          <h2 class="card-title">💰 财务仪表盘</h2>
-          <div class="financial-summary">
-            <div class="finance-item income">
-              <span class="finance-label">本月收入</span>
-              <span class="finance-value income" id="monthlyIncome">¥0</span>
-            </div>
-            <div class="finance-item expense">
-              <span class="finance-label">本月支出</span>
-              <span class="finance-value" id="monthlyExpense">¥2万</span>
-            </div>
-            <div class="finance-item balance">
-              <span class="finance-label">净资产</span>
-              <span class="finance-value gold" id="availableFund">¥50万</span>
-            </div>
-          </div>
-          <!-- 收支明细 -->
-          <div class="finance-flow">
-            <div class="flow-section">
-              <h4>📈 收入流水</h4>
-              <div class="flow-list" id="incomeFlowList">
-                <div class="flow-empty">暂无收入记录</div>
+        <!-- Mind Model Dashboard -->
+        <section class="card mind-model-card">
+          <h2 class="card-title">🧠 思维模式仪表盘</h2>
+          <div class="mind-model-content">
+            <!-- 左侧：得分 -->
+            <div class="mind-score-section">
+              <div class="mind-score-circle">
+                <span class="mind-score-value">75</span>
+                <span class="mind-score-label">今日得分</span>
               </div>
             </div>
-            <div class="flow-section">
-              <h4>📉 支出流水</h4>
-              <div class="flow-list" id="expenseFlowList">
-                <div class="flow-item expense">生活开支 -¥2万</div>
+            
+            <!-- 右侧：模式分析 -->
+            <div class="mind-analysis-section">
+              <!-- 当前模式状态 -->
+              <div class="mind-section">
+                <h4>🎯 当前模式</h4>
+                <div class="mind-patterns">
+                  <div class="pattern-item good">
+                    <span class="pattern-icon">✅</span>
+                    <div class="pattern-info">
+                      <span class="pattern-name">抽象建模</span>
+                      <span class="pattern-status">良好</span>
+                    </div>
+                  </div>
+                  <div class="pattern-item warning">
+                    <span class="pattern-icon">⚠️</span>
+                    <div class="pattern-info">
+                      <span class="pattern-name">过度思考</span>
+                      <span class="pattern-status">注意</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 错误模式 -->
+              <div class="mind-section">
+                <h4>❌ 需纠正</h4>
+                <div class="wrong-patterns">
+                  <span class="pattern-tag wrong">🤔 过度思考 <span class="freq">×3</span></span>
+                  <span class="pattern-tag wrong">⚫ 非黑即白 <span class="freq">×2</span></span>
+                </div>
+              </div>
+              
+              <!-- 正确模式 -->
+              <div class="mind-section">
+                <h4>✅ 正确思维</h4>
+                <div class="correct-patterns">
+                  <span class="pattern-tag correct">📊 概率思维</span>
+                  <span class="pattern-tag correct">🌱 成长心态</span>
+                  <span class="pattern-tag correct">🧪 实验思维</span>
+                </div>
+              </div>
+              
+              <!-- 今日练习 -->
+              <div class="mind-section">
+                <h4>📝 今日练习</h4>
+                <div class="mind-exercises">
+                  <div class="exercise-item">
+                    <span class="exercise-check">⬜</span>
+                    <div class="exercise-info">
+                      <span class="exercise-title">3秒决策练习</span>
+                      <span class="exercise-desc">对小事3秒内做决定</span>
+                    </div>
+                  </div>
+                  <div class="exercise-item done">
+                    <span class="exercise-check">☑️</span>
+                    <div class="exercise-info">
+                      <span class="exercise-title">行动优先</span>
+                      <span class="exercise-desc">先做再优化</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -174,6 +220,16 @@
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Row 2.5: Opportunity Radar -->
+      <div class="row">
+        <section class="card radar-card">
+          <h2 class="card-title">🗺️ 机会雷达</h2>
+          <div class="radar-container" id="radarContainer">
+            <div class="radar-empty">加载中...</div>
           </div>
         </section>
       </div>
@@ -559,6 +615,16 @@
   </div>
 
   <script src="data.js"></script>
+  <script src="firebase.js"></script>
+  <script src="auth.js"></script>
   <script src="app.js"></script>
+  <script>
+    // 初始化认证系统
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof initAuth === 'function') {
+        initAuth();
+      }
+    });
+  </script>
 </body>
 </html>

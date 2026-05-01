@@ -274,6 +274,173 @@ body {
 .flow-item.expense { border-left: 3px solid var(--color-warning); }
 .flow-empty { color: var(--color-text-secondary); font-style: italic; }
 
+/* Mind Model */
+.mind-model-content {
+  display: flex;
+  gap: 20px;
+}
+
+.mind-score-section {
+  flex-shrink: 0;
+}
+
+.mind-score-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.mind-score-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.mind-score-label {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.mind-analysis-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mind-section h4 {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+.mind-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pattern-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--color-bg);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.pattern-item.good { border-left: 3px solid var(--color-success); }
+.pattern-item.warning { border-left: 3px solid var(--color-warning); }
+.pattern-item.bad { border-left: 3px solid var(--color-error); }
+
+.pattern-icon { font-size: 1rem; }
+
+.pattern-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pattern-name { font-weight: 500; }
+
+.pattern-status {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+}
+
+.pattern-item.good .pattern-status { background: rgba(76, 175, 80, 0.2); color: var(--color-success); }
+.pattern-item.warning .pattern-status { background: rgba(255, 152, 0, 0.2); color: var(--color-warning); }
+.pattern-item.bad .pattern-status { background: rgba(244, 67, 54, 0.2); color: var(--color-error); }
+
+.wrong-patterns,
+.correct-patterns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pattern-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  background: var(--color-bg);
+}
+
+.pattern-tag.wrong {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--color-error);
+}
+
+.pattern-tag.correct {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--color-success);
+}
+
+.pattern-tag .freq {
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+.mind-exercises {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exercise-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--color-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.exercise-item:hover {
+  background: var(--color-bg-secondary);
+}
+
+.exercise-item.done {
+  opacity: 0.7;
+}
+
+.exercise-check {
+  font-size: 1.2rem;
+}
+
+.exercise-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-title {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.exercise-desc {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
 /* Quest */
 .quest-list { display: flex; flex-direction: column; gap: 12px; }
 
@@ -854,4 +1021,166 @@ body {
   .demo-btn { min-width: 45%; }
   .form-row { flex-wrap: wrap; }
   .form-row label { flex: 0 0 100%; }
+}
+/* ==========================================
+   机会雷达样式
+   ========================================== */
+
+.radar-card {
+  grid-column: span 2;
+}
+
+.radar-container {
+  position: relative;
+  height: 200px;
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.05) 0%, rgba(124, 77, 255, 0.02) 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.radar-svg {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  width: 260px;
+  height: 200px;
+}
+
+.radar-label {
+  font-size: 10px;
+  fill: #666;
+}
+
+.radar-dots {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  width: 260px;
+  height: 200px;
+}
+
+.radar-dot {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #7C4DFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(124, 77, 255, 0.3);
+  z-index: 2;
+}
+
+.radar-dot:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+  z-index: 10;
+}
+
+.radar-dot.project {
+  border-color: #4CAF50;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.radar-dot.opportunity {
+  border-color: #FF9800;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.radar-dot.completed {
+  opacity: 0.6;
+}
+
+.radar-dot-icon {
+  font-size: 14px;
+}
+
+.radar-legend {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: #666;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid;
+}
+
+.legend-dot.project {
+  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.legend-dot.opportunity {
+  border-color: #FF9800;
+  background: rgba(255, 152, 0, 0.2);
+}
+
+.radar-tooltip {
+  display: none;
+  position: absolute;
+  background: rgba(20, 20, 30, 0.95);
+  border: 1px solid rgba(124, 77, 255, 0.5);
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 160px;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.tooltip-title {
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.tooltip-desc {
+  color: #aaa;
+  font-size: 11px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.tooltip-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: #888;
+}
+
+.tooltip-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: #7C4DFF;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.tooltip-link:hover {
+  text-decoration: underline;
+}
+
+.radar-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-size: 14px;
 }
