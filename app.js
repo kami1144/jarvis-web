@@ -37,7 +37,7 @@ function renderAll() {
   setCurrentDate();
   const data = JARVIS.getAllData();
   const computed = JARVIS.getRealtimeData();
-  
+
   renderCharacter(computed, data);
   renderFamily(data.profile);
   renderMindModel(data.mindModel);
@@ -45,7 +45,6 @@ function renderAll() {
   renderRadar(data.opportunities);
   renderAlerts(computed, data);
   renderSkills(data.skills);
-  renderTasks();
   renderEnvironment();
   renderHistoryChart(7);
   initAIAdvice();
@@ -211,35 +210,64 @@ function renderMindModel(mindData) {
   }
 }
 
-// 渲染任务（从Obsidian读取）
+// 渲染任务（合并Obsidian项目和本地任务）
 function renderQuests(projects) {
   const questList = document.getElementById('questList');
   if (!questList) return;
-  
-  if (!projects || projects.length === 0) {
-    // 默认项目
-    projects = [
-      { id: 'adult-shop', name: 'adult-shop 上线', icon: '⚔️', progress: 70, status: 'in_progress' },
-      { id: 'jarvis-web', name: 'J.A.R.V.I.S. Web面板', icon: '🎮', progress: 40, status: 'in_progress' },
-      { id: 'manga-studio', name: 'MangaStudio', icon: '📚', progress: 30, status: 'pending' }
-    ];
-  }
-  
-  const statusMap = { in_progress: '进行中', completed: '完成', pending: '待开始' };
-  const statusClass = { in_progress: 'in-progress', completed: 'completed', pending: 'pending' };
-  
-  questList.innerHTML = projects.map(p => `
-    <div class="quest-item ${statusClass[p.status] || 'pending'}" data-quest-id="${p.id}">
+
+  // 加载本地任务
+  const tasks = TaskTracker.loadTasks();
+
+  // 默认项目（从Obsidian）
+  const defaultProjects = [
+    { id: 'adult-shop', name: 'adult-shop 上线', icon: '⚔️', progress: 70, status: 'in_progress', source: 'obsidian' },
+    { id: 'jarvis-web', name: 'J.A.R.V.I.S. Web面板', icon: '🎮', progress: 40, status: 'in_progress', source: 'obsidian' },
+    { id: 'manga-studio', name: 'MangaStudio', icon: '📚', progress: 30, status: 'pending', source: 'obsidian' }
+  ];
+
+  // 使用传入的projects或默认值
+  const projectData = (projects && projects.length > 0) ? projects : defaultProjects;
+
+  const statusMap = { in_progress: '进行中', completed: '完成', pending: '待开始', blocked: '阻塞' };
+  const statusClass = { in_progress: 'in-progress', completed: 'completed', pending: 'pending', blocked: 'blocked' };
+
+  // 合并项目和本地任务
+  const allItems = [
+    ...projectData.map(p => ({
+      id: p.id,
+      name: p.name,
+      icon: p.icon || '📋',
+      progress: p.progress || 0,
+      status: p.status || 'pending',
+      source: 'obsidian',
+      project: p.id
+    })),
+    ...tasks.map(t => ({
+      id: t.id,
+      name: t.name,
+      icon: { 'adult-shop': '⚔️', 'jarvis-web': '🎮', 'manga-studio': '📚', 'other': '📋' }[t.project] || '📋',
+      progress: t.progress || 0,
+      status: t.status || 'pending',
+      source: 'local',
+      project: t.project,
+      owner: t.owner,
+      deadline: t.deadline
+    }))
+  ];
+
+  questList.innerHTML = allItems.map(item => `
+    <div class="quest-item ${statusClass[item.status] || 'pending'}" data-quest-id="${item.id}" data-source="${item.source}">
       <div class="quest-header">
-        <span class="quest-icon">${p.icon || '📋'}</span>
-        <span class="quest-name">${p.name}</span>
-        <span class="quest-status ${statusClass[p.status]}">${statusMap[p.status] || '未知'}</span>
+        <span class="quest-icon">${item.icon}</span>
+        <span class="quest-name">${item.name}</span>
+        <span class="quest-status ${statusClass[item.status]}">${statusMap[item.status] || '未知'}</span>
+        ${item.source === 'local' ? `<button class="task-delete" onclick="deleteTask('${item.id}')">🗑️</button>` : ''}
       </div>
       <div class="quest-progress">
         <div class="progress-bar">
-          <div class="progress-fill quest-fill" style="width: ${p.progress || 0}%"></div>
+          <div class="progress-fill quest-fill" style="width: ${item.progress || 0}%"></div>
         </div>
-        <span class="progress-text">${p.progress || 0}%</span>
+        <span class="progress-text">${item.progress || 0}%</span>
       </div>
     </div>
   `).join('');

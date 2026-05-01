@@ -180,10 +180,14 @@
         </section>
       </div>
 
-      <!-- Row 2: Quest Tracker -->
+      <!-- Row 2: Quest + Task Tracker (Merged) -->
       <div class="row">
         <section class="card quest-card">
           <h2 class="card-title">📜 任务追踪 <span class="update-badge" id="questSource">📓 Obsidian</span></h2>
+          <div class="task-controls" style="margin-bottom: 12px;">
+            <button class="btn secondary" onclick="openTaskInput()">➕ 添加任务</button>
+            <button class="btn secondary" onclick="syncFromObsidian()">📓 同步Obsidian</button>
+          </div>
           <div class="quest-list" id="questList">
             <div class="quest-item in-progress">
               <div class="quest-header">
@@ -304,20 +308,6 @@
           <div class="ai-actions">
             <button class="ai-btn" onclick="requestAdvice()">🔮 获取建议</button>
             <button class="ai-btn secondary" onclick="openChat()">💬 对话</button>
-          </div>
-        </section>
-      </div>
-
-      <!-- Row 4: Task Tracker -->
-      <div class="row">
-        <section class="card task-card">
-          <h2 class="card-title">📋 任务追踪 <span class="update-badge" id="taskSource">本地</span></h2>
-          <div class="task-controls" style="margin-bottom: 12px;">
-            <button class="btn secondary" onclick="openTaskInput()">➕ 添加任务</button>
-            <button class="btn secondary" onclick="syncFromObsidian()">📓 同步Obsidian</button>
-          </div>
-          <div class="task-list" id="taskList">
-            <div class="task-empty">暂无任务，点击「➕ 添加任务」创建</div>
           </div>
         </section>
       </div>
