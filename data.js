@@ -252,8 +252,52 @@ function saveData(data) {
   } catch (e) {}
 }
 
+// ==========================================
+// 个人信息和家庭成员
+// ==========================================
+
+const ProfileData = {
+  // 用户个人信息
+  user: {
+    name: 'Kim Kami',
+    birthDate: '1982-01-19',
+    age: 44,
+    type: '探索型大脑'
+  },
+  
+  // 家庭成员
+  family: [
+    { relation: '父亲', name: null, birthDate: '1954-05-12', age: 72, note: null },
+    { relation: '母亲', name: null, birthDate: '1954-06-12', age: 71, note: null },
+    { relation: '女儿', name: '金智雅', birthDate: '2016-08-15', age: 9, note: '小学4年级' },
+    { relation: '儿子', name: '金俊成', birthDate: '2018-04-19', age: 8, note: '小学1年级' }
+  ]
+};
+
+// ==========================================
+// 数据持久层
+// ==========================================
+
+function loadData() {
+  try {
+    const stored = localStorage.getItem(JAVIS_DATA_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch (e) {}
+  return getDefaultData();
+}
+
+function saveData(data) {
+  try {
+    localStorage.setItem(JAVIS_DATA_KEY, JSON.stringify(data));
+  } catch (e) {}
+}
+
 function getDefaultData() {
   return {
+    profile: {
+      user: { ...ProfileData.user },
+      family: ProfileData.family.map(f => ({ ...f }))
+    },
     health: {
       checkup: { ...HealthData.checkup },
       exercisePlan: { ...HealthData.exercisePlan },
@@ -420,6 +464,22 @@ const JARVIS = {
     data.lastUpdate = new Date().toISOString();
     saveData(data);
     return data.projects;
+  },
+  
+  // 更新个人信息
+  updateProfile(profileData) {
+    const data = loadData();
+    if (profileData.user) data.profile.user = { ...data.profile.user, ...profileData.user };
+    if (profileData.family) data.profile.family = profileData.family;
+    data.lastUpdate = new Date().toISOString();
+    saveData(data);
+    return data.profile;
+  },
+  
+  // 获取个人信息
+  getProfile() {
+    const data = loadData();
+    return data.profile;
   },
   
   // 获取实时数据

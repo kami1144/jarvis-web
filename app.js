@@ -42,6 +42,7 @@ function renderAll() {
   HistoryTracker.recordSnapshot(computed);
 
   renderCharacter(computed, data);
+  renderFamily(data.profile);
   renderFinance(data.finance);
   renderQuests(data.projects);
   renderAlerts(computed, data);
@@ -50,6 +51,27 @@ function renderAll() {
   renderEnvironment();
   renderHistoryChart(7);
   initAIAdvice();
+}
+
+// 渲染家庭成员
+function renderFamily(profile) {
+  const familyList = document.getElementById('familyList');
+  if (!familyList || !profile?.family) return;
+  
+  familyList.innerHTML = profile.family.map(f => {
+    const relationIcon = {
+      '父亲': '👴', '母亲': '👵', '女儿': '👧', '儿子': '👦'
+    }[f.relation] || '👤';
+    
+    return `
+      <div class="family-tag">
+        <span class="relation">${relationIcon} ${f.relation}</span>
+        ${f.name ? `<span class="name">${f.name}</span>` : ''}
+        <span class="age">${f.age}岁</span>
+        ${f.note ? `<span class="note">${f.note}</span>` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
 // 渲染角色卡片
