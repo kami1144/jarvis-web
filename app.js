@@ -87,11 +87,12 @@ function renderCharacter(computed, data) {
   hpFill.style.background = getHPColor(computed.hp.current);
   card.querySelector('#hpValue').textContent = `${computed.hp.current}/${computed.hp.max}`;
   
-  // 能量 → 思维数据
+  // 能量 → 思维数据（用存储的今日得分，不是重新计算）
   const energyFill = card.querySelector('.energy-fill');
-  energyFill.style.width = `${Math.min(100, computed.mindScore.current)}%`;
-  energyFill.style.background = getEnergyColor(computed.mindScore.current);
-  card.querySelector('#energyValue').textContent = `${computed.mindScore.current}/${computed.mindScore.max}`;
+  const mindScoreValue = data.mindModel?.today?.score || computed.mindScore.current;
+  energyFill.style.width = `${Math.min(100, mindScoreValue)}%`;
+  energyFill.style.background = getEnergyColor(mindScoreValue);
+  card.querySelector('#energyValue').textContent = `${mindScoreValue}/${computed.mindScore.max}`;
   
   // 金币 → 财务数据
   const goldFill = card.querySelector('.gold-fill');
@@ -110,7 +111,7 @@ function renderCharacter(computed, data) {
   card.querySelector('#checkupDate').textContent = data.health?.checkup?.date?.slice(5) || '待输入';
   
   // 净资产 → 思维得分（思维模式仪表盘）
-  const mindScore = computed.mindScore.current;
+  const mindScore = data.mindModel?.today?.score || computed.mindScore.current;
   card.querySelector('#netWorth').textContent = `${mindScore}分`;
   
   // 情绪 → 财务净资产
