@@ -1,0 +1,203 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-05-02T07:16:09.377Z",
+  "source": "~/.shared/task-board.json",
+  "projects": [
+    {
+      "id": "adult-shop",
+      "name": "adult-shop 上线",
+      "icon": "⚔️",
+      "type": "project",
+      "status": "blocked",
+      "distance": "near",
+      "description": "日本成人用品电商（Dropshipping模式）",
+      "progress": 90,
+      "link": "https://adult-shop-kami1144s-projects.vercel.app",
+      "lastUpdated": "2026-05-01 00:20",
+      "subTasks": [
+        {
+          "name": "website_tech",
+          "owner": "3号",
+          "status": "✅ 完成",
+          "nextStep": "等工厂确认后上架产品",
+          "note": "AI功能已集成，网站MVP完成"
+        },
+        {
+          "name": "xiaohongshu",
+          "owner": "2号",
+          "status": "🔄 养号中",
+          "nextStep": "老大发布第一条内容",
+          "note": "老大在运营"
+        },
+        {
+          "name": "factory",
+          "owner": "老大",
+          "status": "🔴 待启动",
+          "nextStep": "1688找3家工厂对比",
+          "note": "选工厂 checklist 已备"
+        },
+        {
+          "name": "brand_name",
+          "owner": "老大",
+          "status": "🔴 未解决",
+          "nextStep": "确定品牌名",
+          "note": "域名注册需要"
+        },
+        {
+          "name": "domain",
+          "owner": "老大",
+          "status": "⏳ 待办",
+          "nextStep": "注册品牌名.com",
+          "note": "等品牌名确定"
+        },
+        {
+          "name": "server",
+          "owner": "老大",
+          "status": "⏳ 待办",
+          "nextStep": "租mixhost季度付",
+          "note": "Adult対応套餐"
+        },
+        {
+          "name": "paypal",
+          "owner": "小新",
+          "status": "⏳ 等待中",
+          "nextStep": "05/07 配置",
+          "note": "随网站同步"
+        },
+        {
+          "name": "product_listing",
+          "owner": "小新",
+          "status": "⏳ 等待中",
+          "nextStep": "05/10 等样品确认后上架",
+          "note": "首批3-5个SKU"
+        },
+        {
+          "name": "dropshipping",
+          "owner": "老大",
+          "status": "⏳ 等待中",
+          "nextStep": "05/10 工厂确认后代发对接",
+          "note": "代发协议"
+        },
+        {
+          "name": "privacy_shipping",
+          "owner": "老大",
+          "status": "⏳ 待办",
+          "nextStep": "05/12 确认无logo包装+隐私面单",
+          "note": ""
+        },
+        {
+          "name": "coordinator",
+          "owner": "小新",
+          "status": "进行中",
+          "nextStep": "监督各profile进度",
+          "note": "✅ 晚安巡检：网站HTTP200正常"
+        }
+      ]
+    },
+    {
+      "id": "manga-studio",
+      "name": "MangaStudio",
+      "icon": "📚",
+      "type": "project",
+      "status": "active",
+      "distance": "medium",
+      "description": "成人漫画AI排版工具",
+      "progress": 30,
+      "link": null,
+      "lastUpdated": "2026-05-01 00:20",
+      "subTasks": [
+        {
+          "name": "tech",
+          "owner": "3号",
+          "status": "进行中",
+          "nextStep": "JSON格式统一",
+          "note": "Windows用户名'金'"
+        }
+      ]
+    },
+    {
+      "id": "star-talent",
+      "name": "星火人才",
+      "icon": "🔥",
+      "type": "opportunity",
+      "status": "planning",
+      "distance": "far",
+      "description": "里程碑约束型持续资助",
+      "progress": 10,
+      "link": null,
+      "lastUpdated": "2026-05-01 00:20",
+      "subTasks": [
+        {
+          "name": "strategy",
+          "owner": "4号",
+          "status": "进行中",
+          "nextStep": "待老大指示",
+          "note": "沟通前先查wiki"
+        }
+      ]
+    },
+    {
+      "id": "jarvis-web",
+      "name": "J.A.R.V.I.S. Web面板",
+      "icon": "🎮",
+      "type": "project",
+      "status": "active",
+      "distance": "near",
+      "description": "J.A.R.V.I.S. 人生仪表盘 - 现实感知系统",
+      "progress": 100,
+      "link": "https://jarvis-web-ashen.vercel.app",
+      "lastUpdated": "2026-05-01 00:20",
+      "subTasks": [
+        {
+          "name": "v3_web_panel",
+          "owner": "3号",
+          "status": "✅ v3完成",
+          "nextStep": "-",
+          "note": "HP健康/能量情绪/金币财务/经验综合，3秒刷新，地址: jarvis-web-ashen.vercel.app"
+        },
+        {
+          "name": "alert_system",
+          "owner": "3号",
+          "status": "✅ 完成",
+          "nextStep": "-",
+          "note": "财务/健康/人际/项目阻塞预警，commit: 76b4aea"
+        },
+        {
+          "name": "env_perception",
+          "owner": "3号",
+          "status": "✅ 完成",
+          "nextStep": "-",
+          "note": "手动录入界面，行业/政策/人际关系，commit: 76b4aea"
+        },
+        {
+          "name": "task_tracker",
+          "owner": "3号",
+          "status": "✅ 完成",
+          "nextStep": "-",
+          "note": "任务卡片/进度/子任务，commit: 76b4aea"
+        },
+        {
+          "name": "history_charts",
+          "owner": "3号",
+          "status": "✅ 完成",
+          "nextStep": "-",
+          "note": "Chart.js折线图，7/30/90天，commit: 76b4aea"
+        },
+        {
+          "name": "ai_advisor",
+          "owner": "3号",
+          "status": "✅ 完成",
+          "nextStep": "-",
+          "note": "AI建议卡片，基于数据动态生成，commit: 76b4aea"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalProjects": 4,
+    "activeProjects": 2,
+    "blockedProjects": 1,
+    "completedProjects": 0
+  },
+  "lastUpdated": "2026-05-01 00:20"
+}

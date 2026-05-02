@@ -12,15 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initApp() {
   setCurrentDate();
-  renderAll();
+  renderAll(); // async but non-blocking
   startRealtimeUpdates();
   bindEvents();
   console.log('🎮 J.A.R.V.I.S. v3 初始化完成 - 手动输入 + Obsidian联动');
 }
 
 function startRealtimeUpdates() {
-  renderAll();
-  refreshTimer = setInterval(renderAll, REFRESH_INTERVAL);
+  renderAll(); // initial call
+  refreshTimer = setInterval(() => renderAll(), REFRESH_INTERVAL);
   console.log(`⏱️ 实时更新已启动 (${REFRESH_INTERVAL / 1000}秒间隔)`);
 }
 
@@ -33,16 +33,34 @@ function setCurrentDate() {
   document.getElementById('currentDate').textContent = dateStr;
 }
 
-function renderAll() {
+// 缓存同步数据
+let syncCache = null;
+
+async function loadSyncData() {
+  if (syncCache) return syncCache;
+  try {
+    const res = await fetch('/jARVIS-sync.json?t=' + Date.now());
+    if (res.ok) {
+      syncCache = await res.json();
+      return syncCache;
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function renderAll() {
   setCurrentDate();
   const data = JARVIS.getAllData();
   const computed = JARVIS.getRealtimeData();
 
+  // 异步加载同步数据
+  const syncData = await loadSyncData();
+
   renderCharacter(computed, data);
   renderFamily(data.profile);
   renderMindModel(data.mindModel);
-  renderQuests(data.projects);
-  renderRadar(data.opportunities);
+  renderQuests(syncData?.projects || null);
+  renderRadar(syncData?.projects || data.opportunities);
   renderAlerts(computed, data);
   renderSkills(data.skills);
   renderEnvironment();
@@ -224,8 +242,20 @@ function renderQuests(projects) {
   // 使用传入的projects或默认值
   const projectData = (projects && projects.length > 0) ? projects : defaultProjects;
 
-  const statusMap = { in_progress: '进行中', completed: '完成', pending: '待开始', blocked: '阻塞' };
-  const statusClass = { in_progress: 'in-progress', completed: 'completed', pending: 'pending', blocked: 'blocked' };
+  const statusMap = {
+    in_progress: '进行中', active: '进行中', '进行中': '进行中',
+    completed: '完成', 完成: '完成',
+    pending: '待开始', 待开始: '待开始',
+    blocked: '阻塞', 阻塞: '阻塞',
+    planning: '规划中'
+  };
+  const statusClass = {
+    in_progress: 'in-progress', active: 'in-progress',
+    completed: 'completed',
+    pending: 'pending',
+    blocked: 'blocked',
+    planning: 'pending'
+  };
 
   // 合并项目和本地任务
   const allItems = [
