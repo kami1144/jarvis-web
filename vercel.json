@@ -1,9 +1,6 @@
 {
   "version": 2,
+  "public": true,
   "buildCommand": null,
-  "outputDirectory": ".",
-  "rewrites": [],
-  "routes": [
-    { "src": "/(.*)", "dest": "/$1" }
-  ]
+  "outputDirectory": "public"
 }
