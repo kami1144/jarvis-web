@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 const TASK_BOARD_PATH = '/Users/jinyonghao/.shared/task-board.json';
-const OUTPUT_PATH = path.join(__dirname, '../public/jARVIS-sync.json');
+const OUTPUT_PATH = path.join(__dirname, '../jARVIS-sync.json');
 
 function sync() {
   // 1. 读取 task-board.json
