@@ -1,15 +1,135 @@
 {
   "signals": [
     {
-      "id": "sig_20260502_2ecba7",
-      "type": "market",
-      "source": "PR TIMES",
-      "sourceUrl": "https://prtimes.jp/",
-      "title": "[プレスリリース・ニュースリリース配信サービスのPR TIMES](https://prtimes.jp/)",
-      "summary": "* [プレスリリースを受信](https://prtimes.jp/user_info) * [企業登録申請](https://prtimes.jp/main/registcorp/form) * ログイン   * [プレスリリース](https://prtimes.jp/) * [ランキング](https://prtimes.jp/ranking/) * [TV](https://prtime",
-      "rawContent": "* [プレスリリースを受信](https://prtimes.jp/user_info) * [企業登録申請](https://prtimes.jp/main/registcorp/form) * ログイン   * [プレスリリース](https://prtimes.jp/) * [ランキング](https://prtimes.jp/ranking/) * [TV](https://prtimes.jp/tv) * [ストーリー](https://prtimes.jp/story/)   * [総合](https://prtimes.jp/) * [テクノロジー](https://prtimes.jp/technology/) * [モバイル](https://prtimes.jp/mobile/) * [アプリ](https://prtimes.jp/app/) * [エンタメ](https://prtimes.jp/entertainment/) * [ビューティー](https://prtimes.jp/beauty/) * [ファッション](https://prtimes.jp/fashion/) * [ライフスタイル](https://prtimes.jp/lifestyle/) * [ビジネス](https://prtimes.jp/business/) * [グルメ](https://prtimes.jp/gourmet/) * [スポーツ](https://prtimes.jp/sports/)",
-      "publishedAt": "2026-05-02T11:21:11.388Z",
-      "receivedAt": "2026-05-02T11:21:11.388Z",
+      "id": "sig_20260502_212322_6908e0",
+      "type": "industry",
+      "source": "流通ニュース",
+      "sourceUrl": "https://www.ryutsuu.biz/",
+      "title": "ひとまいる社長インタビュー／「カクヤス」を再編、物流を軸にプラットフォーム構築へ",
+      "summary": "关键词：、物流",
+      "url": "https://www.ryutsuu.biz/column/r20250807001.html",
+      "publishedAt": "2026-05-02T21:23:22.035159",
+      "receivedAt": "2026-05-02T21:23:22.035163",
+      "tags": [
+        "、物流",
+        "industry"
+      ],
+      "impact": {
+        "level": "low",
+        "recommendation": "持续跟踪，暂无明确行动",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "sig_20260502_212322_6908e0",
+      "type": "industry",
+      "source": "流通ニュース",
+      "sourceUrl": "https://www.ryutsuu.biz/",
+      "title": "楽天市場／住所不要で気軽にギフトを贈れる新機能「楽天ソーシャルギフト」提供開始",
+      "summary": "关键词：市場",
+      "url": "https://www.ryutsuu.biz/ec/s050186.html",
+      "publishedAt": "2026-05-02T21:23:22.035090",
+      "receivedAt": "2026-05-02T21:23:22.035101",
+      "tags": [
+        "市場",
+        "industry"
+      ],
+      "impact": {
+        "level": "medium",
+        "recommendation": "关注市场机会，评估是否加快 adult-shop 上线",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "sig_20260502_212321_89618b",
+      "type": "industry",
+      "source": "EC業界ニュース",
+      "sourceUrl": "https://www.ecnomikata.com/news/",
+      "title": "EC・通販事業の始め方・伸ばし方の情報はこちら",
+      "summary": "关键词：EC",
+      "url": "",
+      "publishedAt": "2026-05-02T21:23:21.959859",
+      "receivedAt": "2026-05-02T21:23:21.959862",
+      "tags": [
+        "EC",
+        "industry"
+      ],
+      "impact": {
+        "level": "low",
+        "recommendation": "持续跟踪，暂无明确行动",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "sig_20260502_212321_89618b",
+      "type": "industry",
+      "source": "EC業界ニュース",
+      "sourceUrl": "https://www.ecnomikata.com/news/",
+      "title": "EC運営の役立ち資料を探す",
+      "summary": "关键词：EC",
+      "url": "",
+      "publishedAt": "2026-05-02T21:23:21.959836",
+      "receivedAt": "2026-05-02T21:23:21.959839",
+      "tags": [
+        "EC",
+        "industry"
+      ],
+      "impact": {
+        "level": "low",
+        "recommendation": "持续跟踪，暂无明确行动",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "sig_20260502_212321_89618b",
+      "type": "industry",
+      "source": "EC業界ニュース",
+      "sourceUrl": "https://www.ecnomikata.com/news/",
+      "title": "EC専門ビジネスマッチング【企業一覧から探す】",
+      "summary": "关键词：EC",
+      "url": "",
+      "publishedAt": "2026-05-02T21:23:21.959803",
+      "receivedAt": "2026-05-02T21:23:21.959806",
+      "tags": [
+        "EC",
+        "industry"
+      ],
+      "impact": {
+        "level": "low",
+        "recommendation": "持续跟踪，暂无明确行动",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "sig_20260502_212321_89618b",
+      "type": "industry",
+      "source": "EC業界ニュース",
+      "sourceUrl": "https://www.ecnomikata.com/news/",
+      "title": "EC運営のサービス・ツールを探す",
+      "summary": "关键词：EC",
+      "url": "",
+      "publishedAt": "2026-05-02T21:23:21.959737",
+      "receivedAt": "2026-05-02T21:23:21.959748",
+      "tags": [
+        "EC",
+        "industry"
+      ],
+      "impact": {
+        "level": "low",
+        "recommendation": "持续跟踪，暂无明确行动",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "sig_20260502_4hyk4o",
+      "type": "industry",
+      "source": "小売ドア",
+      "sourceUrl": "https://mag.shogyo.jp/",
+      "title": "navigating to \"https://mag.shogyo.jp/\", waiting until \"domcontentloaded\"",
+      "summary": "[ERROR]... × https://mag.shogyo.jp/                             | Error: Unexpected error in _crawl_web at line 778 in _crawl_web (../../../../../Library/Frameworks/Python.framework/Versions/3.12/li",
+      "rawContent": "[ERROR]... × https://mag.shogyo.jp/                             | Error: Unexpected error in _crawl_web at line 778 in _crawl_web (../../../../../Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12 /site-packages/crawl4ai/async_crawler_strategy.py): Error: Failed on navigating ACS-GOTO: Page.goto: net::ERR_NAME_NOT_RESOLVED at https://mag.shogyo.jp/ Call log:",
+      "publishedAt": "2026-05-02T11:21:29.480Z",
+      "receivedAt": "2026-05-02T11:21:29.480Z",
       "tags": [],
       "impact": {
         "projectId": "adult-shop",
@@ -47,15 +167,15 @@
       }
     },
     {
-      "id": "sig_20260502_4hyk4o",
-      "type": "industry",
-      "source": "小売ドア",
-      "sourceUrl": "https://mag.shogyo.jp/",
-      "title": "navigating to \"https://mag.shogyo.jp/\", waiting until \"domcontentloaded\"",
-      "summary": "[ERROR]... × https://mag.shogyo.jp/                             | Error: Unexpected error in _crawl_web at line 778 in _crawl_web (../../../../../Library/Frameworks/Python.framework/Versions/3.12/li",
-      "rawContent": "[ERROR]... × https://mag.shogyo.jp/                             | Error: Unexpected error in _crawl_web at line 778 in _crawl_web (../../../../../Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12 /site-packages/crawl4ai/async_crawler_strategy.py): Error: Failed on navigating ACS-GOTO: Page.goto: net::ERR_NAME_NOT_RESOLVED at https://mag.shogyo.jp/ Call log:",
-      "publishedAt": "2026-05-02T11:21:29.480Z",
-      "receivedAt": "2026-05-02T11:21:29.480Z",
+      "id": "sig_20260502_2ecba7",
+      "type": "market",
+      "source": "PR TIMES",
+      "sourceUrl": "https://prtimes.jp/",
+      "title": "[プレスリリース・ニュースリリース配信サービスのPR TIMES](https://prtimes.jp/)",
+      "summary": "* [プレスリリースを受信](https://prtimes.jp/user_info) * [企業登録申請](https://prtimes.jp/main/registcorp/form) * ログイン   * [プレスリリース](https://prtimes.jp/) * [ランキング](https://prtimes.jp/ranking/) * [TV](https://prtime",
+      "rawContent": "* [プレスリリースを受信](https://prtimes.jp/user_info) * [企業登録申請](https://prtimes.jp/main/registcorp/form) * ログイン   * [プレスリリース](https://prtimes.jp/) * [ランキング](https://prtimes.jp/ranking/) * [TV](https://prtimes.jp/tv) * [ストーリー](https://prtimes.jp/story/)   * [総合](https://prtimes.jp/) * [テクノロジー](https://prtimes.jp/technology/) * [モバイル](https://prtimes.jp/mobile/) * [アプリ](https://prtimes.jp/app/) * [エンタメ](https://prtimes.jp/entertainment/) * [ビューティー](https://prtimes.jp/beauty/) * [ファッション](https://prtimes.jp/fashion/) * [ライフスタイル](https://prtimes.jp/lifestyle/) * [ビジネス](https://prtimes.jp/business/) * [グルメ](https://prtimes.jp/gourmet/) * [スポーツ](https://prtimes.jp/sports/)",
+      "publishedAt": "2026-05-02T11:21:11.388Z",
+      "receivedAt": "2026-05-02T11:21:11.388Z",
       "tags": [],
       "impact": {
         "projectId": "adult-shop",
@@ -69,6 +189,5 @@
         "confirmedScore": null
       }
     }
-  ],
-  "lastUpdated": "2026-05-02T11:21:31.489Z"
+  ]
 }
