@@ -67,54 +67,165 @@ def search_tavily(query: str, num_results: int = 5) -> list:
 
 
 def assess_impact(title: str, url: str, content: str, query: str) -> dict:
-    """评估信息对我们的影响"""
+    """
+    评估信息对项目的影响
+    输出：前端期望的完整 impact 结构
+    """
     text = (title + " " + content).lower()
+    query_lower = query.lower()
     
-    # 判断方向
-    opportunity_kw = ["growth", "expand", "increase", "surge", "rising", "opportunity", "gaining traction", "growth", "拡大", "成長", "急成長"]
-    risk_kw = ["ban", "restrict", "regulation", "decline", "drop", "shrink", "risk", "規制", "禁止", "下跌"]
-    neutral_kw = ["trend", "analysis", "guide", "update", "overview", "guide", "trends"]
+    # ==========================================
+    # 第一层：判断信号和我们的相关性
+    # ==========================================
+    # 直接相关关键词（adult-shop核心业务）
+    adult_shop_kw = ["adult product", "sex toy", "sexual wellness", "pleasure product",
+                     "成人用品", "避孕", "润滑", "性感", "intimate product",
+                     "adult goods", "erotic"]
+    # 间接相关关键词（电商/市场趋势）
+    ecommerce_kw = ["ecommerce", "e-commerce", "online shopping", "cross border",
+                    "ec market", "b2c", "Platform", "赵云巢", "越境EC", "ネット販売"]
+    # 政策相关
+    policy_kw = ["regulation", "policy", "regulatory", "law", "ban", "restrict",
+                 "visa", "immigration", "foreign", "tax", "規制", "法", "政策", "外资", "ビザ"]
+    # 人才相关
+    talent_kw = ["talent", "hiring", "freelance", "remote work", "it engineer",
+                "人材", "派遣", "採用", "スキル", "人才", "エンジニア"]
     
-    opp_count = sum(1 for kw in opportunity_kw if kw in text)
-    risk_count = sum(1 for kw in risk_kw if kw in text)
+    # 计算各类别匹配数
+    adult_score = sum(1 for kw in adult_shop_kw if kw in text)
+    ecommerce_score = sum(1 for kw in ecommerce_kw if kw in text)
+    policy_score = sum(1 for kw in policy_kw if kw in text)
+    talent_score = sum(1 for kw in talent_kw if kw in text)
     
-    if opp_count > risk_count:
+    # 确定相关性类型
+    if adult_score > 0:
+        relevance = "direct"       # 直接影响 adult-shop
+        primary_domain = "adult-shop"
+    elif policy_score > 0:
+        relevance = "policy"       # 政策法规影响
+        primary_domain = "adult-shop"
+    elif ecommerce_score > 0:
+        relevance = "market"       # 市场趋势影响
+        primary_domain = "adult-shop"
+    elif talent_score > 0:
+        relevance = "talent"       # 人才市场影响
+        primary_domain = "starfire"  # 星火人才
+    else:
+        relevance = "indirect"
+        primary_domain = "adult-shop"
+    
+    # ==========================================
+    # 第二层：判断方向（机会/风险/中性）
+    # ==========================================
+    # 增长/机会信号
+    opportunity_signals = [
+        "growth", "growing", "expand", "expanding", "increase", "increasing",
+        "surge", "rising", "soar", "booming", "positive", "opportunity",
+        "gaining traction", "on the rise", "strong demand", "bloom",
+        "成長", "拡大", "急成長", "増加", "伸長", "躍進", "市場拡大"
+    ]
+    # 风险/负面信号
+    risk_signals = [
+        "decline", "decreasing", "drop", "fall", "shrinking", "contraction",
+        "ban", "banned", "restrict", "regulation", "regulatory", "risk",
+        "concern", "warning", "volatile", "uncertain", "headwind",
+        "下跌", "減少", "規制", "禁止", "停止", "縮小", "心配"
+    ]
+    # 中性信号
+    neutral_signals = [
+        "trend", "analysis", "guide", "overview", "report", "survey",
+        "insight", "perspective", "forecast", "projection", "estimate"
+    ]
+    
+    opp_count = sum(1 for s in opportunity_signals if s in text)
+    risk_count = sum(1 for s in risk_signals if s in text)
+    
+    # neutral信号只作为降级条件，不作为升级条件
+    # 如果同时有增长和风险，增长优先
+    if opp_count >= 2 and opp_count > risk_count:
         direction = "opportunity"
-        rationale = "市场正向变化，存在机会窗口"
-        score = min(30, opp_count * 10 + 10)
-    elif risk_count > opp_count:
+        base_score = 15 + opp_count * 8
+    elif risk_count >= 2 and risk_count > opp_count:
         direction = "risk"
-        rationale = "存在监管/市场风险，需要关注"
-        score = max(-20, -(risk_count * 8 + 5))
+        base_score = -(15 + risk_count * 8)
+    elif opp_count >= 1 and opp_count > risk_count:
+        direction = "opportunity"
+        base_score = 10 + opp_count * 5
+    elif risk_count >= 1 and risk_count > opp_count:
+        direction = "risk"
+        base_score = -(10 + risk_count * 5)
     else:
         direction = "neutral"
-        rationale = "中性信息，影响待评估"
-        score = 0
+        base_score = 0
     
-    # 生成建议
-    if "adult" in text or "sex toy" in text or "pleasure" in text or " товар" in text:
-        rec = "直接相关！评估对 adult-shop 产品线和定价策略的影响"
-    elif "japan" in text and ("ecommerce" in text or "market" in text):
-        rec = "日本电商市场动态，关注市场扩张对 adult-shop 的机会"
-    elif "cross border" in text or "跨境" in text:
-        rec = "跨境政策直接影响 adult-shop 供应链和合规策略"
-    elif "foreign" in text or "外资" in text:
-        rec = "外资政策影响 adult-shop 在日架构设计"
-    elif "talent" in text or "人材" in text or "人才" in text:
-        rec = "影响星火人才业务的定价和需求趋势"
-    elif "consumer" in text or "shopping" in text or "consumer" in text:
-        rec = "消费趋势变化影响 adult-shop 用户定位和营销策略"
+    # ==========================================
+    # 第三层：计算置信度（0.0 ~ 1.0）
+    # ==========================================
+    # 内容长度：摘要越长，置信度越高
+    content_length = len(content)
+    length_factor = min(1.0, content_length / 500)  # 500字封顶
+    
+    # 相关性加成：直接相关 > 政策 > 市场趋势
+    relevance_factor = {"direct": 0.9, "policy": 0.7, "market": 0.6, "talent": 0.7, "indirect": 0.3}
+    rel_factor = relevance_factor.get(relevance, 0.5)
+    
+    confidence = round(length_factor * 0.4 + rel_factor * 0.6, 2)
+    confidence = max(0.2, min(0.95, confidence))  # 钳制在 0.2~0.95
+    
+    # ==========================================
+    # 第四层：生成具体建议
+    # ==========================================
+    if primary_domain == "starfire":
+        if direction == "opportunity":
+            rec = "星火人才业务利好！人才需求增加，考虑扩大产能或提高报价"
+        elif direction == "risk":
+            rec = "星火人才面临风险！关注政策变化对派遣业务的影响"
+        else:
+            rec = "人才市场动态，建议评估对星火人才定价策略的影响"
+    elif relevance == "direct":
+        if direction == "opportunity":
+            rec = "成人用品市场利好！直接机会，考虑加速 adult-shop 产品上线"
+        elif direction == "risk":
+            rec = "成人用品领域风险！检查 adult-shop 合规性和品类风险"
+        else:
+            rec = "成人用品行业动态，评估对 adult-shop 产品定位的影响"
+    elif relevance == "policy":
+        if direction == "risk":
+            rec = "政策法规风险！立即评估对 adult-shop 外资架构/合规的影响"
+        else:
+            rec = "政策法规变化，关注对 adult-shop 跨境供应链和资质的影响"
+    elif relevance == "market":
+        if direction == "opportunity":
+            rec = "日本电商市场扩张！评估 adult-shop 如何抓住这波增长红利"
+        elif direction == "risk":
+            rec = "电商市场风险！关注竞争加剧，思考 adult-shop 差异化策略"
+        else:
+            rec = "日本电商趋势，持续关注市场变化对 adult-shop 的机会"
     else:
-        rec = "持续关注，评估对项目的影响"
+        rec = "关注动态变化，评估对本项目潜在影响"
+    
+    # ==========================================
+    # 第五层：判断时间范围
+    # ==========================================
+    if any(kw in text for kw in ["2025", "2026", "now", "current", "今年", "現在"]):
+        horizon = "short"
+    elif any(kw in text for kw in ["forecast", "project", "2027", "2028", "未来", "予測"]):
+        horizon = "long"
+    else:
+        horizon = "mid"
+    
+    # 分数钳制
+    score = max(-30, min(40, base_score))
     
     return {
         "status": "pending",
         "direction": direction,
         "score": score,
-        "confidence": 0.6,
-        "horizon": "mid",
-        "rationale": rationale,
-        "projectId": "adult-shop"
+        "confidence": confidence,
+        "horizon": horizon,
+        "rationale": f"[{relevance.upper()}] {direction} — {primary_domain}",
+        "recommendation": rec,
+        "projectId": primary_domain
     }
 
 
