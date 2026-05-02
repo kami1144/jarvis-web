@@ -1,6 +1,1158 @@
 {
   "signals": [
     {
+      "id": "sig_20260502_213344_935125",
+      "type": "industry",
+      "source": "www.linkedin.com",
+      "sourceUrl": "https://www.linkedin.com/pulse/smart-vending-machines-redefining-unattended-retail-farddin-p-s-y98ic",
+      "title": "Smart Vending Machines: Redefining Unattended Retail",
+      "summary": "# Smart Vending Machines: Redefining Unattended Retail. As digital transformation sweeps through retail, even the humble...",
+      "url": "https://www.linkedin.com/pulse/smart-vending-machines-redefining-unattended-retail-farddin-p-s-y98ic",
+      "publishedAt": "2026-05-02T21:33:44.646477",
+      "receivedAt": "2026-05-02T21:33:44.646484",
+      "tags": [
+        "无人零售",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213344_935125",
+      "type": "industry",
+      "source": "soranews24.com",
+      "sourceUrl": "https://soranews24.com/tag/capsule-vending-machines",
+      "title": "Tag: capsule vending machines | SoraNews24 -Japan News-",
+      "summary": "## Sushi By Foreigners BC: Japanese gacha capsule toys just keep on getting weirder. * (capsule machines • capsule toys ...",
+      "url": "https://soranews24.com/tag/capsule-vending-machines",
+      "publishedAt": "2026-05-02T21:33:44.646327",
+      "receivedAt": "2026-05-02T21:33:44.646334",
+      "tags": [
+        "无人零售",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213344_935125",
+      "type": "industry",
+      "source": "soranews24.com",
+      "sourceUrl": "https://soranews24.com/2021/12/09/japan-has-a-random-hotel-room-gacha-capsule-vending-machine",
+      "title": "Japan has a random hotel room gacha capsule vending machine | SoraNews24 -Japan News-",
+      "summary": "* » Japan has a random hotel room gacha capsule vending machine. ## Japan has a random hotel room gacha capsule vending ...",
+      "url": "https://soranews24.com/2021/12/09/japan-has-a-random-hotel-room-gacha-capsule-vending-machine",
+      "publishedAt": "2026-05-02T21:33:44.646190",
+      "receivedAt": "2026-05-02T21:33:44.646197",
+      "tags": [
+        "无人零售",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213344_935125",
+      "type": "industry",
+      "source": "www.nipino.com",
+      "sourceUrl": "https://www.nipino.com/the-mystery-behind-unattended-vending-machines",
+      "title": "The Mystery Behind Unattended Vending Machines - Nipino.com - Bridging Japan and the Philippines Online",
+      "summary": "* Japan Starter Toolkit Premium | Nipino.com – Thrive in Japan from Day One. All Moving to Japan Living in Japan Basics ...",
+      "url": "https://www.nipino.com/the-mystery-behind-unattended-vending-machines",
+      "publishedAt": "2026-05-02T21:33:44.646034",
+      "receivedAt": "2026-05-02T21:33:44.646042",
+      "tags": [
+        "无人零售",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213344_935125",
+      "type": "industry",
+      "source": "www.accio.com",
+      "sourceUrl": "https://www.accio.com/blog/shockingly-innovative-underpants-vending-machines-in-japan",
+      "title": "Beyond the Myth: 7 Shockingly Innovative Underpants Vending Machines in Japan for 2026",
+      "summary": "Beyond the Myth: 7 Shockingly Innovative Underpants Vending Machines in Japan for 2026. # Beyond the Myth: 7 Shockingly ...",
+      "url": "https://www.accio.com/blog/shockingly-innovative-underpants-vending-machines-in-japan",
+      "publishedAt": "2026-05-02T21:33:44.645840",
+      "receivedAt": "2026-05-02T21:33:44.645851",
+      "tags": [
+        "无人零售",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213340_0f98c2",
+      "type": "industry",
+      "source": "deebo.co.jp",
+      "sourceUrl": "https://deebo.co.jp/ja-jp/blogs/articles-resources/japan-e-commerce-2025-key-trends-global-brands-need-to-know?srsltid=AfmBOophDmMI-YIB7zqJkAIY31Rwc1fHiv_C-78bReWhOKowYhUaAXRn",
+      "title": "Japan E-Commerce 2025: Key Trends Global Brands Need to Know – DEEBO",
+      "summary": "# Japan E-Commerce 2025: Key Trends Global Brands Need to Know. Japan remains one of the most advanced and competitive o...",
+      "url": "https://deebo.co.jp/ja-jp/blogs/articles-resources/japan-e-commerce-2025-key-trends-global-brands-need-to-know?srsltid=AfmBOophDmMI-YIB7zqJkAIY31Rwc1fHiv_C-78bReWhOKowYhUaAXRn",
+      "publishedAt": "2026-05-02T21:33:40.509034",
+      "receivedAt": "2026-05-02T21:33:40.509041",
+      "tags": [
+        "消费趋势",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213340_0f98c2",
+      "type": "industry",
+      "source": "embarc.jp",
+      "sourceUrl": "https://embarc.jp/en/blog/japan-consumer-trends-2025",
+      "title": "Japan Consumer Trends 2025: 7 Key Shifts Global Firms Must Track",
+      "summary": "More importantly, Japanese e-commerce is surging—estimated to grow 7.7% in 2025 to reach around US $206.8 billion (Retai...",
+      "url": "https://embarc.jp/en/blog/japan-consumer-trends-2025",
+      "publishedAt": "2026-05-02T21:33:40.508861",
+      "receivedAt": "2026-05-02T21:33:40.508868",
+      "tags": [
+        "消费趋势",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213340_0f98c2",
+      "type": "industry",
+      "source": "www.statista.com",
+      "sourceUrl": "https://www.statista.com/forecasts/1001091/attitudes-towards-online-shopping-in-japan/?srsltid=AfmBOopIffYNtNvl5GVE1V9jfI5MK7r97Y-VjjbKUWdPFwAF9pfvCVYL",
+      "title": "Attitudes towards online shopping in Japan 2025| Statista",
+      "summary": "Consumer · eCommerce · Mobility. Consumer Insights. Insights on consumer attitudes and behavior worldwide. 3,000,000+ in...",
+      "url": "https://www.statista.com/forecasts/1001091/attitudes-towards-online-shopping-in-japan/?srsltid=AfmBOopIffYNtNvl5GVE1V9jfI5MK7r97Y-VjjbKUWdPFwAF9pfvCVYL",
+      "publishedAt": "2026-05-02T21:33:40.508695",
+      "receivedAt": "2026-05-02T21:33:40.508702",
+      "tags": [
+        "消费趋势",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213340_0f98c2",
+      "type": "industry",
+      "source": "www.accio.com",
+      "sourceUrl": "https://www.accio.com/business/japan_ecommerce_trends",
+      "title": "Japan Ecommerce Trends 2025: AI Growth & Market Projections",
+      "summary": "The Japanese e-commerce market is experiencing sustained growth, driven by high internet penetration, evolving consumer ...",
+      "url": "https://www.accio.com/business/japan_ecommerce_trends",
+      "publishedAt": "2026-05-02T21:33:40.508535",
+      "receivedAt": "2026-05-02T21:33:40.508549",
+      "tags": [
+        "消费趋势",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213337_a81c1a",
+      "type": "talent",
+      "source": "www.reportlinker.com",
+      "sourceUrl": "https://www.reportlinker.com/dlp/6993670189c6c6c8471f11b2b3879998",
+      "title": "Japan Remote Working Market Report- Q1 2025",
+      "summary": "4. Japan Remote Working Market Report- Q1 2025. ## Executive Summary: Japan Remote Working Market Q1 2025. The first qua...",
+      "url": "https://www.reportlinker.com/dlp/6993670189c6c6c8471f11b2b3879998",
+      "publishedAt": "2026-05-02T21:33:37.933100",
+      "receivedAt": "2026-05-02T21:33:37.933103",
+      "tags": [
+        "人才平台",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213337_a81c1a",
+      "type": "talent",
+      "source": "www.linkedin.com",
+      "sourceUrl": "https://www.linkedin.com/pulse/freelance-platforms-market-share-region-2025-australia-xlv8c/",
+      "title": "Freelance Platforms Market Share by Region 2025: Australia | Japan",
+      "summary": "The Freelance Platforms Market, valued at 6.44 billion in 2025, is expected to grow at a CAGR of 16.17% from 2026 to 203...",
+      "url": "https://www.linkedin.com/pulse/freelance-platforms-market-share-region-2025-australia-xlv8c/",
+      "publishedAt": "2026-05-02T21:33:37.933042",
+      "receivedAt": "2026-05-02T21:33:37.933045",
+      "tags": [
+        "人才平台",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213337_a81c1a",
+      "type": "talent",
+      "source": "www.jobbers.io",
+      "sourceUrl": "https://www.jobbers.io/freelancing-in-japan-2025-complete-guide-for-gaijin-international-clients/",
+      "title": "Freelancing in Japan 2025: Complete Guide for Gaijin ... - Jobbers",
+      "summary": "The Japanese freelance platforms market generated revenue of $113.9 million in 2023 and is expected to reach $544.5 mill...",
+      "url": "https://www.jobbers.io/freelancing-in-japan-2025-complete-guide-for-gaijin-international-clients/",
+      "publishedAt": "2026-05-02T21:33:37.932988",
+      "receivedAt": "2026-05-02T21:33:37.932991",
+      "tags": [
+        "人才平台",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213337_a81c1a",
+      "type": "talent",
+      "source": "www.grandviewresearch.com",
+      "sourceUrl": "https://www.grandviewresearch.com/horizon/outlook/freelance-platforms-market/japan",
+      "title": "Japan Freelance Platforms Market Size & Outlook, 2033",
+      "summary": "# Japan Freelance Platforms Market Size & Outlook, 2026-2033. The freelance platforms market in Japan is expected to rea...",
+      "url": "https://www.grandviewresearch.com/horizon/outlook/freelance-platforms-market/japan",
+      "publishedAt": "2026-05-02T21:33:37.932936",
+      "receivedAt": "2026-05-02T21:33:37.932940",
+      "tags": [
+        "人才平台",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213337_a81c1a",
+      "type": "talent",
+      "source": "prsync.com",
+      "sourceUrl": "http://prsync.com/market-research-update/japan-freelance-platforms-market-predictions-shaping-the-future-of-global-trade-and-investment-forecast--to--4907225/",
+      "title": "Japan Freelance Platforms Market Predictions Shaping the Future of Global Trade and Investment, Forecast 2025 to 2032",
+      "summary": "# Japan Freelance Platforms Market Predictions Shaping the Future of Global Trade and Investment, Forecast 2025 to 2032....",
+      "url": "http://prsync.com/market-research-update/japan-freelance-platforms-market-predictions-shaping-the-future-of-global-trade-and-investment-forecast--to--4907225/",
+      "publishedAt": "2026-05-02T21:33:37.932867",
+      "receivedAt": "2026-05-02T21:33:37.932873",
+      "tags": [
+        "人才平台",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213335_1b5406",
+      "type": "talent",
+      "source": "itbusinesstoday.com",
+      "sourceUrl": "https://itbusinesstoday.com/hr-tech/ai-driven-workforce-planning-in-japan-from-talent-shortage-to-skills-intelligence/",
+      "title": "AI-Driven Workforce Planning in Japan - ITBusinesstoday",
+      "summary": "Japan faces a real labor shortage. See how AI workforce planning and skills intelligence are reshaping hiring, reskillin...",
+      "url": "https://itbusinesstoday.com/hr-tech/ai-driven-workforce-planning-in-japan-from-talent-shortage-to-skills-intelligence/",
+      "publishedAt": "2026-05-02T21:33:35.423368",
+      "receivedAt": "2026-05-02T21:33:35.423374",
+      "tags": [
+        "日本IT人才",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213335_1b5406",
+      "type": "talent",
+      "source": "www.linkedin.com",
+      "sourceUrl": "https://www.linkedin.com/posts/undercode-news_ai-adoption-eases-japans-it-talent-shortage-activity-7445978202885373953-V4zn",
+      "title": "Japan's IT Talent Shortage Eased by AI Adoption - LinkedIn",
+      "summary": "39% of workers' core skills are expected to change by 2030. The response to that is intentional investment in the skills...",
+      "url": "https://www.linkedin.com/posts/undercode-news_ai-adoption-eases-japans-it-talent-shortage-activity-7445978202885373953-V4zn",
+      "publishedAt": "2026-05-02T21:33:35.423255",
+      "receivedAt": "2026-05-02T21:33:35.423262",
+      "tags": [
+        "日本IT人才",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213335_1b5406",
+      "type": "talent",
+      "source": "japan-dev.com",
+      "sourceUrl": "https://japan-dev.com/blog/it-jobs-in-demand-2025",
+      "title": "In-Demand IT Jobs in Japan for 2026: Market Trends and Top Roles",
+      "summary": "As companies embrace new technologies, the demand for skilled workers continues to outpace supply, threatening to slow d...",
+      "url": "https://japan-dev.com/blog/it-jobs-in-demand-2025",
+      "publishedAt": "2026-05-02T21:33:35.423154",
+      "receivedAt": "2026-05-02T21:33:35.423161",
+      "tags": [
+        "日本IT人才",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213335_1b5406",
+      "type": "talent",
+      "source": "www.linuxfoundation.org",
+      "sourceUrl": "https://www.linuxfoundation.org/press/2025-japan-tech-talent-report-now-live",
+      "title": "2025 Japan Tech Talent Report Now Live - Linux Foundation",
+      "summary": "The report reveals a lag in cloud adoption and talent shortages in Japanese enterprises, as well as a rising awareness a...",
+      "url": "https://www.linuxfoundation.org/press/2025-japan-tech-talent-report-now-live",
+      "publishedAt": "2026-05-02T21:33:35.422996",
+      "receivedAt": "2026-05-02T21:33:35.423008",
+      "tags": [
+        "日本IT人才",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 20,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213335_1b5406",
+      "type": "talent",
+      "source": "www.linuxfoundation.org",
+      "sourceUrl": "https://www.linuxfoundation.org/hubfs/Research%20Reports/lfr_techtalent_jp2025_052325.pdf?hsLang=en",
+      "title": "[PDF] 2025 - State of Tech Talent Japan Report - Linux Foundation",
+      "summary": "However, a concerning trend among Japanese organizations emerges in entry-level technical positions, which shows a -19% ...",
+      "url": "https://www.linuxfoundation.org/hubfs/Research%20Reports/lfr_techtalent_jp2025_052325.pdf?hsLang=en",
+      "publishedAt": "2026-05-02T21:33:35.422866",
+      "receivedAt": "2026-05-02T21:33:35.422878",
+      "tags": [
+        "日本IT人才",
+        "talent"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213332_6456cd",
+      "type": "policy",
+      "source": "www.meti.go.jp",
+      "sourceUrl": "https://www.meti.go.jp/english/policy/economy/startup_nbp/startup_visa.html",
+      "title": "Startup Visa / METI Ministry of Economy, Trade and Industry",
+      "summary": "4. Startup and New Business Promotion. # Startup Visa. You can start a business in Japan, if you obtain a status of resi...",
+      "url": "https://www.meti.go.jp/english/policy/economy/startup_nbp/startup_visa.html",
+      "publishedAt": "2026-05-02T21:33:32.783849",
+      "receivedAt": "2026-05-02T21:33:32.783856",
+      "tags": [
+        "在日外资政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213332_6456cd",
+      "type": "policy",
+      "source": "corporateimmigrationpartners.com",
+      "sourceUrl": "https://corporateimmigrationpartners.com/japan-startup-visa-validity-extended-to-two-years/",
+      "title": "Japan: Startup Visa Validity Extended to Two Years",
+      "summary": "Effective April 1, 2025, Japan will extend its startup visa validity from six months to two years. This change allows fo...",
+      "url": "https://corporateimmigrationpartners.com/japan-startup-visa-validity-extended-to-two-years/",
+      "publishedAt": "2026-05-02T21:33:32.783714",
+      "receivedAt": "2026-05-02T21:33:32.783727",
+      "tags": [
+        "在日外资政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213332_6456cd",
+      "type": "policy",
+      "source": "www.immigration-lawyers.jp",
+      "sourceUrl": "https://www.immigration-lawyers.jp/investor-visa/1016/",
+      "title": "Japan's Business Manager Visa changes on October 16,2025",
+      "summary": "The Startup Visa allows entrepreneurs to reside in Japan under a Special Activities (tokutei katsudō) status for up to o...",
+      "url": "https://www.immigration-lawyers.jp/investor-visa/1016/",
+      "publishedAt": "2026-05-02T21:33:32.783608",
+      "receivedAt": "2026-05-02T21:33:32.783616",
+      "tags": [
+        "在日外资政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213332_6456cd",
+      "type": "policy",
+      "source": "japan-businessvisa.com",
+      "sourceUrl": "https://japan-businessvisa.com/en/en-changed-in-october-2025experts-thoroughly-explain-new-rules-for-the-japan-business-visa-business-manager-visa-for-foreign-entrepreneurs/",
+      "title": "【Changed in October 2025】Experts Thoroughly Explain New Rules for the “Japan Business Visa (Business Manager Visa)” for Foreign Entrepreneurs - Japan ",
+      "summary": "Japan Business Visa New Rules 2025: Complete Guide to Management Visa Changes. # Japan Business Visa New Rules 2025: Com...",
+      "url": "https://japan-businessvisa.com/en/en-changed-in-october-2025experts-thoroughly-explain-new-rules-for-the-japan-business-visa-business-manager-visa-for-foreign-entrepreneurs/",
+      "publishedAt": "2026-05-02T21:33:32.783469",
+      "receivedAt": "2026-05-02T21:33:32.783477",
+      "tags": [
+        "在日外资政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213332_6456cd",
+      "type": "policy",
+      "source": "japanremotely.com",
+      "sourceUrl": "https://japanremotely.com/news-japan-start-up-visa-expansion-updates/",
+      "title": "What to Know About Japan’s New Start-up Visa Expansion",
+      "summary": "The Startup Visa is a residency program designed to support foreign entrepreneurs during the initial stages of starting ...",
+      "url": "https://japanremotely.com/news-japan-start-up-visa-expansion-updates/",
+      "publishedAt": "2026-05-02T21:33:32.783252",
+      "receivedAt": "2026-05-02T21:33:32.783264",
+      "tags": [
+        "在日外资政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213330_dad443",
+      "type": "policy",
+      "source": "www.nature.com",
+      "sourceUrl": "https://www.nature.com/articles/s41599-025-05551-y",
+      "title": "Empowering China's cross-border e-commerce: high-quality ...",
+      "summary": "R&D investment is crucial for recognizing and seizing external opportunities, enabling firms to meet international marke...",
+      "url": "https://www.nature.com/articles/s41599-025-05551-y",
+      "publishedAt": "2026-05-02T21:33:30.363690",
+      "receivedAt": "2026-05-02T21:33:30.363696",
+      "tags": [
+        "中国电商政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213330_dad443",
+      "type": "policy",
+      "source": "www.china-briefing.com",
+      "sourceUrl": "https://www.china-briefing.com/news/china-2025-tax-filing-export-compliance-cross-border-ecommerce/",
+      "title": "How China's 2025 New Tax Filing Rules Will Affect Export Compliance",
+      "summary": "China's 2025 new tax filing rules enforce real-name tax reporting for all exporters. Learn the impact on cross-border ec...",
+      "url": "https://www.china-briefing.com/news/china-2025-tax-filing-export-compliance-cross-border-ecommerce/",
+      "publishedAt": "2026-05-02T21:33:30.363599",
+      "receivedAt": "2026-05-02T21:33:30.363606",
+      "tags": [
+        "中国电商政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213330_dad443",
+      "type": "policy",
+      "source": "english.mofcom.gov.cn",
+      "sourceUrl": "https://english.mofcom.gov.cn/Policies/ForeignInvestmentAdministration/art/2025/art_cf7fc241d17f42768849fc2837cd3715.html",
+      "title": "2025 Action Plan for Stabilizing Foreign Investment",
+      "summary": "We have thus formulated this action plan to intensify efforts to attract and stabilize foreign investment in 2025.",
+      "url": "https://english.mofcom.gov.cn/Policies/ForeignInvestmentAdministration/art/2025/art_cf7fc241d17f42768849fc2837cd3715.html",
+      "publishedAt": "2026-05-02T21:33:30.363495",
+      "receivedAt": "2026-05-02T21:33:30.363501",
+      "tags": [
+        "中国电商政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213330_dad443",
+      "type": "policy",
+      "source": "focus.cbbc.org",
+      "sourceUrl": "https://focus.cbbc.org/navigating-chinas-cross-border-e-commerce-in-2025/",
+      "title": "What is Chinese Cross-Border E-Commerce?",
+      "summary": "In 2025, China's cross-border e-commerce market is projected to reach £268 billion, with annual growth exceeding 10%, dr...",
+      "url": "https://focus.cbbc.org/navigating-chinas-cross-border-e-commerce-in-2025/",
+      "publishedAt": "2026-05-02T21:33:30.363394",
+      "receivedAt": "2026-05-02T21:33:30.363401",
+      "tags": [
+        "中国电商政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213330_dad443",
+      "type": "policy",
+      "source": "gatekaizen.com",
+      "sourceUrl": "https://gatekaizen.com/china-cbec-cross-border-e-commerce-2025-guide-trends-platforms-strategies/",
+      "title": "China Cross-Border E-Commerce 2025 Guide",
+      "summary": "# China CBEC (Cross-Border E-Commerce) 2025 Guide: Trends, Platforms and Strategies. China’s **cross-border e-commerce (...",
+      "url": "https://gatekaizen.com/china-cbec-cross-border-e-commerce-2025-guide-trends-platforms-strategies/",
+      "publishedAt": "2026-05-02T21:33:30.363253",
+      "receivedAt": "2026-05-02T21:33:30.363267",
+      "tags": [
+        "中国电商政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213327_0c9ee9",
+      "type": "policy",
+      "source": "www.tktk.com",
+      "sourceUrl": "https://www.tktk.com/pt/news/3515.html",
+      "title": "Countdown to Japan's new e-commerce regulations! If the seller does not do so, the product may be completely taken down! | Tuke Marketing",
+      "summary": "Agência Global de Marketing no TikTok. Countdown to Japan's new e-commerce regulations! Countdown to Japan's new e-comme...",
+      "url": "https://www.tktk.com/pt/news/3515.html",
+      "publishedAt": "2026-05-02T21:33:27.916916",
+      "receivedAt": "2026-05-02T21:33:27.916922",
+      "tags": [
+        "跨境政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "risk",
+        "score": -13,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "存在监管/市场风险，需要关注",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213327_0c9ee9",
+      "type": "policy",
+      "source": "tbaglobal.com",
+      "sourceUrl": "https://tbaglobal.com/policy-update-japans-new-authorised-representative-requirements/",
+      "title": "Policy Update: Japan’s New Domestic Administrator Requirements for Overseas E-Commerce Sellers | TBA Global",
+      "summary": "## Product Compliance. # Policy Update: Japan’s New Domestic Administrator Requirements for Overseas E-Commerce Sellers....",
+      "url": "https://tbaglobal.com/policy-update-japans-new-authorised-representative-requirements/",
+      "publishedAt": "2026-05-02T21:33:27.916691",
+      "receivedAt": "2026-05-02T21:33:27.916697",
+      "tags": [
+        "跨境政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213327_0c9ee9",
+      "type": "policy",
+      "source": "kakusouzoku.com",
+      "sourceUrl": "https://kakusouzoku.com/wp/cross-border-ecommerce-japan-guide/",
+      "title": "Cross-Border E-Commerce Japan: Complete Guide for Foreign Companies",
+      "summary": "# Cross-Border E-Commerce Japan: Complete Guide for Foreign Companies. ## Cross-Border E-Commerce for Foreign Companies ...",
+      "url": "https://kakusouzoku.com/wp/cross-border-ecommerce-japan-guide/",
+      "publishedAt": "2026-05-02T21:33:27.916559",
+      "receivedAt": "2026-05-02T21:33:27.916565",
+      "tags": [
+        "跨境政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213327_0c9ee9",
+      "type": "policy",
+      "source": "www.linkedin.com",
+      "sourceUrl": "https://www.linkedin.com/posts/scottscofield_japanregulatory-japanesemarket-importerofrecord-activity-7433052073111486464-bCL_",
+      "title": "Japan Tightens Regulatory Measures on Cross-Border ...",
+      "summary": "Starting October 12, 2025 — New Import Declaration Fields for E‑commerce Cargo was introduced Heads up to anyone importi...",
+      "url": "https://www.linkedin.com/posts/scottscofield_japanregulatory-japanesemarket-importerofrecord-activity-7433052073111486464-bCL_",
+      "publishedAt": "2026-05-02T21:33:27.916454",
+      "receivedAt": "2026-05-02T21:33:27.916461",
+      "tags": [
+        "跨境政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213327_0c9ee9",
+      "type": "policy",
+      "source": "scm-en.ecer.com",
+      "sourceUrl": "https://scm-en.ecer.com/topic/detail-813640-japans-2025-ecommerce-import-rule-challenges-fixedtax-systems.html",
+      "title": "Japans 2025 Ecommerce Import Rule Challenges Fixedtax ...",
+      "summary": "Starting October 12, 2025, Japan will enforce new regulations requiring precise tracking of every e-commerce shipment en...",
+      "url": "https://scm-en.ecer.com/topic/detail-813640-japans-2025-ecommerce-import-rule-challenges-fixedtax-systems.html",
+      "publishedAt": "2026-05-02T21:33:27.916271",
+      "receivedAt": "2026-05-02T21:33:27.916318",
+      "tags": [
+        "跨境政策",
+        "policy"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "risk",
+        "score": -13,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "存在监管/市场风险，需要关注",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213325_b21265",
+      "type": "industry",
+      "source": "univdatos.com",
+      "sourceUrl": "https://univdatos.com/reports/sex-toys-market",
+      "title": "Sex Toys Market Size, Growth Report, 2033 - UnivDatos",
+      "summary": "The Global Sex Toys Market was valued at USD 37.83 billion in 2024 and is expected to grow at a robust CAGR of 9.04% dur...",
+      "url": "https://univdatos.com/reports/sex-toys-market",
+      "publishedAt": "2026-05-02T21:33:25.276964",
+      "receivedAt": "2026-05-02T21:33:25.276970",
+      "tags": [
+        "成人用品市场",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213325_b21265",
+      "type": "industry",
+      "source": "finance.yahoo.com",
+      "sourceUrl": "https://finance.yahoo.com/news/sex-toys-market-size-set-184700137.html",
+      "title": "Sex Toys Market size is set to grow by USD 34.54 billion from 2025 ...",
+      "summary": "Sex Toys Market size is set to grow by USD 34.54 billion from 2025-2029, increasing popularity of sex toys globally boos...",
+      "url": "https://finance.yahoo.com/news/sex-toys-market-size-set-184700137.html",
+      "publishedAt": "2026-05-02T21:33:25.276882",
+      "receivedAt": "2026-05-02T21:33:25.276888",
+      "tags": [
+        "成人用品市场",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213325_b21265",
+      "type": "industry",
+      "source": "www.fortunebusinessinsights.com",
+      "sourceUrl": "https://www.fortunebusinessinsights.com/sexual-wellness-products-market-110030",
+      "title": "Sexual Wellness Products Market Size | Industry Report [2034]",
+      "summary": "Asia Pacific witnessed sexual wellness products market growth from USD 10.12 billion in 2025 to USD 10.95 billion in 202...",
+      "url": "https://www.fortunebusinessinsights.com/sexual-wellness-products-market-110030",
+      "publishedAt": "2026-05-02T21:33:25.276780",
+      "receivedAt": "2026-05-02T21:33:25.276796",
+      "tags": [
+        "成人用品市场",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213325_b21265",
+      "type": "industry",
+      "source": "www.technavio.com",
+      "sourceUrl": "https://www.technavio.com/report/sex-toys-market-industry-analysis",
+      "title": "Sex Toys Market Analysis, Size, and Forecast 2025-2029 - Technavio",
+      "summary": "The market for sex toys is expected to grow at a rate of 10% annually, reflecting the continuous demand for innovative a...",
+      "url": "https://www.technavio.com/report/sex-toys-market-industry-analysis",
+      "publishedAt": "2026-05-02T21:33:25.276657",
+      "receivedAt": "2026-05-02T21:33:25.276665",
+      "tags": [
+        "成人用品市场",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213325_b21265",
+      "type": "industry",
+      "source": "www.researchandmarkets.com",
+      "sourceUrl": "https://www.researchandmarkets.com/report/asia-pacific-sex-toy-market?srsltid=AfmBOooc8OfAcfWeAmu5TK4M6zZwA_FPed9SItItDuatznuvDZ8vYugQ",
+      "title": "Asia-Pacific Sex Toys Market Size, Competitors & Forecast",
+      "summary": "Asia-Pacific Sex Toys Market Size, Share & Trends Analysis Report By End-user, By Product Type, By Distribution Channel,...",
+      "url": "https://www.researchandmarkets.com/report/asia-pacific-sex-toy-market?srsltid=AfmBOooc8OfAcfWeAmu5TK4M6zZwA_FPed9SItItDuatznuvDZ8vYugQ",
+      "publishedAt": "2026-05-02T21:33:25.276530",
+      "receivedAt": "2026-05-02T21:33:25.276542",
+      "tags": [
+        "成人用品市场",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213323_448331",
+      "type": "industry",
+      "source": "www.grandviewresearch.com",
+      "sourceUrl": "https://www.grandviewresearch.com/horizon/outlook/b2c-e-commerce-market/japan",
+      "title": "Japan B2C E-commerce Market Size & Outlook, 2030",
+      "summary": "# Japan B2c E-commerce Market Size & Outlook, 2024-2030. The b2c e-commerce market in Japan is expected to reach a proje...",
+      "url": "https://www.grandviewresearch.com/horizon/outlook/b2c-e-commerce-market/japan",
+      "publishedAt": "2026-05-02T21:33:23.035903",
+      "receivedAt": "2026-05-02T21:33:23.035910",
+      "tags": [
+        "日本电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213323_448331",
+      "type": "industry",
+      "source": "www.accio.com",
+      "sourceUrl": "https://www.accio.com/business/japan_ecommerce_trends",
+      "title": "Japan Ecommerce Trends 2026: Growth & Insights",
+      "summary": "The Japanese e-commerce market is experiencing sustained growth, driven by high internet penetration, evolving consumer ...",
+      "url": "https://www.accio.com/business/japan_ecommerce_trends",
+      "publishedAt": "2026-05-02T21:33:23.035785",
+      "receivedAt": "2026-05-02T21:33:23.035792",
+      "tags": [
+        "日本电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213323_448331",
+      "type": "industry",
+      "source": "www.linkedin.com",
+      "sourceUrl": "https://www.linkedin.com/pulse/japan-b2c-e-commerce-market-2025-current-insight-zxy1f/",
+      "title": "Japan B2C e-commerce Market 2025 | Current Insight with Future ...",
+      "summary": "Japan B2C e-commerce market is projected to grow at a Compound Annual Growth Rate (CAGR) of 9.2% from 2025 to 2032.",
+      "url": "https://www.linkedin.com/pulse/japan-b2c-e-commerce-market-2025-current-insight-zxy1f/",
+      "publishedAt": "2026-05-02T21:33:23.035684",
+      "receivedAt": "2026-05-02T21:33:23.035691",
+      "tags": [
+        "日本电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213323_448331",
+      "type": "industry",
+      "source": "www.businesswire.com",
+      "sourceUrl": "https://www.businesswire.com/news/home/20260107279284/en/Japan-B2C-Ecommerce-Databook-Report-2025-Market-to-Expand-by-7.6-to-Reach-%24258.09-Billion-in-2025---Forecast-to-2029---ResearchAndMarkets.com",
+      "title": "Japan B2C Ecommerce Databook Report 2025: Market to Expand ...",
+      "summary": "The ecommerce market in Japan was expected to grow by 7.6% annually, reaching US$258.07 billion by 2025. The ecommerce m...",
+      "url": "https://www.businesswire.com/news/home/20260107279284/en/Japan-B2C-Ecommerce-Databook-Report-2025-Market-to-Expand-by-7.6-to-Reach-%24258.09-Billion-in-2025---Forecast-to-2029---ResearchAndMarkets.com",
+      "publishedAt": "2026-05-02T21:33:23.035563",
+      "receivedAt": "2026-05-02T21:33:23.035574",
+      "tags": [
+        "日本电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 20,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213320_fb5a1d",
+      "type": "industry",
+      "source": "www.researchandmarkets.com",
+      "sourceUrl": "https://www.researchandmarkets.com/reports/5661934/sex-toys-market-in-japan-2026-2030?srsltid=AfmBOopKV-XnMv9QwCpd12d-xSVy_vYiicnT9IwWJT7lN6dKm8UyBI3J",
+      "title": "Sex Toys Market in Japan 2026-2030",
+      "summary": "The sex toys market in japan is forecasted to grow by USD 1.42 billion during 2025-2030, accelerating at a CAGR of 11.6%...",
+      "url": "https://www.researchandmarkets.com/reports/5661934/sex-toys-market-in-japan-2026-2030?srsltid=AfmBOopKV-XnMv9QwCpd12d-xSVy_vYiicnT9IwWJT7lN6dKm8UyBI3J",
+      "publishedAt": "2026-05-02T21:33:20.454568",
+      "receivedAt": "2026-05-02T21:33:20.454574",
+      "tags": [
+        "成人用品电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213320_fb5a1d",
+      "type": "industry",
+      "source": "www.businessresearchinsights.com",
+      "sourceUrl": "https://www.businessresearchinsights.com/market-reports/adult-products-market-102452",
+      "title": "Adult Products Market Size & Share From 2025 To 2034",
+      "summary": "The global Adult Products Market size stood at USD 72.34 billion in 2025, growing further to USD 315.57 billion by 2034 ...",
+      "url": "https://www.businessresearchinsights.com/market-reports/adult-products-market-102452",
+      "publishedAt": "2026-05-02T21:33:20.454465",
+      "receivedAt": "2026-05-02T21:33:20.454473",
+      "tags": [
+        "成人用品电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213320_fb5a1d",
+      "type": "industry",
+      "source": "www.futuremarketinsights.com",
+      "sourceUrl": "https://www.futuremarketinsights.com/reports/japan-sexual-wellness-market",
+      "title": "Japan Sexual Wellness Market Size & Demand Outlook 2025-2035",
+      "summary": "# Japan Sexual Wellness Market. ## Japan Sexual Wellness Market Insights – Growth & Demand 2025-2035. The Japan Sexual W...",
+      "url": "https://www.futuremarketinsights.com/reports/japan-sexual-wellness-market",
+      "publishedAt": "2026-05-02T21:33:20.454354",
+      "receivedAt": "2026-05-02T21:33:20.454366",
+      "tags": [
+        "成人用品电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "opportunity",
+        "score": 30,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "市场正向变化，存在机会窗口",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213320_fb5a1d",
+      "type": "industry",
+      "source": "www.linkedin.com",
+      "sourceUrl": "https://www.linkedin.com/pulse/female-adult-products-market-size-key-trends-2026-2033-fajif/",
+      "title": "Female Adult Products Market Size and Key Trends 2026-2033",
+      "summary": "In April 2025, a strategic partnership was formed between a leading Japanese e-commerce platform and a global adult well...",
+      "url": "https://www.linkedin.com/pulse/female-adult-products-market-size-key-trends-2026-2033-fajif/",
+      "publishedAt": "2026-05-02T21:33:20.453626",
+      "receivedAt": "2026-05-02T21:33:20.453635",
+      "tags": [
+        "成人用品电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
+      "id": "sig_20260502_213320_fb5a1d",
+      "type": "industry",
+      "source": "www.ulpa.jp",
+      "sourceUrl": "https://www.ulpa.jp/post/e-commerce-in-japan-a-complete-guide",
+      "title": "E-commerce in Japan: A Complete Guide [Updated for 2025]",
+      "summary": "**E-commerce Market Trends in Japan**. **Marketing Strategies for E-commerce in Japan**. What are the top e-commerce pla...",
+      "url": "https://www.ulpa.jp/post/e-commerce-in-japan-a-complete-guide",
+      "publishedAt": "2026-05-02T21:33:20.453474",
+      "receivedAt": "2026-05-02T21:33:20.453489",
+      "tags": [
+        "成人用品电商",
+        "industry"
+      ],
+      "impact": {
+        "status": "pending",
+        "direction": "neutral",
+        "score": 0,
+        "confidence": 0.6,
+        "horizon": "mid",
+        "rationale": "中性信息，影响待评估",
+        "projectId": "adult-shop"
+      }
+    },
+    {
       "id": "sig_20260502_212322_6908e0",
       "type": "industry",
       "source": "流通ニュース",

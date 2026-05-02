@@ -1,171 +1,117 @@
 #!/usr/bin/env python3
 """
-外部情报收集器 v3 — RSS精准抓取 + AI分析
+外部情报收集器 v4 — Tavily精准搜索 + AI影响评估
+写入 ~/jarvis-web/public/jARVIS-signals.json
 """
 
 import json
 import re
 import sys
-import xml.etree.ElementTree as ET
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
 SIGNALS_FILE = Path.home() / "jarvis-web" / "public" / "jARVIS-signals.json"
+TAVILY_API_KEY = "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"
 
-# ============ RSS信息源 ============
-RSS_SOURCES = [
-    # 电商行业
-    {
-        "name": "INTERNET Watch",
-        "url": "https://internet.watch.impress.co.jp/data/rss/1.0/iw_all.rdf",
-        "category": "industry",
-        "keywords": ["EC", "电商", "販売", "市場", "ネット", "物流", "カード", "支付", "Pay", "Amazon", "楽天"],
-    },
-    {
-        "name": "ITmedia ビジネス中方",
-        "url": "https://www.itmedia.co.jp/business/rss/index.rdf",
-        "category": "industry",
-        "keywords": ["EC", "电商", "販売", "市場", "プラットフォーム", "D2C", "越境"],
-    },
-    # 宏观政策
-    {
-        "name": "日本経済新聞 政策",
-        "url": "https://www.nikkei.com/news/rss/?息切れ_Parser",
-        "category": "policy",
-        "keywords": ["政策", "規制", "外资", "中国", "改革", "経済"],
-    },
-]
-
-# 备选：用curl直接搜的关键词
-SEARCH_KEYWORDS = [
-    "adult goods ecommerce Japan market 2025",
-    "中国 跨境电商 政策 2025 外资",
-    "日本 EC 成人用品 市場 動向",
+# ============ 搜索主题 ============
+SEARCH_QUERIES = [
+    # 成人用品/电商行业
+    {"query": "adult products ecommerce Japan market 2025 trends", "type": "industry", "category": "成人用品电商"},
+    {"query": "Japan B2C ecommerce market size growth 2025", "type": "industry", "category": "日本电商"},
+    {"query": "sex toys pleasure products market Asia 2025", "type": "industry", "category": "成人用品市场"},
+    
+    # 政策法规
+    {"query": "Japan cross border ecommerce regulation foreign 2025", "type": "policy", "category": "跨境政策"},
+    {"query": "China cross border ecommerce policy foreign investment 2025", "type": "policy", "category": "中国电商政策"},
+    {"query": "Japan foreign entrepreneur visa startup 2025 policy", "type": "policy", "category": "在日外资政策"},
+    
+    # 人才市场
+    {"query": "Japan IT talent shortage 2025 hiring trends", "type": "talent", "category": "日本IT人才"},
+    {"query": "Japan remote work freelance platform market 2025", "type": "talent", "category": "人才平台"},
+    
+    # 消费趋势
+    {"query": "Japan consumer behavior online shopping 2025", "type": "industry", "category": "消费趋势"},
+    {"query": "Japan capsule hotels vending machines unattended retail 2025", "type": "industry", "category": "无人零售"},
 ]
 
 
-def fetch_url(url: str) -> str:
+def search_tavily(query: str, num_results: int = 5) -> list:
+    """调用 Tavily API 搜索"""
     import subprocess
+    import json as json_lib
+    
+    payload = json_lib.dumps({
+        "api_key": TAVILY_API_KEY,
+        "query": query,
+        "num_results": num_results,
+        "search_depth": "basic"
+    })
+    
     try:
         result = subprocess.run(
-            ["curl", "-s", "-L", "--max-time", "15",
-             "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-             "-H", "Accept: application/rss+xml, application/xml, text/xml, */*",
-             url],
+            ["curl", "-s", "-X", "POST", "https://api.tavily.com/search",
+             "-H", "Content-Type: application/json",
+             "-d", payload,
+             "--max-time", "15"],
             capture_output=True, text=True, timeout=20
         )
-        return result.stdout
-    except:
-        return ""
-
-
-def parse_rss(xml_content: str, source_config: dict) -> list:
-    """解析RSS XML，提取条目"""
-    signals = []
-    
-    try:
-        # 尝试不同命名空间
-        root = ET.fromstring(xml_content)
         
-        # 尝试标准RSS 2.0
-        items = root.findall(".//item")
-        if not items:
-            items = root.findall(".//entry")
-        
-        for item in items:
-            title = ""
-            link = ""
-            desc = ""
-            
-            for child in item:
-                tag = child.tag.split('}')[-1] if '}' in child.tag else child.tag
-                if tag == "title":
-                    title = child.text or ""
-                elif tag in ("link", "guid"):
-                    link = child.text or ""
-                elif tag in ("description", "summary", "content"):
-                    desc = child.text or ""
-            
-            title = title.strip()
-            if not title or len(title) < 8:
-                continue
-            
-            # 过滤导航类
-            skip = ["ログイン", "パスワード", "Copyright", "プライバシー", "利用規約", "RSS", "Feed"]
-            if any(s in title for s in skip):
-                continue
-            
-            # 匹配关键词
-            matched_kw = None
-            for kw in source_config["keywords"]:
-                if kw.lower() in title.lower():
-                    matched_kw = kw
-                    break
-            
-            if matched_kw:
-                signals.append({
-                    "title": title[:150],
-                    "url": link if link.startswith("http") else "",
-                    "keyword": matched_kw,
-                    "source": source_config["name"]
-                })
+        if result.returncode == 0 and result.stdout:
+            data = json_lib.loads(result.stdout)
+            return data.get("results", [])
+    except Exception as e:
+        print(f"    Tavily搜索失败: {e}", file=sys.stderr)
     
-    except ET.ParseError:
-        pass
-    
-    return signals[:6]  # 最多6条
+    return []
 
 
-def assess_impact(title: str, category: str) -> dict:
-    """评估影响，对应前端期望的impact字段"""
-    title_lower = title.lower()
+def assess_impact(title: str, url: str, content: str, query: str) -> dict:
+    """评估信息对我们的影响"""
+    text = (title + " " + content).lower()
     
-    high_kw = ["規制", "禁止", "拡大", "成長", "改革", "新規", "参入", "大型", "革命", "躍進", "急成長", "市场规模"]
-    medium_kw = ["市場", "販売", "増加", "拡大", "導入", "展開", "需要", "伸長", "好影響", "Dynamo"]
+    # 判断方向
+    opportunity_kw = ["growth", "expand", "increase", "surge", "rising", "opportunity", "gaining traction", "growth", "拡大", "成長", "急成長"]
+    risk_kw = ["ban", "restrict", "regulation", "decline", "drop", "shrink", "risk", "規制", "禁止", "下跌"]
+    neutral_kw = ["trend", "analysis", "guide", "update", "overview", "guide", "trends"]
     
-    high_count = sum(1 for kw in high_kw if kw in title_lower)
-    medium_count = sum(1 for kw in medium_kw if kw in title_lower)
+    opp_count = sum(1 for kw in opportunity_kw if kw in text)
+    risk_count = sum(1 for kw in risk_kw if kw in text)
     
-    # direction判断：增长类 → opportunity，风险类 → risk，中性
-    if any(kw in title_lower for kw in ["成長", "拡大", "急成長", "躍進", "需要", "増加"]):
+    if opp_count > risk_count:
         direction = "opportunity"
         rationale = "市场正向变化，存在机会窗口"
-    elif any(kw in title_lower for kw in ["規制", "禁止", "停止", "下跌", "減少"]):
+        score = min(30, opp_count * 10 + 10)
+    elif risk_count > opp_count:
         direction = "risk"
-        rationale = "存在潜在风险，需要关注"
+        rationale = "存在监管/市场风险，需要关注"
+        score = max(-20, -(risk_count * 8 + 5))
     else:
         direction = "neutral"
-        rationale = "影响待评估"
-    
-    # 评分：high=正，medium=小正，low=0
-    if high_count >= 2 or (high_count >= 1 and medium_count >= 1):
-        score = 20
-    elif medium_count >= 1 or high_count >= 1:
-        score = 10
-    else:
+        rationale = "中性信息，影响待评估"
         score = 0
     
     # 生成建议
-    if category == "industry":
-        if direction == "opportunity":
-            rec = "市场利好，评估是否加快 adult-shop 上线节奏"
-        elif direction == "risk":
-            rec = "关注风险，考虑合规和防御策略"
-        else:
-            rec = "持续关注，暂无明确行动项"
-    elif category == "policy":
-        if any(kw in title_lower for kw in ["外资", "中国", "跨境", "規制"]):
-            rec = "重要！评估对 adult-shop 外资架构和合规的影响"
-        else:
-            rec = "跟踪政策动向，评估后行动"
+    if "adult" in text or "sex toy" in text or "pleasure" in text or " товар" in text:
+        rec = "直接相关！评估对 adult-shop 产品线和定价策略的影响"
+    elif "japan" in text and ("ecommerce" in text or "market" in text):
+        rec = "日本电商市场动态，关注市场扩张对 adult-shop 的机会"
+    elif "cross border" in text or "跨境" in text:
+        rec = "跨境政策直接影响 adult-shop 供应链和合规策略"
+    elif "foreign" in text or "外资" in text:
+        rec = "外资政策影响 adult-shop 在日架构设计"
+    elif "talent" in text or "人材" in text or "人才" in text:
+        rec = "影响星火人才业务的定价和需求趋势"
+    elif "consumer" in text or "shopping" in text or "consumer" in text:
+        rec = "消费趋势变化影响 adult-shop 用户定位和营销策略"
     else:
-        rec = "关注变化，评估对项目影响"
+        rec = "持续关注，评估对项目的影响"
     
     return {
         "status": "pending",
         "direction": direction,
         "score": score,
-        "confidence": 0.3,
+        "confidence": 0.6,
         "horizon": "mid",
         "rationale": rationale,
         "projectId": "adult-shop"
@@ -182,6 +128,7 @@ def generate_signal_id() -> str:
 def main():
     print(f"[{datetime.now().isoformat()}] 开始情报收集...")
     
+    # 读取已有信号
     existing = []
     if SIGNALS_FILE.exists():
         try:
@@ -193,46 +140,57 @@ def main():
     
     all_new = []
     
-    for src in RSS_SOURCES:
-        print(f"\n  抓取 {src['name']}...")
-        xml = fetch_url(src["url"])
+    for sq in SEARCH_QUERIES:
+        print(f"\n  搜索: {sq['query'][:60]}...")
+        results = search_tavily(sq["query"], num_results=4)
         
-        if not xml or len(xml) < 100:
-            print(f"    获取失败或内容为空")
+        if not results:
+            print(f"    无结果")
             continue
         
-        items = parse_rss(xml, src)
-        print(f"    找到 {len(items)} 条相关内容")
+        print(f"    获得 {len(results)} 条")
         
-        for item in items:
-            impact = assess_impact(item["title"], src["category"])
+        for r in results:
+            title = r.get("title", "")[:150]
+            url = r.get("url", "")
+            content = r.get("content", "")[:300]
+            
+            if not title or len(title) < 10:
+                continue
+            
+            # 去重
+            if any(title[:40] == s.get("title", "")[:40] for s in existing):
+                continue
+            if any(title[:40] == s.get("title", "")[:40] for s in all_new):
+                continue
+            
+            impact = assess_impact(title, url, content, sq["query"])
             
             signal = {
                 "id": generate_signal_id(),
-                "type": src["category"],
-                "source": item["source"],
-                "sourceUrl": src["url"],
-                "title": item["title"],
-                "summary": f"关键词：{item['keyword']} | {item['url'][:80] if item['url'] else '无链接'}",
-                "url": item["url"],
+                "type": sq["type"],
+                "source": extract_domain(url),
+                "sourceUrl": url,
+                "title": title,
+                "summary": content[:120] + "..." if len(content) > 120 else content,
+                "url": url,
                 "publishedAt": datetime.now().isoformat(),
                 "receivedAt": datetime.now().isoformat(),
-                "tags": [item["keyword"], src["category"]],
-                "impact": assess_impact(item["title"], src["category"])
+                "tags": [sq["category"], sq["type"]],
+                "impact": impact
             }
             all_new.append(signal)
+        
+        time.sleep(1)  # 避免请求过快
     
-    print(f"\n共抓到 {len(all_new)} 条新信号")
+    print(f"\n新增 {len(all_new)} 条信号")
     
     if not all_new:
         print("没有新信号")
         return
     
-    # 去重
-    existing_titles = {s.get("title", "")[:40] for s in existing}
-    new_unique = [s for s in all_new if s["title"][:40] not in existing_titles]
-    
-    merged = existing + new_unique
+    # 合并去重
+    merged = existing + all_new
     
     # 只保留最近30天
     cutoff = (datetime.now() - timedelta(days=30)).isoformat()
@@ -241,14 +199,25 @@ def main():
     # 按时间排序
     merged.sort(key=lambda x: x.get("receivedAt", ""), reverse=True)
     
+    # 写入
+    SIGNALS_FILE.parent.mkdir(parents=True, exist_ok=True)
     SIGNALS_FILE.write_text(json.dumps({"signals": merged}, ensure_ascii=False, indent=2))
     
-    print(f"写入 {len(merged)} 条信号（新增 {len(new_unique)} 条）")
-    print(f"\n=== 摘要 ===")
-    for s in new_unique[:5]:
-        print(f"  [{s['source']}] {s['title'][:60]}")
-        print(f"    → {s['impact']['recommendation']}")
+    print(f"写入 {len(merged)} 条信号")
+    print(f"\n=== 新信号摘要 ===")
+    for s in all_new[:5]:
+        icon = "📈" if s["impact"]["direction"] == "opportunity" else "📉" if s["impact"]["direction"] == "risk" else "➡️"
+        print(f"  {icon} [{s['source']}] {s['title'][:50]}")
+        print(f"     → {s['impact']['rationale']} | {s['impact']['projectId']}")
+    
+    return len(all_new)
+
+
+def extract_domain(url: str) -> str:
+    match = re.search(r'https?://([^/]+)', url)
+    return match.group(1) if match else url[:30]
 
 
 if __name__ == "__main__":
-    main()
+    n = main()
+    sys.exit(0 if n > 0 else 1)

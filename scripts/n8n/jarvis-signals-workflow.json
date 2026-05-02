@@ -1,0 +1,96 @@
+{
+  "name": "jARVIS Signals Eval Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "jarvis-signals",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "jarvis-signals"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/repos/kami1144/jarvis-web/contents/public/jARVIS-signals.json",
+        "options": {
+          "headers": {
+            "Accept": "application/vnd.github.v3+json",
+            "Authorization": "token {{ $env.GITHUB_TOKEN }}",
+            "User-Agent": "n8n-jarvis-signals"
+          }
+        }
+      },
+      "id": "get-existing",
+      "name": "GET Existing File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// $input.all() 获取所有输入\nconst webhookData = $input.first().json;\nconst evals = webhookData.evals;\nconst timestamp = webhookData.timestamp;\n\n// GitHub API 返回 base64 编码的内容\nconst existingContent = $input.first().json.content;\nconst existingDecoded = Buffer.from(existingContent, 'base64').toString('utf-8');\nlet signals = JSON.parse(existingDecoded);\n\n// 合并 evals（覆盖同名 signal 的 eval）\nfor (const evalItem of evals) {\n  const idx = signals.findIndex(s => s.id === evalItem.id);\n  if (idx !== -1) {\n    signals[idx].eval = evalItem.eval;\n    signals[idx].evalTimestamp = timestamp;\n  }\n}\n\n// 输出新内容（base64 编码）\nconst newContent = JSON.stringify(signals, null, 2);\nconst newContentBase64 = Buffer.from(newContent).toString('base64');\nconst sha = $input.first().json.sha;\n\nreturn [{ json: { content: newContentBase64, sha, message: `chore: update signals eval via n8n ${timestamp}` } }];"
+      },
+      "id": "merge-data",
+      "name": "Merge Evals",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "https://api.github.com/repos/kami1144/jarvis-web/contents/public/jARVIS-signals.json",
+        "options": {
+          "headers": {
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+            "Authorization": "token {{ $env.GITHUB_TOKEN }}",
+            "User-Agent": "n8n-jarvis-signals"
+          }
+        },
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "sha",
+              "value": "={{ $json.sha }}"
+            }
+          ]
+        }
+      },
+      "id": "commit-github",
+      "name": "PUT GitHub",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "GET Existing File", "type": "main", "index": 0 }]]
+    },
+    "GET Existing File": {
+      "main": [[{ "node": "Merge Evals", "type": "main", "index": 0 }]]
+    },
+    "Merge Evals": {
+      "main": [[{ "node": "PUT GitHub", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": []
+}

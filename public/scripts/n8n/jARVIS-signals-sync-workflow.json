@@ -1,0 +1,109 @@
+{
+  "name": "JARVIS Signals Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "jarvis-signals-sync",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "jarvis-signals-sync"
+    },
+    {
+      "parameters": {
+        "fileName": "/data/jARVIS-signals-merged.json"
+      },
+      "name": "Write Eval Diff",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "command": "bash",
+        "description": "Merge evals into signals JSON",
+        "script": [
+          "#!/bin/bash",
+          "EVAL_FILE=\"/data/jARVIS-signals-merged.json\"",
+          "SIGNALS_FILE=\"/data/jARVIS-signals.json\"",
+          "GIT_DIR=\"/repo/.git\"",
+          "",
+          "if [ -f \"$EVAL_FILE\" ]; then",
+          "  # Read eval diff",
+          "  EVAL_DATA=$(cat $EVAL_FILE)",
+          "  echo \"Received eval data: $EVAL_DATA\"",
+          "",
+          "  # Git pull first",
+          "  cd /repo && git pull origin main || true",
+          "",
+          "  # If signals file exists, merge evals into it",
+          "  if [ -f \"$SIGNALS_FILE\" ]; then",
+          "    # Use python to merge",
+          "    python3 - << 'PYEOF'",
+          "import json",
+          "",
+          "with open('$EVAL_FILE', 'r') as f:",
+          "  evals = json.load(f)  # { signalId: { direction, score, confidence, horizon, status, evaluatedAt }",
+          "",
+          "with open('$SIGNALS_FILE', 'r') as f:",
+          "  signals = json.load(f)",
+          "",
+          "merged = 0",
+          "for signal in signals.get('signals', []):",
+          "  sig_id = signal.get('id', '')",
+          "  if sig_id in evals:",
+          "    e = evals[sig_id]",
+          "    signal['impact']['direction'] = e.get('direction', 'neutral')",
+          "    signal['impact']['score'] = e.get('score', 0)",
+          "    signal['impact']['confidence'] = e.get('confidence', 0.6)",
+          "    signal['impact']['horizon'] = e.get('horizon', 'mid')",
+          "    signal['impact']['status'] = e.get('status', 'evaluated')",
+          "    signal['impact']['evaluatedAt'] = e.get('evaluatedAt', '')",
+          "    merged += 1",
+          "",
+          "with open('$SIGNALS_FILE', 'w') as f:",
+          "  json.dump(signals, f, ensure_ascii=False, indent=2)",
+          "",
+          "print(f'Merged {merged} evals into signals')",
+          "PYEOF",
+          "  fi",
+          "",
+          "  # Git add and commit",
+          "  cd /repo",
+          "  git config user.email 'jarvis@noreply'",
+          "  git config user.name 'JARVIS Sync'",
+          "  git add jARVIS-signals.json || true",
+          "  git commit -m \"chore: sync signal evaluations $(date -u +%Y-%m-%dT%H:%M:%SZ)\" || echo 'No changes to commit'",
+          "  git push origin main || echo 'Push failed - check credentials'",
+          "fi"
+        ].join("\n")
+      },
+      "name": "Merge and Commit",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "responseData": "={\n  \"status\": \"ok\",\n  \"merged\": {{ $json.merged }} \n}"
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Merge and Commit", "type": "main", "index": 0 }]]
+    },
+    "Merge and Commit": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  }
+}
