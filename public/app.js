@@ -65,6 +65,7 @@ async function renderAll() {
   renderSkills(data.skills);
   renderEnvironment();
   renderDailySchedule();
+  renderSignals();
   initAIAdvice();
 }
 
@@ -1622,6 +1623,354 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// ==========================================
+// External Signals System
+// ==========================================
+
+const SIGNAL_STORE_URL = '/jARVIS-signals.json';
+
+let signalsCache = null;
+
+async function loadSignals() {
+  try {
+    const res = await fetch(SIGNAL_STORE_URL + '?t=' + Date.now());
+    if (res.ok) {
+      const data = await res.json();
+      signalsCache = data.signals || [];
+      return signalsCache;
+    }
+  } catch (e) {
+    console.warn('信号加载失败:', e.message);
+  }
+  return [];
+}
+
+function saveSignals(signals) {
+  signalsCache = signals;
+  const store = { signals, lastUpdated: new Date().toISOString() };
+  localStorage.setItem('jARVIS-signals-local', JSON.stringify(store));
+}
+
+function getSignals() {
+  return signalsCache || [];
+}
+
+async function renderSignals() {
+  const list = document.getElementById('signalList');
+  const badge = document.getElementById('signalCount');
+  if (!list) return;
+
+  const signals = await loadSignals();
+
+  if (signals.length === 0) {
+    list.innerHTML = '<div class="signal-empty">📭 暂无信号数据，等待 cron 抓取...</div>';
+    if (badge) badge.textContent = '0';
+    return;
+  }
+
+  // 排序：待评估优先，然后按时间倒序
+  const sorted = [...signals].sort((a, b) => {
+    if (a.impact.status === 'pending' && b.impact.status !== 'pending') return -1;
+    if (a.impact.status !== 'pending' && b.impact.status === 'pending') return 1;
+    return new Date(b.receivedAt) - new Date(a.receivedAt);
+  });
+
+  // 更新 badge
+  const pending = signals.filter(s => s.impact.status === 'pending').length;
+  if (badge) badge.textContent = pending > 0 ? `${pending}待评估` : signals.length;
+
+  const typeIcon = { industry: '🏭', policy: '📜', market: '📊', macro: '🌐', news: '📰' };
+  const directionLabel = { opportunity: '机会', risk: '风险', neutral: '中性' };
+  const directionClass = { opportunity: 'opportunity', risk: 'risk', neutral: 'neutral' };
+
+  list.innerHTML = sorted.slice(0, 20).map(s => {
+    const isEvaluated = s.impact.status !== 'pending';
+    const evalClass = isEvaluated ? 'evaluated' : (s.impact.direction || 'neutral');
+    const scoreClass = s.impact.score > 0 ? 'positive' : s.impact.score < 0 ? 'negative' : 'neutral';
+
+    return `
+      <div class="signal-item ${evalClass}" data-id="${s.id}" onclick="showSignalDetail('${s.id}')">
+        <div class="signal-header">
+          <span class="signal-title">${typeIcon[s.type] || '📰'} ${escapeHtml(s.title || '')}</span>
+          <span class="signal-source">${escapeHtml(s.source || '')}</span>
+        </div>
+        ${s.summary ? `<div class="signal-summary" style="font-size:0.72rem;color:#777;margin:2px 0;">${escapeHtml(s.summary.slice(0, 80))}...</div>` : ''}
+        <div class="signal-meta">
+          <span class="signal-tag type-${s.type}">${typeIcon[s.type] || ''} ${s.type}</span>
+          ${s.impact.projectId ? `<span class="signal-tag project-${s.impact.projectId}">📁 ${s.impact.projectId}</span>` : ''}
+          <span class="signal-direction ${directionClass[s.impact.direction] || 'neutral'}">${directionLabel[s.impact.direction] || '中性'}</span>
+          ${isEvaluated ? `<span class="signal-score ${scoreClass}">评分: ${s.impact.score > 0 ? '+' : ''}${s.impact.score}</span>` : '<span class="signal-score neutral">⏳ 待评估</span>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function showSignalDetail(signalId) {
+  const signals = getSignals();
+  const signal = signals.find(s => s.id === signalId);
+  if (!signal) return;
+
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'signalDetailModal';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  const isEvaluated = signal.impact.status !== 'pending';
+  const typeIcon = { industry: '🏭', policy: '📜', market: '📊', macro: '🌐', news: '📰' };
+
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width:560px;">
+      <div class="modal-header">
+        <h3>${typeIcon[signal.type] || '📰'} 信号详情</h3>
+        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom:12px;">
+          <div style="font-size:0.95rem;font-weight:600;color:#e0e0e0;margin-bottom:6px;">${escapeHtml(signal.title)}</div>
+          <div style="font-size:0.72rem;color:#888;">来源: ${escapeHtml(signal.source)} · ${new Date(signal.publishedAt).toLocaleDateString('ja-JP')}</div>
+          ${signal.sourceUrl ? `<a href="${signal.sourceUrl}" target="_blank" style="font-size:0.72rem;color:#64B5F6;">🔗 查看原文 →</a>` : ''}
+        </div>
+        ${signal.summary ? `<div style="font-size:0.8rem;color:#bbb;background:rgba(255,255,255,0.04);padding:10px;border-radius:8px;margin-bottom:12px;line-height:1.5;">${escapeHtml(signal.summary)}</div>` : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <span class="signal-tag type-${signal.type}">${typeIcon[signal.type]} ${signal.type}</span>
+          ${signal.tags.map(t => `<span class="signal-tag">${t}</span>`).join('')}
+        </div>
+        ${isEvaluated ? `
+          <div style="background:rgba(76,175,80,0.1);border-radius:8px;padding:12px;">
+            <div style="font-size:0.8rem;color:#4CAF50;margin-bottom:6px;">✅ 已评估</div>
+            <div style="display:flex;gap:12px;font-size:0.78rem;color:#ccc;">
+              <span>方向: <strong style="color:${signal.impact.direction === 'opportunity' ? '#64B5F6' : signal.impact.direction === 'risk' ? '#EF9A9A' : '#BDBDBD'}">${signal.impact.direction === 'opportunity' ? '机会' : signal.impact.direction === 'risk' ? '风险' : '中性'}</strong></span>
+              <span>评分: <strong style="color:${signal.impact.score > 0 ? '#4CAF50' : signal.impact.score < 0 ? '#F44336' : '#9E9E9E'}">${signal.impact.score > 0 ? '+' : ''}${signal.impact.score}</strong></span>
+              <span>置信度: <strong>${Math.round(signal.impact.confidence * 100)}%</strong></span>
+              <span>时间范围: <strong>${signal.impact.horizon === 'short' ? '短期' : signal.impact.horizon === 'mid' ? '中期' : '长期'}</strong></span>
+            </div>
+            ${signal.impact.rationale ? `<div style="font-size:0.75rem;color:#999;margin-top:8px;">💡 ${escapeHtml(signal.impact.rationale)}</div>` : ''}
+          </div>
+        ` : `
+          <div style="background:rgba(255,152,0,0.1);border-radius:8px;padding:12px;text-align:center;color:#FF9800;font-size:0.82rem;">
+            ⏳ 此信号尚未评估，点击「评估信号」进行评分
+          </div>
+        `}
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="this.closest('.modal').remove()">关闭</button>
+        <button class="btn primary" onclick="openSignalEvalModal();this.closest('.modal').remove();">🔍 评估</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function openSignalEvalModal() {
+  const signals = getSignals();
+  const savedWebhook = localStorage.getItem('n8n_webhook_url') || '';
+  const hasWebhook = !!savedWebhook;
+
+  if (signals.length === 0) {
+    showNotification('📭 暂无信号可评估', 'info');
+    return;
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'signalEvalModal';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  const typeIcon = { industry: '🏭', policy: '📜', market: '📊', macro: '🌐', news: '📰' };
+
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width:620px;">
+      <div class="modal-header">
+        <h3>🔍 评估外部信号</h3>
+        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+      </div>
+      <div class="modal-body">
+        ${!hasWebhook ? `
+        <div style="background:rgba(255,152,0,0.1);border:1px solid rgba(255,152,0,0.3);border-radius:10px;padding:12px;margin-bottom:14px;">
+          <div style="font-size:0.8rem;color:#FF9800;margin-bottom:8px;">
+            ⚠️ 未配置 n8n webhook，评估结果仅保存在浏览器本地
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="n8nWebhookInput" placeholder="https://your-n8n.com/webhook/jarvis-signals-sync"
+              style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid #444;background:#222;color:#ccc;font-size:0.78rem;">
+            <button class="btn primary" style="padding:6px 12px;font-size:0.78rem;" onclick="saveN8NWebhook()">保存</button>
+          </div>
+        </div>
+        ` : `
+        <div style="background:rgba(76,175,80,0.1);border-radius:8px;padding:8px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.72rem;color:#4CAF50;">✅ n8n 已配置</span>
+          <button onclick="clearN8NWebhook()" style="background:none;border:none;color:#888;font-size:0.7rem;cursor:pointer;">清除</button>
+        </div>
+        `}
+        <div class="signal-eval-list">
+          ${signals.map(s => `
+            <div class="signal-eval-item ${s.impact.status !== 'pending' ? 'evaluated' : ''}" id="eval-${s.id}">
+              <div class="signal-eval-title">${typeIcon[s.type] || '📰'} ${escapeHtml(s.title || '').slice(0, 60)}</div>
+              ${s.summary ? `<div class="signal-eval-summary">${escapeHtml(s.summary || '').slice(0, 100)}</div>` : ''}
+              <div class="signal-eval-controls">
+                <label>方向:</label>
+                <select id="dir-${s.id}" onchange="updateSignalPreview('${s.id}')">
+                  <option value="opportunity" ${s.impact.direction === 'opportunity' ? 'selected' : ''}>📈 机会</option>
+                  <option value="risk" ${s.impact.direction === 'risk' ? 'selected' : ''}>📉 风险</option>
+                  <option value="neutral" ${s.impact.direction === 'neutral' ? 'selected' : ''}>➡️ 中性</option>
+                </select>
+                <label>评分:</label>
+                <input type="range" id="score-${s.id}" min="-100" max="100" value="${s.impact.score || 0}"
+                  oninput="document.getElementById('scoreVal-${s.id}').textContent = this.value > 0 ? '+'+this.value : this.value">
+                <span id="scoreVal-${s.id}" style="font-size:0.75rem;color:#ccc;min-width:30px;">${s.impact.score > 0 ? '+' : ''}${s.impact.score || 0}</span>
+                <label>置信:</label>
+                <select id="conf-${s.id}">
+                  <option value="0.3" ${s.impact.confidence == 0.3 ? 'selected' : ''}>低</option>
+                  <option value="0.6" ${s.impact.confidence == 0.6 || !s.impact.confidence ? 'selected' : ''}>中</option>
+                  <option value="0.8" ${s.impact.confidence == 0.8 ? 'selected' : ''}>高</option>
+                  <option value="1.0" ${s.impact.confidence == 1.0 ? 'selected' : ''}>确定</option>
+                </select>
+                <label>范围:</label>
+                <select id="horizon-${s.id}">
+                  <option value="short" ${s.impact.horizon === 'short' ? 'selected' : ''}>短期</option>
+                  <option value="mid" ${s.impact.horizon === 'mid' || !s.impact.horizon ? 'selected' : ''}>中期</option>
+                  <option value="long" ${s.impact.horizon === 'long' ? 'selected' : ''}>长期</option>
+                </select>
+              </div>
+              ${s.impact.status !== 'pending' ? `<div style="font-size:0.7rem;color:#4CAF50;margin-top:6px;">✅ 已评估 | 评分: ${s.impact.score > 0 ? '+' : ''}${s.impact.score}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="this.closest('.modal').remove()">取消</button>
+        <button class="btn primary" onclick="saveAllSignalEvals()">💾 保存全部</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function saveN8NWebhook() {
+  const url = document.getElementById('n8nWebhookInput')?.value?.trim();
+  if (!url) {
+    showNotification('请输入 webhook URL', 'warning');
+    return;
+  }
+  localStorage.setItem('n8n_webhook_url', url);
+  showNotification('✅ n8n webhook 已保存，评估将自动同步', 'success');
+  // 重新打开 modal
+  document.getElementById('signalEvalModal')?.remove();
+  openSignalEvalModal();
+}
+
+function clearN8NWebhook() {
+  localStorage.removeItem('n8n_webhook_url');
+  localStorage.removeItem('n8n_webhook_hint_shown');
+  showNotification('ℹ️ n8n webhook 已清除', 'info');
+  document.getElementById('signalEvalModal')?.remove();
+  openSignalEvalModal();
+}
+
+function updateSignalPreview(signalId) {
+  // 实时预览效果（可选增强）
+}
+
+async function saveAllSignalEvals() {
+  const signals = getSignals();
+  const evals = {};  // 只收集变更的评估
+  let changed = 0;
+
+  for (const signal of signals) {
+    const dirEl = document.getElementById(`dir-${signal.id}`);
+    const scoreEl = document.getElementById(`score-${signal.id}`);
+    const confEl = document.getElementById(`conf-${signal.id}`);
+    const horizonEl = document.getElementById(`horizon-${signal.id}`);
+
+    if (!dirEl || !scoreEl) continue;
+
+    const newDirection = dirEl.value;
+    const newScore = parseInt(scoreEl.value);
+    const newConfidence = parseFloat(confEl?.value || 0.6);
+    const newHorizon = horizonEl?.value || 'mid';
+
+    if (signal.impact.direction !== newDirection ||
+        signal.impact.score !== newScore ||
+        signal.impact.confidence !== newConfidence ||
+        signal.impact.horizon !== newHorizon) {
+      signal.impact.direction = newDirection;
+      signal.impact.score = newScore;
+      signal.impact.confidence = newConfidence;
+      signal.impact.horizon = newHorizon;
+      signal.impact.status = 'evaluated';
+      signal.impact.evaluatedAt = new Date().toISOString();
+      evals[signal.id] = {
+        direction: newDirection,
+        score: newScore,
+        confidence: newConfidence,
+        horizon: newHorizon,
+        status: 'evaluated',
+        evaluatedAt: signal.impact.evaluatedAt
+      };
+      changed++;
+    }
+  }
+
+  if (changed > 0) {
+    saveSignals(signals);
+    await syncEvalsToN8N(evals);
+    showNotification(`✅ 已保存 ${changed} 个信号评估`, 'success');
+  } else {
+    showNotification('ℹ️ 没有变化', 'info');
+  }
+
+  document.getElementById('signalEvalModal')?.remove();
+  renderSignals();
+}
+
+// n8n webhook URL（用户部署 n8n 后填入）
+// 格式: https://your-n8n.com/webhook/jarvis-signals-sync
+const N8N_WEBHOOK_URL = localStorage.getItem('n8n_webhook_url') || '';
+
+async function syncEvalsToN8N(evals) {
+  // 1. localStorage 持久化（始终）
+  const localStore = JSON.parse(localStorage.getItem('jARVIS-signals-local') || '{"signals":[],"lastUpdated":null}');
+  localStore.signals.forEach(s => {
+    if (evals[s.id]) {
+      Object.assign(s.impact, evals[s.id]);
+    }
+  });
+  localStore.lastUpdated = new Date().toISOString();
+  localStorage.setItem('jARVIS-signals-local', JSON.stringify(localStore));
+
+  // 2. n8n webhook 同步（只发送变更的 evals diff）
+  const webhookUrl = localStorage.getItem('n8n_webhook_url');
+  if (webhookUrl) {
+    try {
+      const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ evals, timestamp: new Date().toISOString() })
+      });
+      if (res.ok) {
+        console.log('✅ 评估已同步到 n8n');
+      } else {
+        console.warn('⚠️ n8n 同步失败:', res.status);
+      }
+    } catch (e) {
+      console.warn('⚠️ n8n 同步异常:', e.message);
+    }
+  } else {
+    console.log('📝 评估已保存到本地（未配置 n8n webhook）');
+  }
+}
+
+function configureN8NWebhook(url) {
+  localStorage.setItem('n8n_webhook_url', url);
+  showNotification('✅ n8n webhook 已配置', 'success');
+}
 
 // 响应式
 window.addEventListener('resize', () => {

@@ -1,0 +1,74 @@
+{
+  "signals": [
+    {
+      "id": "sig_20260502_2ecba7",
+      "type": "market",
+      "source": "PR TIMES",
+      "sourceUrl": "https://prtimes.jp/",
+      "title": "[プレスリリース・ニュースリリース配信サービスのPR TIMES](https://prtimes.jp/)",
+      "summary": "* [プレスリリースを受信](https://prtimes.jp/user_info) * [企業登録申請](https://prtimes.jp/main/registcorp/form) * ログイン   * [プレスリリース](https://prtimes.jp/) * [ランキング](https://prtimes.jp/ranking/) * [TV](https://prtime",
+      "rawContent": "* [プレスリリースを受信](https://prtimes.jp/user_info) * [企業登録申請](https://prtimes.jp/main/registcorp/form) * ログイン   * [プレスリリース](https://prtimes.jp/) * [ランキング](https://prtimes.jp/ranking/) * [TV](https://prtimes.jp/tv) * [ストーリー](https://prtimes.jp/story/)   * [総合](https://prtimes.jp/) * [テクノロジー](https://prtimes.jp/technology/) * [モバイル](https://prtimes.jp/mobile/) * [アプリ](https://prtimes.jp/app/) * [エンタメ](https://prtimes.jp/entertainment/) * [ビューティー](https://prtimes.jp/beauty/) * [ファッション](https://prtimes.jp/fashion/) * [ライフスタイル](https://prtimes.jp/lifestyle/) * [ビジネス](https://prtimes.jp/business/) * [グルメ](https://prtimes.jp/gourmet/) * [スポーツ](https://prtimes.jp/sports/)",
+      "publishedAt": "2026-05-02T11:21:11.388Z",
+      "receivedAt": "2026-05-02T11:21:11.388Z",
+      "tags": [],
+      "impact": {
+        "projectId": "adult-shop",
+        "score": 0,
+        "direction": "neutral",
+        "horizon": "mid",
+        "confidence": 0,
+        "rationale": "",
+        "evaluatedAt": null,
+        "status": "pending",
+        "confirmedScore": null
+      }
+    },
+    {
+      "id": "sig_20260502_gmbvwe",
+      "type": "market",
+      "source": "EC業界ニュース",
+      "sourceUrl": "https://www.ecnomikata.com/news/",
+      "title": "ランキング",
+      "summary": "* 今日 * 週間 * 月間",
+      "rawContent": "* 今日 * 週間 * 月間",
+      "publishedAt": "2026-05-02T11:21:22.296Z",
+      "receivedAt": "2026-05-02T11:21:22.296Z",
+      "tags": [],
+      "impact": {
+        "projectId": "adult-shop",
+        "score": 0,
+        "direction": "neutral",
+        "horizon": "mid",
+        "confidence": 0,
+        "rationale": "",
+        "evaluatedAt": null,
+        "status": "pending",
+        "confirmedScore": null
+      }
+    },
+    {
+      "id": "sig_20260502_4hyk4o",
+      "type": "industry",
+      "source": "小売ドア",
+      "sourceUrl": "https://mag.shogyo.jp/",
+      "title": "navigating to \"https://mag.shogyo.jp/\", waiting until \"domcontentloaded\"",
+      "summary": "[ERROR]... × https://mag.shogyo.jp/                             | Error: Unexpected error in _crawl_web at line 778 in _crawl_web (../../../../../Library/Frameworks/Python.framework/Versions/3.12/li",
+      "rawContent": "[ERROR]... × https://mag.shogyo.jp/                             | Error: Unexpected error in _crawl_web at line 778 in _crawl_web (../../../../../Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12 /site-packages/crawl4ai/async_crawler_strategy.py): Error: Failed on navigating ACS-GOTO: Page.goto: net::ERR_NAME_NOT_RESOLVED at https://mag.shogyo.jp/ Call log:",
+      "publishedAt": "2026-05-02T11:21:29.480Z",
+      "receivedAt": "2026-05-02T11:21:29.480Z",
+      "tags": [],
+      "impact": {
+        "projectId": "adult-shop",
+        "score": 0,
+        "direction": "neutral",
+        "horizon": "mid",
+        "confidence": 0,
+        "rationale": "",
+        "evaluatedAt": null,
+        "status": "pending",
+        "confirmedScore": null
+      }
+    }
+  ],
+  "lastUpdated": "2026-05-02T11:21:31.489Z"
+}

@@ -1301,3 +1301,217 @@ body {
   border-radius: 2px;
   transition: width 0.3s ease;
 }
+
+/* ===================================
+   External Signals Card
+   =================================== */
+
+.signal-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid #0f3460;
+}
+
+.signal-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e94560;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.signal-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.signal-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.signal-empty {
+  color: #555;
+  font-size: 0.85rem;
+  padding: 20px;
+  text-align: center;
+}
+
+.signal-item {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.signal-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.signal-item.evaluated {
+  border-left-color: #4CAF50;
+  opacity: 0.75;
+}
+
+.signal-item.pending {
+  border-left-color: #FF9800;
+}
+
+.signal-item.opportunity {
+  border-left-color: #2196F3;
+}
+
+.signal-item.risk {
+  border-left-color: #F44336;
+}
+
+.signal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.signal-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.signal-source {
+  font-size: 0.65rem;
+  color: #888;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+.signal-meta {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.signal-tag {
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  color: #aaa;
+}
+
+.signal-tag.type-industry { background: rgba(33,150,243,0.2); color: #64B5F6; }
+.signal-tag.type-policy   { background: rgba(244,67,54,0.2); color: #EF9A9A; }
+.signal-tag.type-market   { background: rgba(76,175,80,0.2);  color: #A5D6A7; }
+.signal-tag.type-macro    { background: rgba(156,39,176,0.2); color: #CE93D8; }
+
+.signal-tag.project-adult-shop { background: rgba(233,69,96,0.2); color: #F48FB1; }
+
+.signal-direction {
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.signal-direction.opportunity {
+  background: rgba(33,150,243,0.2);
+  color: #64B5F6;
+}
+
+.signal-direction.risk {
+  background: rgba(244,67,54,0.2);
+  color: #EF9A9A;
+}
+
+.signal-direction.neutral {
+  background: rgba(158,158,158,0.2);
+  color: #BDBDBD;
+}
+
+.signal-score {
+  font-size: 0.7rem;
+  color: #ccc;
+}
+
+.signal-score.positive { color: #4CAF50; }
+.signal-score.negative { color: #F44336; }
+.signal-score.neutral { color: #9E9E9E; }
+
+/* Signal Evaluation Modal */
+.signal-eval-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.signal-eval-item {
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-left: 3px solid #FF9800;
+}
+
+.signal-eval-item.evaluated {
+  border-left-color: #4CAF50;
+  opacity: 0.7;
+}
+
+.signal-eval-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  margin-bottom: 4px;
+}
+
+.signal-eval-summary {
+  font-size: 0.75rem;
+  color: #999;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.signal-eval-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.signal-eval-controls label {
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.signal-eval-controls input[type="range"] {
+  width: 100px;
+}
+
+.signal-eval-controls select {
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #222;
+  color: #ccc;
+  font-size: 0.75rem;
+}
+
+.signal-eval-save {
+  margin-top: 10px;
+}
+
+/* Mobile: show signal tab */
+@media (max-width: 767px) {
+  .signal-card { display: block; }
+}
