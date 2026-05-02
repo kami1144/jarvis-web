@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-05-02T07:27:41.005Z",
+  "generatedAt": "2026-05-02T08:41:30.886Z",
   "source": "~/.shared/task-board.json",
   "projects": [
     {
@@ -62,28 +62,32 @@
           "owner": "小新",
           "status": "⏳ 等待中",
           "nextStep": "05/07 配置",
-          "note": "随网站同步"
+          "note": "随网站同步",
+          "deadline": "05/07"
         },
         {
           "name": "product_listing",
           "owner": "小新",
           "status": "⏳ 等待中",
           "nextStep": "05/10 等样品确认后上架",
-          "note": "首批3-5个SKU"
+          "note": "首批3-5个SKU",
+          "deadline": "05/10"
         },
         {
           "name": "dropshipping",
           "owner": "老大",
           "status": "⏳ 等待中",
           "nextStep": "05/10 工厂确认后代发对接",
-          "note": "代发协议"
+          "note": "代发协议",
+          "deadline": "05/10"
         },
         {
           "name": "privacy_shipping",
           "owner": "老大",
           "status": "⏳ 待办",
           "nextStep": "05/12 确认无logo包装+隐私面单",
-          "note": ""
+          "note": "",
+          "deadline": "05/12"
         },
         {
           "name": "coordinator",
@@ -144,7 +148,7 @@
       "status": "active",
       "distance": "near",
       "description": "J.A.R.V.I.S. 人生仪表盘 - 现实感知系统",
-      "progress": 100,
+      "progress": 83,
       "link": "https://jarvis-web-ashen.vercel.app",
       "lastUpdated": "2026-05-01 00:20",
       "subTasks": [
@@ -177,11 +181,11 @@
           "note": "任务卡片/进度/子任务，commit: 76b4aea"
         },
         {
-          "name": "history_charts",
+          "name": "daily_schedule",
           "owner": "3号",
-          "status": "✅ 完成",
-          "nextStep": "-",
-          "note": "Chart.js折线图，7/30/90天，commit: 76b4aea"
+          "status": "🔄 开发中",
+          "nextStep": "将历史趋势模块替换为每日日程模块",
+          "note": "数据源: task-board.json，按deadline展示当天日程"
         },
         {
           "name": "ai_advisor",

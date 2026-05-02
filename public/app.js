@@ -64,7 +64,7 @@ async function renderAll() {
   renderAlerts(computed, data);
   renderSkills(data.skills);
   renderEnvironment();
-  renderHistoryChart(7);
+  renderDailySchedule();
   initAIAdvice();
 }
 
@@ -732,127 +732,117 @@ document.getElementById('taskProgressInput')?.addEventListener('input', (e) => {
 });
 
 // ==========================================
-// 历史图表渲染
+// 每日日程渲染
 // ==========================================
 
-let historyChart = null;
+function renderDailySchedule() {
+  const container = document.getElementById('historyChart');
+  if (!container) return;
 
-function renderHistoryChart(days) {
-  const ctx = document.getElementById('historyChart');
-  if (!ctx) return;
+  // 从 syncCache 读取任务数据（和 renderQuests 用同一数据源）
+  const syncData = window.syncCache;
+  if (!syncData || !syncData.projects) {
+    container.innerHTML = '<div class="schedule-empty">📋 暂无日程数据</div>';
+    return;
+  }
 
-  const history = HistoryTracker.getHistory(days);
+  // 收集所有带 deadline 的子任务
+  const allTasks = [];
+  const projectIcons = { 'adult-shop': '⚔️', 'manga-studio': '📚', 'star-talent': '🔥', 'jarvis-web': '🎮' };
 
-  // 如果没有历史数据，生成模拟数据
-  let labels = [];
-  let hpData = [];
-  let energyData = [];
-  let goldData = [];
+  syncData.projects.forEach(project => {
+    if (!project.subTasks) return;
+    project.subTasks.forEach(st => {
+      if (!st.deadline) return;
+      // 解析 deadline 为 Date 对象（MM/DD 格式，今年）
+      const [m, d] = st.deadline.split('/').map(Number);
+      const deadlineDate = new Date();
+      deadlineDate.setMonth(m - 1, d);
+      deadlineDate.setHours(23, 59, 59, 999);
 
-  if (history.length === 0) {
-    // 生成过去N天的模拟数据
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      labels.push(date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
+      // 判断是否已完成
+      const isCompleted = st.status && (st.status.includes('✅') || st.status.includes('完成'));
 
-      // 模拟波动数据
-      hpData.push(60 + Math.random() * 30);
-      energyData.push(50 + Math.random() * 40);
-      goldData.push(40 + Math.random() * 40);
-    }
-  } else {
-    // 使用真实历史数据
-    history.forEach(h => {
-      const date = new Date(h.timestamp);
-      labels.push(date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
-      hpData.push(h.hp);
-      energyData.push(h.energy);
-      goldData.push(h.gold);
+      allTasks.push({
+        name: st.name,
+        projectName: project.name,
+        projectId: project.id,
+        icon: projectIcons[project.id] || '📋',
+        owner: st.owner,
+        deadline: st.deadline,
+        deadlineDate,
+        status: st.status,
+        isCompleted,
+        nextStep: st.nextStep
+      });
     });
-    labels = labels.reverse();
-    hpData = hpData.reverse();
-    energyData = energyData.reverse();
-    goldData = goldData.reverse();
-  }
-
-  // 销毁旧图表
-  if (historyChart) {
-    historyChart.destroy();
-  }
-
-  // 创建新图表
-  historyChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'HP',
-          data: hpData,
-          borderColor: '#FF6B6B',
-          backgroundColor: 'rgba(255, 107, 107, 0.1)',
-          tension: 0.4,
-          fill: true
-        },
-        {
-          label: '能量',
-          data: energyData,
-          borderColor: '#7C4DFF',
-          backgroundColor: 'rgba(124, 77, 255, 0.1)',
-          tension: 0.4,
-          fill: true
-        },
-        {
-          label: '金币',
-          data: goldData,
-          borderColor: '#FFD700',
-          backgroundColor: 'rgba(255, 215, 0, 0.1)',
-          tension: 0.4,
-          fill: true
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            usePointStyle: true,
-            padding: 20,
-            font: { size: 11 }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100,
-          grid: { color: 'rgba(0,0,0,0.05)' }
-        },
-        x: {
-          grid: { display: false }
-        }
-      },
-      interaction: {
-        intersect: false,
-        mode: 'index'
-      }
-    }
   });
+
+  // 今天是 5月2日，所以筛选 deadline = 5/2 的任务
+  const today = new Date();
+  const todayStr = `${today.getMonth() + 1}/${today.getDate()}`;
+
+  const todayTasks = allTasks.filter(t => t.deadline === todayStr);
+
+  // 如果今天没有，显示提示
+  if (todayTasks.length === 0) {
+    // 显示近期任务（3天内）作为参考
+    const upcoming = allTasks
+      .filter(t => !t.isCompleted && t.deadlineDate >= today && t.deadlineDate <= new Date(today.getTime() + 3 * 86400000))
+      .sort((a, b) => a.deadlineDate - b.deadlineDate);
+
+    container.innerHTML = `
+      <div class="schedule-empty">📋 今天没有待办日程</div>
+      ${upcoming.length > 0 ? `
+        <div class="schedule-upcoming-header">📅 近期任务</div>
+        <div class="schedule-list">
+          ${upcoming.map(t => buildScheduleCard(t, false)).join('')}
+        </div>
+      ` : ''}
+    `;
+    return;
+  }
+
+  // 渲染今日日程
+  const sorted = todayTasks.sort((a, b) => a.deadlineDate - b.deadlineDate);
+  container.innerHTML = `
+    <div class="schedule-header">📅 今日日程 · ${todayStr}</div>
+    <div class="schedule-list">
+      ${sorted.map(t => buildScheduleCard(t, true)).join('')}
+    </div>
+  `;
 }
 
-// Chart tabs 事件绑定
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('chart-tab')) {
-    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
-    e.target.classList.add('active');
-    const days = parseInt(e.target.dataset.range);
-    renderHistoryChart(days);
-  }
-});
+function buildScheduleCard(task, isToday) {
+  const deadlineLabel = `${task.deadline}`;
+  const statusClass = task.isCompleted ? 'completed' : '';
+  const checkIcon = task.isCompleted ? '☑️' : '⬜';
+  const rowClass = task.isCompleted ? 'schedule-item completed' : 'schedule-item';
+
+  // 解析进度（从 status 字符串中提取数字）
+  let progress = 0;
+  const progressMatch = task.status?.match(/(\d+)%/);
+  if (progressMatch) progress = parseInt(progressMatch[1]);
+
+  return `
+    <div class="${rowClass}" data-project="${task.projectId}">
+      <div class="schedule-row-main">
+        <span class="schedule-check">${checkIcon}</span>
+        <span class="schedule-icon">${task.icon}</span>
+        <div class="schedule-info">
+          <span class="schedule-name">${task.name}</span>
+          <span class="schedule-meta">${task.projectName} · ${task.owner} · ${deadlineLabel}</span>
+        </div>
+        <span class="schedule-progress">${progress}%</span>
+      </div>
+      ${!task.isCompleted && progress > 0 ? `
+        <div class="schedule-progress-bar">
+          <div class="progress-fill" style="width: ${progress}%"></div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
 
 // ==========================================
 // 环境感知渲染

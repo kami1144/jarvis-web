@@ -57,7 +57,8 @@ function sync() {
         owner: v['负责'] || '',
         status: v['进度'] || '',
         nextStep: v['下一步'] || '',
-        note: v['备注'] || ''
+        note: v['备注'] || '',
+        deadline: v['下一步'] ? v['下一步'].match(/\d{1,2}\/\d{1,2}/)?.[0] : null
       }))
     });
   }
@@ -81,7 +82,8 @@ function sync() {
         owner: v['负责'] || '',
         status: v['进度'] || '',
         nextStep: v['下一步'] || '',
-        note: v['备注'] || ''
+        note: v['备注'] || '',
+        deadline: v['下一步'] ? v['下一步'].match(/\d{1,2}\/\d{1,2}/)?.[0] : null
       }))
     });
   }
@@ -105,7 +107,8 @@ function sync() {
         owner: v['负责'] || '',
         status: v['进度'] || '',
         nextStep: v['下一步'] || '',
-        note: v['备注'] || ''
+        note: v['备注'] || '',
+        deadline: v['下一步'] ? v['下一步'].match(/\d{1,2}\/\d{1,2}/)?.[0] : null
       }))
     });
   }
@@ -137,7 +140,8 @@ function sync() {
         owner: v['负责'] || '',
         status: v['进度'] || '',
         nextStep: v['下一步'] || '',
-        note: v['备注'] || ''
+        note: v['备注'] || '',
+        deadline: v['下一步'] ? v['下一步'].match(/\d{1,2}\/\d{1,2}/)?.[0] : null
       }))
     });
   }
