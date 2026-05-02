@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-05-02T08:41:30.886Z",
+  "generatedAt": "2026-05-02T15:01:13.515Z",
   "source": "~/.shared/task-board.json",
   "projects": [
     {
@@ -13,7 +13,7 @@
       "description": "日本成人用品电商（Dropshipping模式）",
       "progress": 90,
       "link": "https://adult-shop-kami1144s-projects.vercel.app",
-      "lastUpdated": "2026-05-01 00:20",
+      "lastUpdated": "2026-05-02 18:30",
       "subTasks": [
         {
           "name": "website_tech",
@@ -108,7 +108,7 @@
       "description": "成人漫画AI排版工具",
       "progress": 30,
       "link": null,
-      "lastUpdated": "2026-05-01 00:20",
+      "lastUpdated": "2026-05-02 18:30",
       "subTasks": [
         {
           "name": "tech",
@@ -129,7 +129,7 @@
       "description": "里程碑约束型持续资助",
       "progress": 10,
       "link": null,
-      "lastUpdated": "2026-05-01 00:20",
+      "lastUpdated": "2026-05-02 18:30",
       "subTasks": [
         {
           "name": "strategy",
@@ -148,9 +148,9 @@
       "status": "active",
       "distance": "near",
       "description": "J.A.R.V.I.S. 人生仪表盘 - 现实感知系统",
-      "progress": 83,
+      "progress": 100,
       "link": "https://jarvis-web-ashen.vercel.app",
-      "lastUpdated": "2026-05-01 00:20",
+      "lastUpdated": "2026-05-02 18:30",
       "subTasks": [
         {
           "name": "v3_web_panel",
@@ -182,10 +182,10 @@
         },
         {
           "name": "daily_schedule",
-          "owner": "3号",
-          "status": "🔄 开发中",
-          "nextStep": "将历史趋势模块替换为每日日程模块",
-          "note": "数据源: task-board.json，按deadline展示当天日程"
+          "owner": "小新",
+          "status": "✅ 完成",
+          "nextStep": "-",
+          "note": "已替换为每日日程模块，读取task-board.json按deadline展示，commit: 9246d0a"
         },
         {
           "name": "ai_advisor",
@@ -193,6 +193,13 @@
           "status": "✅ 完成",
           "nextStep": "-",
           "note": "AI建议卡片，基于数据动态生成，commit: 76b4aea"
+        },
+        {
+          "name": "impact_system",
+          "owner": "小新",
+          "status": "🔄 Phase1完成，Phase2进行中",
+          "nextStep": "前端集成完成，信号评估界面可用",
+          "note": "✅ 信号Schema ✅ 管道脚本 ✅ 前端卡片 ✅ 评估Modal ✅ cron已注册"
         }
       ]
     }
@@ -203,5 +210,5 @@
     "blockedProjects": 1,
     "completedProjects": 0
   },
-  "lastUpdated": "2026-05-01 00:20"
+  "lastUpdated": "2026-05-02 18:30"
 }
