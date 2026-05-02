@@ -1696,6 +1696,7 @@ async function renderSignals() {
           <span class="signal-source">${escapeHtml(s.source || '')}</span>
         </div>
         ${s.summary ? `<div class="signal-summary" style="font-size:0.72rem;color:#777;margin:2px 0;">${escapeHtml(s.summary.slice(0, 80))}...</div>` : ''}
+        ${s.impact.recommendation ? `<div class="signal-rec" style="font-size:0.72rem;color:#aaa;margin:3px 0 0 0;padding-left:4px;border-left:2px solid ${s.impact.direction === 'opportunity' ? '#4CAF50' : s.impact.direction === 'risk' ? '#F44336' : '#757575'};">💡 ${escapeHtml(s.impact.recommendation)}</div>` : ''}
         <div class="signal-meta">
           <span class="signal-tag type-${s.type}">${typeIcon[s.type] || ''} ${s.type}</span>
           ${s.impact.projectId ? `<span class="signal-tag project-${s.impact.projectId}">📁 ${s.impact.projectId}</span>` : ''}
