@@ -75,47 +75,43 @@ function renderFamily(profile) {
 function renderCharacter(computed, data) {
   const card = document.querySelector('.character-card');
   if (!card) return;
-  
-  // 基础信息
-  card.querySelector('.character-name').textContent = data.character?.name || 'Kim Kami';
-  card.querySelector('.character-type').textContent = data.character?.type || '探索型大脑';
-  
+
+  // 基础信息（从 profile.user 读取）
+  card.querySelector('.character-name').textContent = data.profile?.user?.name || 'Kim Kami';
+  card.querySelector('.character-type').textContent = data.profile?.user?.type || '探索型大脑';
+
   // HP
   const hpFill = card.querySelector('.hp-fill');
   hpFill.style.width = `${computed.hp.current}%`;
   hpFill.style.background = getHPColor(computed.hp.current);
   card.querySelector('#hpValue').textContent = `${computed.hp.current}/${computed.hp.max}`;
-  
-  // 能量 → 思维数据（用存储的今日得分，不是重新计算）
+
+  // 能量（真实能量值）
   const energyFill = card.querySelector('.energy-fill');
-  const mindScoreValue = data.mindModel?.today?.score || computed.mindScore.current;
-  energyFill.style.width = `${Math.min(100, mindScoreValue)}%`;
-  energyFill.style.background = getEnergyColor(mindScoreValue);
-  card.querySelector('#energyValue').textContent = `${mindScoreValue}/${computed.mindScore.max}`;
-  
-  // 金币 → 财务数据
+  energyFill.style.width = `${computed.energy.current}%`;
+  energyFill.style.background = getEnergyColor(computed.energy.current);
+  card.querySelector('#energyValue').textContent = `${computed.energy.current}/${computed.energy.max}`;
+
+  // 金币（财务净资产）
   const goldFill = card.querySelector('.gold-fill');
   const financeNetWorth = FinanceData.getNetWorth();
-  const goldPercent = Math.min(100, Math.max(0, financeNetWorth / 1000000 * 100)); // 100万=100%
+  const goldPercent = Math.min(100, Math.max(0, financeNetWorth / 1000000 * 100));
   goldFill.style.width = `${goldPercent}%`;
   goldFill.style.background = 'linear-gradient(90deg, #FFD700, #FFA500)';
   card.querySelector('#goldValue').textContent = `${(financeNetWorth / 10000).toFixed(0)}万`;
-  
+
   // 经验
   const expFill = card.querySelector('.exp-fill');
   expFill.style.width = `${computed.exp.current}%`;
   card.querySelector('#expValue').textContent = `Lv.${computed.level}`;
-  
-  // 数据来源显示
+
+  // 数据来源显示（修正）
+  // 体检日期
   card.querySelector('#checkupDate').textContent = data.health?.checkup?.date?.slice(5) || '待输入';
-  
-  // 净资产 → 思维得分（思维模式仪表盘）
-  const mindScore = data.mindModel?.today?.score || computed.mindScore.current;
-  card.querySelector('#netWorth').textContent = `${mindScore}分`;
-  
-  // 情绪 → 财务净资产
-  const moodStatus = data.mood?.todayMood?.dominantEmotion || '待分析';
-  card.querySelector('#moodStatus').textContent = `${(financeNetWorth / 10000).toFixed(0)}万`;
+  // 净资产（显示真实财务净资产，单位万日元）
+  card.querySelector('#netWorth').textContent = `${(financeNetWorth / 10000).toFixed(0)}万`;
+  // 情绪（显示真实情绪）
+  card.querySelector('#moodStatus').textContent = data.mood?.todayMood?.dominantEmotion || '待分析';
 }
 
 function getHPColor(value) {

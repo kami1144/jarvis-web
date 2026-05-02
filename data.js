@@ -137,6 +137,7 @@ const FinanceData = {
     // 负债合计
     const totalLiabilities = (
       (liabilities.mortgage || 0) +
+      (liabilities.creditCard || 0) +
       (liabilities.loans || 0) +
       (liabilities.otherDebts || 0)
     );
