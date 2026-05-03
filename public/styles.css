@@ -1515,3 +1515,130 @@ body {
 @media (max-width: 767px) {
   .signal-card { display: block; }
 }
+
+/* ===================================
+   Guidance Cards (主动引导卡片)
+   =================================== */
+
+.guidance-cards-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guidance-card {
+  background: #1a1a1a;
+  border-radius: 12px;
+  border-left: 4px solid #4CAF50;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: guidanceSlideIn 0.3s ease;
+}
+
+@keyframes guidanceSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.guidance-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.guidance-card-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: white;
+}
+
+.guidance-card-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.guidance-card-close:hover {
+  color: #fff;
+}
+
+.guidance-card-body {
+  padding: 16px;
+}
+
+.guidance-card-description {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  margin-bottom: 12px;
+}
+
+.guidance-card-emotion {
+  font-size: 0.82rem;
+  color: #FF9800;
+  margin-bottom: 10px;
+  line-height: 1.5;
+  padding: 10px;
+  background: rgba(255, 152, 0, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #FF9800;
+}
+
+.guidance-card-suggestion {
+  font-size: 0.8rem;
+  color: #aaa;
+  line-height: 1.5;
+}
+
+.guidance-card-actions {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.guidance-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.guidance-btn:hover {
+  opacity: 0.9;
+}
+
+.guidance-btn-primary {
+  background: #2D5A4A;
+  color: white;
+  border: none;
+}
+
+.guidance-btn-secondary {
+  background: transparent;
+  color: #888;
+  border: 1px solid #444;
+}
+
+.guidance-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #aaa;
+}
