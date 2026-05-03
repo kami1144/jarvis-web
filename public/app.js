@@ -67,6 +67,7 @@ async function renderAll() {
   renderDailySchedule();
   renderSignals();
   initAIAdvice();
+  updateMeaningBadge();
 }
 
 // 渲染家庭成员
@@ -804,6 +805,90 @@ function deleteTask(taskId) {
     showNotification('🗑️ 任务已删除', 'info');
     renderTasks();
   }
+}
+
+// ==========================================
+// 意义确认功能
+// ==========================================
+
+function openMeaningConfirm() {
+  renderMeaningList();
+  openModal('meaningModal');
+}
+
+function renderMeaningList() {
+  const list = document.getElementById('meaningList');
+  const empty = document.getElementById('meaningEmpty');
+  if (!list || !empty) return;
+
+  const tasks = AIEvaluator.getTasksNeedingConfirm();
+
+  if (tasks.length === 0) {
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    updateMeaningBadge();
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.style.display = 'block';
+
+  // 更新 badge
+  updateMeaningBadge();
+
+  // 渲染任务列表
+  const today = new Date().toISOString().split('T')[0];
+
+  list.innerHTML = tasks.map(task => {
+    const lastConfirmed = task.last_meaning_confirmed || task.purpose_created_at || today;
+    const daysAgo = Math.floor((new Date(today) - new Date(lastConfirmed)) / 86400000);
+
+    return `
+      <div class="meaning-item" data-task-id="${task.id}">
+        <div class="meaning-task-name">${task.name}</div>
+        <div class="meaning-purpose">
+          <span class="meaning-purpose-label">意义：</span>
+          <span class="meaning-purpose-text">${task.purpose || '确认这个目标对你是否还有意义'}</span>
+        </div>
+        <div class="meaning-days">${daysAgo}天前确认</div>
+        <div class="meaning-actions">
+          <button class="meaning-btn confirm" onclick="confirmMeaning('${task.id}', 'confirm')">✅ 在</button>
+          <button class="meaning-btn modify" onclick="confirmMeaningModify('${task.id}')">✏️ 改了目标</button>
+          <button class="meaning-btn abandon" onclick="confirmMeaning('${task.id}', 'abandon')">🗑️ 放弃</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateMeaningBadge() {
+  const badge = document.getElementById('meaningBadge');
+  if (!badge) return;
+
+  const count = AIEvaluator.getTasksNeedingConfirm().length;
+  badge.textContent = count > 0 ? count : '';
+  badge.style.display = count > 0 ? 'inline' : 'none';
+}
+
+function confirmMeaning(taskId, action) {
+  AIEvaluator.confirmMeaning(taskId, action);
+  showNotification(action === 'confirm' ? '✅ 意义已确认' : action === 'abandon' ? '🗑️ 任务已放弃' : '', 'success');
+  renderMeaningList();
+  renderTasks();
+}
+
+function confirmMeaningModify(taskId) {
+  const task = TaskTracker.loadTasks().find(t => t.id === taskId);
+  if (!task) return;
+
+  const newPurpose = prompt('请输入新的意义/目标：', task.purpose);
+  if (newPurpose === null) return; // 用户取消
+
+  const purpose = newPurpose.trim() || task.purpose;
+  AIEvaluator.confirmMeaning(taskId, 'modify', purpose);
+  showNotification('✏️ 目标已更新', 'success');
+  renderMeaningList();
+  renderTasks();
 }
 
 // 进度滑块事件

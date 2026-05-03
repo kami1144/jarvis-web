@@ -130,6 +130,7 @@
           <h2 class="card-title">📜 任务追踪 <span class="update-badge" id="questSource">📓 Obsidian</span></h2>
           <div class="task-controls" style="margin-bottom: 12px;">
             <button class="btn secondary" onclick="openTaskInput()">➕ 添加任务</button>
+            <button class="btn secondary" onclick="openMeaningConfirm()">🎯 意义确认 <span class="meaning-badge" id="meaningBadge">0</span></button>
             <button class="btn secondary" onclick="syncFromObsidian()">📓 同步Obsidian</button>
           </div>
           <div class="quest-list" id="questList">
@@ -599,6 +600,30 @@
       <div class="modal-footer">
         <button class="btn secondary" onclick="closeModal('taskModal')">取消</button>
         <button class="btn primary" onclick="saveTask()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：意义确认 ========== -->
+  <div class="modal" id="meaningModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🎯 意义确认</h3>
+        <button class="modal-close" onclick="closeModal('meaningModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="meaning-intro">
+          <p>这些任务已经3天+没有确认意义了。它们对你还有价值吗？</p>
+        </div>
+        <div class="meaning-list" id="meaningList">
+          <!-- 动态渲染任务列表 -->
+        </div>
+        <div class="meaning-empty" id="meaningEmpty" style="display:none;">
+          <p>✅ 所有任务都已确认，暂无需要意义确认的任务</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('meaningModal')">关闭</button>
       </div>
     </div>
   </div>

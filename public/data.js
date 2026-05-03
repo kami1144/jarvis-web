@@ -1004,6 +1004,97 @@ const AlertSystem = {
 };
 
 // ==========================================
+// AI Purpose 提炼器
+// ==========================================
+
+const AIEvaluator = {
+  // 从任务名称提取背后的"意义"
+  extractPurpose(taskName) {
+    const name = taskName.toLowerCase();
+
+    // 基于关键词匹配提炼意义（简单规则引擎）
+    const purposeRules = [
+      // 健康相关
+      { keywords: ['运动', '跑步', '健身', '锻炼', '瑜伽'], purpose: '保持身体健康，有精力陪伴家人' },
+      { keywords: ['体检', '检查', '身体'], purpose: '预防问题，保证长期战斗力' },
+
+      // 家庭相关
+      { keywords: ['女儿', '儿子', '孩子', '家人', '陪伴'], purpose: '给孩子高质量的陪伴' },
+      { keywords: ['家长会', '学校', '家长日'], purpose: '参与孩子成长' },
+
+      // 财务相关
+      { keywords: ['赚钱', '收入', '变现', '销售'], purpose: '提供家庭经济保障' },
+      { keywords: ['投资', '理财'], purpose: '积累财富' },
+
+      // 事业相关
+      { keywords: ['上线', '发布', '网站', '产品'], purpose: '完成项目，创造价值' },
+      { keywords: ['学习', '课程', '培训'], purpose: '提升能力' },
+      { keywords: ['面试', '招聘', '人才'], purpose: '组建团队' },
+
+      // 技能相关
+      { keywords: ['日语', '英语', '语言', '韩语'], purpose: '拓展可能性' },
+      { keywords: ['编程', '代码', '开发'], purpose: '用技术解决问题' }
+    ];
+
+    // 遍历匹配
+    for (const rule of purposeRules) {
+      for (const kw of rule.keywords) {
+        if (name.includes(kw)) {
+          return rule.purpose;
+        }
+      }
+    }
+
+    // 默认通用回复
+    return '确认这个目标对你是否还有意义';
+  },
+
+  // 判断任务是否需要意义确认（超过3天未确认且status为pending）
+  needsMeaningConfirm(task) {
+    const today = new Date().toISOString().split('T')[0];
+    const lastConfirmed = task.last_meaning_confirmed || task.purpose_created_at || today;
+    const daysSince = Math.floor((new Date(today) - new Date(lastConfirmed)) / 86400000);
+
+    return task.meaning_status === 'pending' && daysSince >= 3;
+  },
+
+  // 获取需要确认的任务列表
+  getTasksNeedingConfirm() {
+    const tasks = TaskTracker.loadTasks();
+    return tasks.filter(t => this.needsMeaningConfirm(t));
+  },
+
+  // 确认任务意义
+  confirmMeaning(taskId, action, newPurpose = null) {
+    const tasks = TaskTracker.loadTasks();
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return tasks;
+
+    const today = new Date().toISOString().split('T')[0];
+
+    if (action === 'confirm') {
+      // [在]：meaning_status → 'confirmed'
+      task.meaning_status = 'confirmed';
+      task.last_meaning_confirmed = today;
+    } else if (action === 'modify') {
+      // [改了目标]：记录旧purpose，输入新purpose
+      task.previous_purpose = task.purpose;
+      task.purpose = newPurpose;
+      task.purpose_created_at = today;
+      task.last_meaning_confirmed = today;
+      task.meaning_status = 'confirmed';
+    } else if (action === 'abandon') {
+      // [放弃]：meaning_status → 'abandoned'
+      task.meaning_status = 'abandoned';
+      task.last_meaning_confirmed = today;
+    }
+
+    TaskTracker.saveTasks(tasks);
+    return tasks;
+  }
+};
+
+// ==========================================
 // 任务追踪器 (Task Tracker)
 // ==========================================
 
@@ -1033,6 +1124,11 @@ const TaskTracker = {
   // 添加任务
   addTask(task) {
     const tasks = this.loadTasks();
+    const today = new Date().toISOString().split('T')[0];
+
+    // AI 提炼 purpose（简单实现）
+    const purpose = AIEvaluator.extractPurpose(task.name);
+
     const newTask = {
       id: 'task_' + Date.now(),
       name: task.name,
@@ -1042,7 +1138,15 @@ const TaskTracker = {
       deadline: task.deadline || null,
       owner: task.owner || 'Kim',
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+
+      // 意义确认相关字段
+      purpose: purpose,                    // AI 提炼的意义
+      purpose_created_at: today,        // purpose 创建时间
+      last_meaning_confirmed: today,    // 上次确认时间
+      meaning_status: 'pending',     // pending | confirmed | modified | abandoned
+      previous_purpose: null,      // 改了目标时记录旧purpose
+      pattern_note: ''           // 长时间未动的模式备注
     };
     tasks.unshift(newTask);
     this.saveTasks(tasks);
@@ -1261,14 +1365,143 @@ window.AlertSystem = AlertSystem;
 window.TaskTracker = TaskTracker;
 window.HistoryTracker = HistoryTracker;
 window.EnvironmentTracker = EnvironmentTracker;
+window.AIEvaluator = AIEvaluator;
+window.NotificationService = NotificationService;
 
 // ==========================================
 // 每日指挥官数据
 // ==========================================
 
+const NotificationService = {
+  // 推送服务配置
+  config: {
+    // 飞书 webhook（用户在设置中配置）
+    webhookUrl: localStorage.getItem('feishu_webhook_url') || '',
+    // Telegram bot（用户在设置中配置）
+    telegramBotToken: localStorage.getItem('telegram_bot_token') || '',
+    telegramChatId: localStorage.getItem('telegram_chat_id') || ''
+  },
+
+  // 配置 webhook
+  configureFeishu(url) {
+    localStorage.setItem('feishu_webhook_url', url);
+    this.config.webhookUrl = url;
+  },
+
+  configureTelegram(botToken, chatId) {
+    localStorage.setItem('telegram_bot_token', botToken);
+    localStorage.setItem('telegram_chat_id', chatId);
+    this.config.telegramBotToken = botToken;
+    this.config.telegramChatId = chatId;
+  },
+
+  // 检查是否已配置
+  isConfigured() {
+    return this.config.webhookUrl || (this.config.telegramBotToken && this.config.telegramChatId);
+  },
+
+  // 构建推送消息
+  buildMessage(tasks) {
+    const taskList = tasks.map((t, i) => {
+      const daysAgo = Math.floor((new Date() - new Date(t.last_meaning_confirmed || t.purpose_created_at)) / 86400000);
+      return `${i + 1}. ${t.name}（${daysAgo}天前确认）— ${t.purpose}`;
+    }).join('\n');
+
+    return {
+      title: '🎯 意义确认提醒',
+      subtitle: `有 ${tasks.length} 个任务需要你确认意义`,
+      content: taskList,
+      footer: '点击访问 J.A.R.V.I.S. 进行确认'
+    };
+  },
+
+  // 推送飞书消息
+  async sendFeishu(message) {
+    if (!this.config.webhookUrl) return;
+
+    try {
+      const res = await fetch(this.config.webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          msg_type: 'post',
+          content: {
+            title: message.title,
+            subtitle: message.subtitle,
+            content: message.content,
+            footer: message.footer
+          }
+        })
+      });
+      return res.ok;
+    } catch (e) {
+      console.warn('飞书推送失败:', e.message);
+      return false;
+    }
+  },
+
+  // 推送 Telegram 消息
+  async sendTelegram(message) {
+    if (!this.config.telegramBotToken || !this.config.telegramChatId) return;
+
+    const text = `*${message.title}*\n_${message.subtitle}_\n\n${message.content}\n\n💡 ${message.footer}`;
+    const url = `https://api.telegram.org/bot${this.config.telegramBotToken}/sendMessage`;
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: this.config.telegramChatId,
+          text: text,
+          parse_mode: 'Markdown'
+        })
+      });
+      return res.ok;
+    } catch (e) {
+      console.warn('Telegram 推送失败:', e.message);
+      return false;
+    }
+  },
+
+  // 发送通知（自动选择已配置的平台）
+  async send(message) {
+    const results = [];
+
+    if (this.config.webhookUrl) {
+      results.push(await this.sendFeishu(message));
+    }
+
+    if (this.config.telegramBotToken && this.config.telegramChatId) {
+      results.push(await this.sendTelegram(message));
+    }
+
+    return results.some(r => r);
+  },
+
+  // 每日检查并推送（供 cronjob 调用）
+  async checkAndNotify() {
+    const tasks = AIEvaluator.getTasksNeedingConfirm();
+
+    if (tasks.length === 0) {
+      console.log('📝 无需意义确认的任务');
+      return;
+    }
+
+    const message = this.buildMessage(tasks);
+    const sent = await this.send(message);
+
+    if (sent) {
+      console.log(`✅ 已推送 ${tasks.length} 个任务到通知渠道`);
+    } else {
+      console.log('⚠️ 通知渠道未配置，消息未发送');
+    }
+  }
+};
+
 const DailyCommander = {
   STORAGE_KEY: 'jarvis_daily_commander',
-  
+
   // 获取今日日期字符串
   getTodayKey() {
     return new Date().toISOString().split('T')[0];
