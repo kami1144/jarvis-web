@@ -431,6 +431,13 @@ function loadData() {
               data.mindModel.today.currentCase.exercises.push(oldE);
             }
           });
+        } else if (!data.mindModel.today.currentCase.originalThought) {
+          // currentCase 存在但缺 narrative 字段，补全叙事内容
+          data.mindModel.today.currentCase = {
+            ...MindModelData.today.currentCase,
+            ...data.mindModel.today.currentCase,
+            exercises: data.mindModel.today.currentCase.exercises || MindModelData.today.currentCase.exercises
+          };
         }
       }
       saveData(data);
