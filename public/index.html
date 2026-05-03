@@ -131,6 +131,7 @@
           <div class="task-controls" style="margin-bottom: 12px;">
             <button class="btn secondary" onclick="openTaskInput()">➕ 添加任务</button>
             <button class="btn secondary" onclick="openMeaningConfirm()">🎯 意义确认 <span class="meaning-badge" id="meaningBadge">0</span></button>
+            <button class="btn secondary" onclick="openToolKit()">📋 工具</button>
             <button class="btn secondary" onclick="syncFromObsidian()">📓 同步Obsidian</button>
           </div>
           <div class="quest-list" id="questList">
@@ -624,6 +625,32 @@
       </div>
       <div class="modal-footer">
         <button class="btn secondary" onclick="closeModal('meaningModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：知识工具 ========== -->
+  <div class="modal" id="toolModal">
+    <div class="modal-content tool-modal-content">
+      <div class="modal-header">
+        <h3>📋 知识工具</h3>
+        <button class="modal-close" onclick="closeModal('toolModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- 分类标签 -->
+        <div class="tool-categories">
+          <button class="tool-cat-btn active" data-category="all" onclick="ToolKit_filter('all')">全部</button>
+          <button class="tool-cat-btn" data-category="decision" onclick="ToolKit_filter('decision')">🎯 决策</button>
+          <button class="tool-cat-btn" data-category="review" onclick="ToolKit_filter('review')">📝 复盘</button>
+          <button class="tool-cat-btn" data-category="energy" onclick="ToolKit_filter('energy')">⚡ 能量</button>
+        </div>
+        <!-- 工具卡片列表 -->
+        <div class="tool-grid" id="toolGrid">
+          <!-- 动态渲染 -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('toolModal')">关闭</button>
       </div>
     </div>
   </div>

@@ -1183,6 +1183,196 @@ function closeModal(modalId) {
   document.body.style.overflow = '';
 }
 
+// ========== 知识工具模块 ==========
+
+const TOOLS_DATA = {
+  decision: [
+    {
+      id: 'options',
+      name: '选项穷尽法',
+      desc: '做决定前问自己：我的选项够多吗？满足点是什么？',
+      icon: '🔢',
+      category: 'decision',
+      checklist: [
+        '我的选项是否超过3个？',
+        '每个选项的优势是什么？',
+        '每个选项的代价是什么？',
+        '满足点（最低接受条件）是什么？',
+        '如果只能选一个，我会选哪个？'
+      ]
+    },
+    {
+      id: 'six-hats',
+      name: '六顶思考帽',
+      desc: '从白/红/黑/黄/绿/蓝六顶帽子角度分析问题',
+      icon: '🎩',
+      category: 'decision',
+      checklist: [
+        '⚪ 白帽：事实和数据是什么？',
+        '❤️ 红帽：我的直觉/情绪是什么？',
+        '⚫ 黑帽：风险和困难是什么？',
+        '💛 黄帽：价值和收益是什么？',
+        '💚 绿帽：创新方案有哪些？',
+        '🔵 蓝帽：下一步该怎么做？'
+      ]
+    },
+    {
+      id: 'fast-slow',
+      name: '思考快与慢',
+      desc: '决策前6问，检查认知偏见',
+      icon: '🐢',
+      category: 'decision',
+      checklist: [
+        '我是在逃避问题还是在解决问题？',
+        '我的判断是基于事实还是感觉？',
+        '1小时后我会怎么想这个决定？',
+        '1年后呢？',
+        '如果有perfect信息，我会怎么做？',
+        '最坏情况我能接受吗？'
+      ]
+    }
+  ],
+  review: [
+    {
+      id: 'daily-review',
+      name: '每日快速复盘',
+      desc: '今天做得好/可改进/明日重点',
+      icon: '📋',
+      category: 'review',
+      checklist: [
+        '✅ 今天做得好的一件事：',
+        '📝 可改进的一件事：',
+        '🎯 明天最重要的一件事：',
+        '💡 今天学到了什么：',
+        '🙏 今天感谢谁：'
+      ]
+    }
+  ],
+  energy: [
+    {
+      id: 'flow-match',
+      name: '心流匹配表',
+      desc: '根据能量状态匹配任务类型',
+      icon: '⚡',
+      category: 'energy',
+      checklist: [
+        '🔴 高能量 → 创造性任务：设计、规划、决策',
+        '🟡 中高能量 → 协作任务：会议、沟通、辅导',
+        '🟢 中能量 → 执行任务：整理、文档、审查',
+        '🔵 低能量 → 机械任务：数据录入、基础沟通'
+      ]
+    }
+  ]
+};
+
+// 扁平化所有工具
+function ToolKit_getAllTools() {
+  const all = [];
+  Object.values(TOOLS_DATA).forEach(cat => {
+    cat.forEach(tool => all.push(tool));
+  });
+  return all;
+}
+
+// 打开工具面板
+function openToolKit() {
+  renderToolGrid('all');
+  openModal('toolModal');
+}
+
+// 渲染工具卡片
+function renderToolGrid(category) {
+  const grid = document.getElementById('toolGrid');
+  if (!grid) return;
+
+  let tools = ToolKit_getAllTools();
+  if (category !== 'all') {
+    tools = tools.filter(t => t.category === category);
+  }
+
+  grid.innerHTML = tools.map(tool => `
+    <div class="tool-card" data-category="${tool.category}" onclick="ToolKit_openDetail('${tool.id}')">
+      <div class="tool-card-header">
+        <span class="tool-icon">${tool.icon}</span>
+        <span class="tool-name">${tool.name}</span>
+      </div>
+      <div class="tool-desc">${tool.desc}</div>
+    </div>
+  `).join('');
+
+  // 更新分类按钮状态
+  document.querySelectorAll('.tool-cat-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.category === category);
+  });
+}
+
+// 过滤工具分类
+function ToolKit_filter(category) {
+  renderToolGrid(category);
+}
+
+// 打开工具详情
+function ToolKit_openDetail(toolId) {
+  const tool = ToolKit_getAllTools().find(t => t.id === toolId);
+  if (!tool) return;
+
+  // 记录使用时间
+  ToolKit_logUsage(toolId);
+
+  // 显示详情模态框
+  let detailModal = document.getElementById('toolDetailModal');
+  if (!detailModal) {
+    // 创建详情模态框
+    const detailHTML = `
+    <div class="modal" id="toolDetailModal">
+      <div class="modal-content tool-detail-content">
+        <div class="modal-header">
+          <h3 id="toolDetailTitle"></h3>
+          <button class="modal-close" onclick="closeModal('toolDetailModal')">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="tool-detail-desc" id="toolDetailDesc"></div>
+          <div class="tool-checklist" id="toolChecklist"></div>
+          <div class="tool-notes">
+            <textarea id="toolNoteInput" rows="4" placeholder="记录你的思考..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn secondary" onclick="closeModal('toolDetailModal')">关闭</button>
+        </div>
+      </div>
+    </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', detailHTML);
+  }
+
+  document.getElementById('toolDetailTitle').textContent = tool.icon + ' ' + tool.name;
+  document.getElementById('toolDetailDesc').textContent = tool.desc;
+  document.getElementById('toolChecklist').innerHTML = tool.checklist.map(item => `
+    <div class="checklist-item">
+      <input type="checkbox" class="checklist-checkbox">
+      <span class="checklist-text">${item}</span>
+    </div>
+  `).join('');
+  document.getElementById('toolNoteInput').value = '';
+
+  openModal('toolDetailModal');
+}
+
+// 记录工具使用
+function ToolKit_logUsage(toolId) {
+  const key = 'jarvis_tool_usage';
+  const usage = JSON.parse(localStorage.getItem(key) || {});
+  const today = new Date().toISOString().split('T')[0];
+
+  if (!usage[toolId]) usage[toolId] = [];
+  if (!usage[toolId].includes(today)) {
+    usage[toolId].push(today);
+  }
+
+  localStorage.setItem(key, JSON.stringify(usage));
+}
+
 function openHealthInput() {
   const data = JARVIS.getAllData();
   const h = data.health;
