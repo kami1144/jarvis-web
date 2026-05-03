@@ -146,6 +146,13 @@ function getEnergyColor(value) {
   return 'linear-gradient(90deg, #78909C, #607D8B)';
 }
 
+// 折叠状态跟踪
+const mindCaseCollapse = {
+  current: false, // false = 展开
+  history: true,  // true = 折叠
+  historyItems: {} // idx -> true(folded)
+};
+
 // 渲染思维模式仪表盘（折叠式）
 function renderMindModel(mindData) {
   const card = document.querySelector('.mind-model-card');
@@ -181,9 +188,9 @@ function renderMindModel(mindData) {
           <span class="case-preview">${cc?.originalThought?.slice(0, 20) || ''}...</span>
           <span class="case-progress">${completedCount}/${exercises.length} 完成</span>
         </div>
-        <span class="case-toggle">▼</span>
+        <span class="case-toggle">${mindCaseCollapse.current ? '▶' : '▼'}</span>
       </div>
-      <div class="case-detail" id="case-detail-current">
+      <div class="case-detail" id="case-detail-current" style="display:${mindCaseCollapse.current ? 'none' : 'block'};">
         ${cc ? `
         <div class="case-section">
           <div class="case-label">💭 原来的思维</div>
@@ -226,17 +233,17 @@ function renderMindModel(mindData) {
         <div class="case-summary">
           <span class="case-preview">最近：${cases[0]?.originalThought?.slice(0, 15) || ''}...</span>
         </div>
-        <span class="case-toggle" id="toggle-history">▶</span>
+        <span class="case-toggle" id="toggle-history">${mindCaseCollapse.history ? '▶' : '▼'}</span>
       </div>
-      <div class="case-detail" id="case-detail-history" style="display:none;">
+      <div class="case-detail" id="case-detail-history" style="display:${mindCaseCollapse.history ? 'none' : 'block'};">
         ${cases.map((c, idx) => `
           <div class="history-case-item" onclick="toggleHistoryCase(${idx})">
             <div class="history-case-header">
               <span class="history-case-date">${c.completedAt ? new Date(c.completedAt).toLocaleDateString('zh') : '未知'}</span>
               <span class="history-case-preview">${c.originalThought?.slice(0, 25) || ''}...</span>
-              <span class="history-case-toggle" id="hist-toggle-${idx}">▶</span>
+              <span class="history-case-toggle" id="hist-toggle-${idx}">${mindCaseCollapse.historyItems[idx] !== false ? '▶' : '▼'}</span>
             </div>
-            <div class="history-case-detail" id="hist-detail-${idx}" style="display:none;">
+            <div class="history-case-detail" id="hist-detail-${idx}" style="display:${mindCaseCollapse.historyItems[idx] !== false ? 'none' : 'block'};">
               <div class="case-section">
                 <div class="case-label">💭 原来的思维</div>
                 <div class="case-content">"${c.originalThought}"</div>
@@ -276,22 +283,24 @@ function renderMindModel(mindData) {
 
 // 折叠/展开案例
 function toggleCase(caseId) {
-  const detail = document.getElementById(`case-detail-${caseId}`);
-  const toggle = document.querySelector(`[data-case-id="${caseId}"] .case-toggle`);
-  if (!detail) return;
-  const isHidden = detail.style.display === 'none';
-  detail.style.display = isHidden ? 'block' : 'none';
-  if (toggle) toggle.textContent = isHidden ? '▼' : '▶';
+  if (caseId === 'current') {
+    mindCaseCollapse.current = !mindCaseCollapse.current;
+  } else if (caseId === 'history') {
+    mindCaseCollapse.history = !mindCaseCollapse.history;
+  }
+  // 只重新渲染思维模块，不重新生成整个HTML
+  renderMindModel(JARVIS.getAllData().mindModel);
 }
 
 // 折叠/展开历史案例
 function toggleHistoryCase(idx) {
+  // undefined/false -> true(折叠), false/true -> false(展开)
+  mindCaseCollapse.historyItems[idx] = !mindCaseCollapse.historyItems[idx];
+  // 只更新这个历史案例的显示状态
   const detail = document.getElementById(`hist-detail-${idx}`);
   const toggle = document.getElementById(`hist-toggle-${idx}`);
-  if (!detail) return;
-  const isHidden = detail.style.display === 'none';
-  detail.style.display = isHidden ? 'block' : 'none';
-  if (toggle) toggle.textContent = isHidden ? '▼' : '▶';
+  if (detail) detail.style.display = mindCaseCollapse.historyItems[idx] ? 'none' : 'block';
+  if (toggle) toggle.textContent = mindCaseCollapse.historyItems[idx] ? '▶' : '▼';
 }
 
 // 渲染任务（合并Obsidian项目和本地任务）
