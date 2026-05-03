@@ -1589,3 +1589,401 @@ const DailyCommander = {
     }
   }
 };
+
+// ==========================================
+// 周度复盘 (Weekly Review)
+// ==========================================
+
+const WeeklyReview = {
+  STORAGE_KEY: 'jarvis_weekly_review',
+
+  // 获取本周的起止日期
+  getWeekRange() {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    monday.setHours(0, 0, 0, 0);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    return {
+      start: monday.toISOString().split('T')[0],
+      end: sunday.toISOString().split('T')[0]
+    };
+  },
+
+  // 获取周复盘数据
+  load() {
+    const key = this.STORAGE_KEY;
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return this.getDefault();
+  },
+
+  // 保存周复盘数据
+  save(data) {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+  },
+
+  // 默认数据结构
+  getDefault() {
+    const week = this.getWeekRange();
+    return {
+      weekStart: week.start,
+      weekEnd: week.end,
+      goals: [],
+      lessons: [],
+      summary: ''
+    };
+  },
+
+  // 添加目标
+  addGoal(text) {
+    const data = this.load();
+    const week = this.getWeekRange();
+
+    if (data.weekStart !== week.start) {
+      data = this.getDefault();
+    }
+
+    data.goals.unshift({
+      id: 'goal_' + Date.now(),
+      text: text,
+      completed: false,
+      note: '',
+      createdAt: new Date().toISOString()
+    });
+    this.save(data);
+    return data;
+  },
+
+  // 切换目标完成状态
+  toggleGoal(goalId) {
+    const data = this.load();
+    const goal = data.goals.find(g => g.id === goalId);
+    if (goal) {
+      goal.completed = !goal.completed;
+      this.save(data);
+    }
+    return data;
+  },
+
+  // 添加经验教训
+  addLesson(text, type) {
+    const data = this.load();
+    const week = this.getWeekRange();
+
+    if (data.weekStart !== week.start) {
+      data = this.getDefault();
+    }
+
+    data.lessons.unshift({
+      id: 'lesson_' + Date.now(),
+      text: text,
+      type: type,
+      createdAt: new Date().toISOString()
+    });
+    this.save(data);
+    return data;
+  },
+
+  // 保存总结
+  saveSummary(summary) {
+    const data = this.load();
+    data.summary = summary;
+    this.save(data);
+    return data;
+  },
+
+  // 获取完成率
+  getCompletionRate() {
+    const data = this.load();
+    if (data.goals.length === 0) return 0;
+    const completed = data.goals.filter(g => g.completed).length;
+    return Math.round((completed / data.goals.length) * 100);
+  }
+};
+
+// ==========================================
+// 习惯追踪 (Habit Tracker)
+// ==========================================
+
+const HabitTracker = {
+  STORAGE_KEY: 'jarvis_habit_tracker',
+
+  load() {
+    const key = this.STORAGE_KEY;
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return [];
+  },
+
+  save(habits) {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(habits));
+  },
+
+  addHabit(name, goal, period = 'daily') {
+    const habits = this.load();
+    habits.unshift({
+      id: 'habit_' + Date.now(),
+      name: name,
+      goal: goal,
+      period: period,
+      streak: 0,
+      maxStreak: 0,
+      completedDates: [],
+      createdAt: new Date().toISOString()
+    });
+    this.save(habits);
+    return habits;
+  },
+
+  deleteHabit(habitId) {
+    const habits = this.load().filter(h => h.id !== habitId);
+    this.save(habits);
+    return habits;
+  },
+
+  markComplete(habitId) {
+    const habits = this.load();
+    const habit = habits.find(h => h.id === habitId);
+    const today = new Date().toISOString().split('T')[0];
+
+    if (habit) {
+      if (!habit.completedDates.includes(today)) {
+        habit.completedDates.push(today);
+        habit.streak = this.calculateStreak(habit.completedDates);
+        if (habit.streak > habit.maxStreak) {
+          habit.maxStreak = habit.streak;
+        }
+        this.save(habits);
+      }
+    }
+    return habits;
+  },
+
+  calculateStreak(completedDates) {
+    if (completedDates.length === 0) return 0;
+    const sorted = [...completedDates].sort().reverse();
+    let streak = 0;
+    let current = new Date();
+
+    for (let i = 0; i < sorted.length; i++) {
+      const dateStr = current.toISOString().split('T')[0];
+      if (sorted.includes(dateStr)) {
+        streak++;
+        current.setDate(current.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  },
+
+  isCompletedToday(habitId) {
+    const habits = this.load();
+    const habit = habits.find(h => h.id === habitId);
+    const today = new Date().toISOString().split('T')[0];
+    return habit?.completedDates?.includes(today);
+  },
+
+  getTodayProgress() {
+    const habits = this.load();
+    const today = new Date().toISOString().split('T')[0];
+    const completed = habits.filter(h => h.completedDates.includes(today)).length;
+    return {
+      total: habits.length,
+      completed: completed,
+      percentage: habits.length > 0 ? Math.round((completed / habits.length) * 100) : 0
+    };
+  }
+};
+
+// ==========================================
+// 冲突处理 (Conflict Resolution)
+// ==========================================
+
+const ConflictResolution = {
+  STORAGE_KEY: 'jarvis_conflict_resolution',
+
+  load() {
+    const key = this.STORAGE_KEY;
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return [];
+  },
+
+  save(conflicts) {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(conflicts));
+  },
+
+  addConflict(person, reason, emotion) {
+    const conflicts = this.load();
+    conflicts.unshift({
+      id: 'conflict_' + Date.now(),
+      person: person,
+      reason: reason,
+      emotion: emotion,
+      status: 'open',
+      solution: '',
+      reflection: '',
+      resolution: '',
+      createdAt: new Date().toISOString(),
+      resolvedAt: null
+    });
+    this.save(conflicts);
+    return conflicts;
+  },
+
+  updateConflict(conflictId, updates) {
+    const conflicts = this.load();
+    const conflict = conflicts.find(c => c.id === conflictId);
+    if (conflict) {
+      Object.assign(conflict, updates);
+      if (updates.status === 'resolved') {
+        conflict.resolvedAt = new Date().toISOString();
+      }
+      this.save(conflicts);
+    }
+    return conflicts;
+  },
+
+  resolveConflict(conflictId, solution, reflection) {
+    return this.updateConflict(conflictId, {
+      status: 'resolved',
+      solution: solution,
+      reflection: reflection,
+      resolvedAt: new Date().toISOString()
+    });
+  },
+
+  deleteConflict(conflictId) {
+    const conflicts = this.load().filter(c => c.id !== conflictId);
+    this.save(conflicts);
+    return conflicts;
+  },
+
+  getGuidanceQuestions() {
+    return [
+      '对方的立场是什么？我理解吗？',
+      '我的核心需求是什么？',
+      '有没有双赢的解决方案？',
+      '我需要放下什么？',
+      '下一步最小的一步是什么？'
+    ];
+  },
+
+  getEmotionIcon(emotion) {
+    const icons = {
+      'angry': '😠',
+      'frustrated': '😤',
+      'sad': '😢',
+      'confused': '😵',
+      'anxious': '😰'
+    };
+    return icons[emotion] || '😔';
+  }
+};
+
+// ==========================================
+// 影响力自检 (Influence Check)
+// ==========================================
+
+const InfluenceCheck = {
+  STORAGE_KEY: 'jarvis_influence_check',
+
+  load() {
+    const key = this.STORAGE_KEY;
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return this.getDefault();
+  },
+
+  save(data) {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+  },
+
+  getDefault() {
+    return {
+      dimensions: {
+        technical: { score: 5, maxScore: 10, desc: '技术能力' },
+        decision: { score: 5, maxScore: 10, desc: '决策影响力' },
+        emotional: { score: 5, maxScore: 10, desc: '情绪感染力' },
+        resource: { score: 5, maxScore: 10, desc: '资源调动力' }
+      },
+      audience: [],
+      lastUpdated: new Date().toISOString()
+    };
+  },
+
+  updateDimensionScore(dimension, score) {
+    const data = this.load();
+    if (data.dimensions[dimension]) {
+      data.dimensions[dimension].score = Math.min(score, data.dimensions[dimension].maxScore);
+      data.lastUpdated = new Date().toISOString();
+      this.save(data);
+    }
+    return data;
+  },
+
+  addAudience(name, influence = 'normal', relation = 'colleague') {
+    const data = this.load();
+    data.audience.unshift({
+      id: 'audience_' + Date.now(),
+      name: name,
+      influence: influence,
+      relation: relation,
+      addedAt: new Date().toISOString()
+    });
+    data.lastUpdated = new Date().toISOString();
+    this.save(data);
+    return data;
+  },
+
+  deleteAudience(audienceId) {
+    const data = this.load();
+    data.audience = data.audience.filter(a => a.id !== audienceId);
+    data.lastUpdated = new Date().toISOString();
+    this.save(data);
+    return data;
+  },
+
+  getRadarData() {
+    const data = this.load();
+    return Object.entries(data.dimensions).map(([key, val]) => ({
+      dimension: key,
+      label: val.desc,
+      value: val.score,
+      maxValue: val.maxScore
+    }));
+  },
+
+  getTotalScore() {
+    const data = this.load();
+    const scores = Object.values(data.dimensions);
+    const total = scores.reduce((sum, s) => sum + s.value, 0);
+    const max = scores.reduce((sum, s) => sum + s.maxScore, 0);
+    return Math.round((total / max) * 100);
+  },
+
+  getHighInfluenceAudience() {
+    const data = this.load();
+    return data.audience.filter(a => a.influence === 'high');
+  }
+};
+
+// 导出到全局
+window.WeeklyReview = WeeklyReview;
+window.HabitTracker = HabitTracker;
+window.ConflictResolution = ConflictResolution;
+window.InfluenceCheck = InfluenceCheck;

@@ -1246,6 +1246,77 @@ const TOOLS_DATA = {
         '💡 今天学到了什么：',
         '🙏 今天感谢谁：'
       ]
+    },
+    {
+      id: 'weekly-review',
+      name: '周度复盘',
+      desc: '本周目标/经验/教训/下周计划',
+      icon: '📊',
+      category: 'review',
+      checklist: [
+        '🎯 本周目标完成情况：',
+        '💪 做得好的三件事：',
+        '📝 需要改进的三件事：',
+        '💡 本周学到的最重要的一件事：',
+        '🎯 下周最重要的三件事：',
+        '🙏 本周感谢谁：'
+      ],
+      action: 'openWeeklyReview()'
+    }
+  ],
+  habit: [
+    {
+      id: 'habit-tracker',
+      name: '习惯追踪',
+      desc: '追踪每日习惯养成情况',
+      icon: '🎯',
+      category: 'habit',
+      checklist: [
+        '🎯 今天要养成的习惯：',
+        '⏰ 触发时间/场景：',
+        '✅ 完成的奖励：',
+        '📝 未完成的原因：',
+        '🔄 调整方案：'
+      ],
+      action: 'openHabitTracker()'
+    }
+  ],
+  relationship: [
+    {
+      id: 'conflict-handler',
+      name: '冲突处理',
+      desc: '结构化处理人际关系冲突',
+      icon: '🤝',
+      category: 'relationship',
+      checklist: [
+        '👤 对方是谁？冲突点是什么？',
+        '❤️ 我当下的情绪是什么？',
+        '🎯 我的核心需求是什么？',
+        '💭 对方的立场/需求是什么？',
+        '🔄 有没有双赢方案？',
+        '📝 我需要放下什么？',
+        '� next 最小的一步是什么？',
+        '✅ 解决后的反思：'
+      ],
+      action: 'openConflictHandler()'
+    }
+  ],
+  influence: [
+    {
+      id: 'influence-check',
+      name: '影响力自检',
+      desc: '评估自己在四个维度的影响力',
+      icon: '📈',
+      category: 'influence',
+      checklist: [
+        '💻 技术能力：别人因为我技术好而认可我',
+        '🎯 决策影响力：别人因为我决策好而跟随我',
+        '❤️ 情绪感染力：别人因为我积极而受鼓舞',
+        '📦 资源调动力：别人因为我资源多而靠近我',
+        '🎯 最需要提升的维度是？',
+        '📝 行动计划：'
+      ],
+      action: 'openInfluenceCheck()'
     }
   ],
   energy: [
