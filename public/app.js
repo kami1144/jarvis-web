@@ -1319,6 +1319,59 @@ const TOOLS_DATA = {
       action: 'openInfluenceCheck()'
     }
   ],
+  monthly: [
+    {
+      id: 'monthly-review',
+      name: '月度复盘',
+      desc: '按月回顾目标/成就/教训',
+      icon: '📅',
+      category: 'monthly',
+      checklist: [
+        '🎯 本月目标完成情况：',
+        '🏆 本月最大的三个成就：',
+        '📝 本月最大的三个教训：',
+        '💡 本月学到的最重要的一件事：',
+        '🎯 下月最重要的三件事：',
+        '🙏 本月感谢谁：'
+      ],
+      action: 'openMonthlyReview()'
+    }
+  ],
+  pain: [
+    {
+      id: 'pain-reflection',
+      name: '痛苦反思',
+      desc: '记录和分析痛苦经历的结构化工具',
+      icon: '😔',
+      category: 'pain',
+      checklist: [
+        '📌 发生了什么让我痛苦的事？',
+        '💔 我的情绪是什么？强度多少？',
+        '🔍 为什么这让我痛苦？',
+        '💡 我学到了什么？',
+        '🎯 下一次我会怎么做不同？',
+        '✅ 现在我可以做什么？'
+      ],
+      action: 'openPainReflection()'
+    }
+  ],
+  principles: [
+    {
+      id: 'life-principles',
+      name: '人生原则清单',
+      desc: '记录和迭代人生原则清单',
+      icon: '📜',
+      category: 'principles',
+      checklist: [
+        '✏️ 我最核心的三个原则是？',
+        '💪 这些原则指导了什么决定？',
+        '🔄 这些原则需要调整吗？',
+        '🎯 本周践行了哪个原则？',
+        '📝 有什么新的原则想加入？'
+      ],
+      action: 'openLifePrinciples()'
+    }
+  ],
   energy: [
     {
       id: 'flow-match',
@@ -2499,6 +2552,259 @@ function updateAIAdvice() {
       <span class="advice-main">${advice.main}</span>
       <span class="advice-sub">${advice.sub}</span>
     `;
+  }
+}
+
+// ==========================================
+// 月度复盘工具函数
+// ==========================================
+
+function openMonthlyReview() {
+  closeModal('toolDetailModal');
+  renderMonthlyGoals();
+  renderMonthlyAchievements();
+  openModal('monthlyReviewModal');
+}
+
+function renderMonthlyGoals() {
+  const list = document.getElementById('monthlyGoalsList');
+  if (!list) return;
+
+  const data = MonthlyReview.load();
+  if (data.goals.length === 0) {
+    list.innerHTML = '<div class="review-empty">暂无目标，点击上方添加</div>';
+    return;
+  }
+
+  list.innerHTML = data.goals.map(g => `
+    <div class="review-item ${g.completed ? 'completed' : ''}">
+      <input type="checkbox" ${g.completed ? 'checked' : ''} onchange="toggleMonthlyGoal('${g.id}')">
+      <span class="review-text">${g.text}</span>
+      <button class="review-delete" onclick="deleteMonthlyGoal('${g.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+function addMonthlyGoal() {
+  const input = document.getElementById('monthlyGoalInput');
+  const text = input.value.trim();
+  if (text) {
+    MonthlyReview.addGoal(text);
+    input.value = '';
+    renderMonthlyGoals();
+    showNotification('✅ 目标已添加', 'success');
+  }
+}
+
+function toggleMonthlyGoal(goalId) {
+  MonthlyReview.toggleGoal(goalId);
+  renderMonthlyGoals();
+}
+
+function deleteMonthlyGoal(goalId) {
+  const data = MonthlyReview.load();
+  data.goals = data.goals.filter(g => g.id !== goalId);
+  MonthlyReview.save(data);
+  renderMonthlyGoals();
+}
+
+function renderMonthlyAchievements() {
+  // 成就渲染函数（可选实现）
+}
+
+function addMonthlyAchievement() {
+  const input = document.getElementById('monthlyAchievementInput');
+  const category = document.getElementById('monthlyAchievementCategory');
+  const text = input.value.trim();
+  if (text) {
+    MonthlyReview.addAchievement(text, category.value);
+    input.value = '';
+    showNotification('✅ 成就已添加', 'success');
+  }
+}
+
+function addMonthlyLesson() {
+  const input = document.getElementById('monthlyLessonInput');
+  const text = input.value.trim();
+  if (text) {
+    MonthlyReview.addLesson(text);
+    input.value = '';
+    showNotification('✅ 教训已保存', 'success');
+  }
+}
+
+function saveMonthlySummary() {
+  const input = document.getElementById('monthlySummaryInput');
+  const summary = input.value.trim();
+  MonthlyReview.saveSummary(summary);
+  showNotification('✅ 总结已保存', 'success');
+}
+
+// ==========================================
+// 痛苦反思工具函数
+// ==========================================
+
+function openPainReflection() {
+  closeModal('toolDetailModal');
+  renderPainList();
+  openModal('painReflectionModal');
+}
+
+function renderPainList() {
+  const list = document.getElementById('painList');
+  if (!list) return;
+
+  const data = PainReflection.load();
+  if (data.length === 0) {
+    list.innerHTML = '<div class="pain-empty">暂无记录，记录你的痛苦经历</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(p => `
+    <div class="pain-item stage-${p.stage}">
+      <div class="pain-header">
+        <span class="pain-stage">${PainReflection.getStageIcon(p.stage)}</span>
+        <span class="pain-emotion">${PainReflection.getEmotionIcon(p.emotion)}</span>
+        <span class="pain-intensity">强度: ${p.intensity}/10</span>
+      </div>
+      <div class="pain-event">${p.event}</div>
+      ${p.stage === 'recorded' ? `
+        <div class="pain-actions">
+          <button class="btn secondary" onclick="openPainAnalysis('${p.id}')">🔍 分析</button>
+          <button class="btn secondary" onclick="deletePainReflection('${p.id}')">🗑️</button>
+        </div>
+      ` : ''}
+      ${p.stage === 'analyzed' ? `
+        <div class="pain-analysis">
+          <div>💡 ${p.insight}</div>
+          <button class="btn primary" onclick="resolvePain('${p.id}')">✅ 标记已解决</button>
+        </div>
+      ` : ''}
+      ${p.stage === 'resolved' ? `
+        <div class="pain-resolved">✓ 已解决</div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+// 痛苦强度滑块事件
+document.getElementById('painIntensityInput')?.addEventListener('input', (e) => {
+  document.getElementById('painIntensityValue').textContent = e.target.value;
+});
+
+function recordPain() {
+  const event = document.getElementById('painEventInput').value.trim();
+  const emotion = document.getElementById('painEmotionInput').value;
+  const intensity = parseInt(document.getElementById('painIntensityInput').value);
+
+  if (event) {
+    PainReflection.recordPain(event, emotion, intensity);
+    document.getElementById('painEventInput').value = '';
+    renderPainList();
+    showNotification('✅ 痛苦经历已记录', 'success');
+  }
+}
+
+function openPainAnalysis(painId) {
+  const data = PainReflection.load();
+  const pain = data.find(p => p.id === painId);
+  if (!pain) return;
+
+  const analysis = prompt('分析：这件事为什么会让你痛苦？');
+  const insight = prompt('洞察：我学到了什么？');
+
+  if (analysis && insight) {
+    PainReflection.analyze(painId, analysis, insight);
+    renderPainList();
+    showNotification('✅ 分析已保存', 'success');
+  }
+}
+
+function resolvePain(painId) {
+  const action = prompt('行动：现在我可以做什么？');
+  if (action) {
+    PainReflection.resolve(painId, action);
+    renderPainList();
+    showNotification('✅ 已标记为解决', 'success');
+  }
+}
+
+function deletePainReflection(painId) {
+  if (confirm('确定要删除这条记录吗？')) {
+    PainReflection.delete(painId);
+    renderPainList();
+    showNotification('🗑️ 已删除', 'info');
+  }
+}
+
+// ==========================================
+// 人生原则清单工具函数
+// ==========================================
+
+function openLifePrinciples() {
+  closeModal('toolDetailModal');
+  renderPrinciplesList();
+  openModal('lifePrinciplesModal');
+}
+
+function renderPrinciplesList() {
+  const list = document.getElementById('principlesList');
+  const select = document.getElementById('principleExampleSelect');
+
+  const data = LifePrinciples.load();
+
+  if (list) {
+    if (data.principles.length === 0) {
+      list.innerHTML = '<div class="principles-empty">暂无原则，添加你的第一个原则</div>';
+      return;
+    }
+
+    list.innerHTML = data.principles.map(p => `
+      <div class="principle-item">
+        <span class="principle-category">[${p.category}]</span>
+        <span class="principle-text">${p.text}</span>
+        <span class="principle-source">${p.source === 'custom' ? '' : '⭐'}</span>
+        <button class="principle-delete" onclick="deletePrinciple('${p.id}')">×</button>
+      </div>
+    `).join('');
+  }
+
+  // 更新原则选择下拉框
+  if (select) {
+    select.innerHTML = data.principles.map(p => `
+      <option value="${p.id}">${p.text.slice(0, 30)}</option>
+    `).join('');
+  }
+}
+
+function addPrinciple() {
+  const text = document.getElementById('principleTextInput').value.trim();
+  const category = document.getElementById('principleCategoryInput').value;
+
+  if (text) {
+    LifePrinciples.addPrinciple(text, category);
+    document.getElementById('principleTextInput').value = '';
+    renderPrinciplesList();
+    showNotification('✅ 原则已添加', 'success');
+  }
+}
+
+function deletePrinciple(principleId) {
+  if (confirm('确定要删除这个原则吗？')) {
+    LifePrinciples.deletePrinciple(principleId);
+    renderPrinciplesList();
+    showNotification('🗑️ 已删除', 'info');
+  }
+}
+
+function addPrincipleExample() {
+  const principleId = document.getElementById('principleExampleSelect').value;
+  const example = document.getElementById('principleExampleInput').value.trim();
+
+  if (principleId && example) {
+    LifePrinciples.addExample(principleId, example);
+    document.getElementById('principleExampleInput').value = '';
+    showNotification('✅ 践行案例已保存', 'success');
   }
 }
 

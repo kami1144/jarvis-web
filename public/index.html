@@ -642,6 +642,9 @@
           <button class="tool-cat-btn active" data-category="all" onclick="ToolKit_filter('all')">全部</button>
           <button class="tool-cat-btn" data-category="decision" onclick="ToolKit_filter('decision')">🎯 决策</button>
           <button class="tool-cat-btn" data-category="review" onclick="ToolKit_filter('review')">📝 复盘</button>
+          <button class="tool-cat-btn" data-category="monthly" onclick="ToolKit_filter('monthly')">📅 月度</button>
+          <button class="tool-cat-btn" data-category="pain" onclick="ToolKit_filter('pain')">😔 痛苦</button>
+          <button class="tool-cat-btn" data-category="principles" onclick="ToolKit_filter('principles')">📜 原则</button>
           <button class="tool-cat-btn" data-category="energy" onclick="ToolKit_filter('energy')">⚡ 能量</button>
         </div>
         <!-- 工具卡片列表 -->
@@ -651,6 +654,142 @@
       </div>
       <div class="modal-footer">
         <button class="btn secondary" onclick="closeModal('toolModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：月度复盘 ========== -->
+  <div class="modal" id="monthlyReviewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📅 月度复盘</h3>
+        <button class="modal-close" onclick="closeModal('monthlyReviewModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <h4>🎯 本月目标</h4>
+          <div class="form-row">
+            <input type="text" id="monthlyGoalInput" placeholder="输入本月目标...">
+            <button class="btn primary" onclick="addMonthlyGoal()">添加</button>
+          </div>
+          <div class="review-list" id="monthlyGoalsList"></div>
+        </div>
+        <div class="form-section">
+          <h4>🏆 成就</h4>
+          <div class="form-row">
+            <input type="text" id="monthlyAchievementInput" placeholder="输入本月成就...">
+            <select id="monthlyAchievementCategory">
+              <option value="work">工作</option>
+              <option value="health">健康</option>
+              <option value="relationship">关系</option>
+              <option value="learning">学习</option>
+            </select>
+            <button class="btn primary" onclick="addMonthlyAchievement()">添加</button>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>📝 经验教训</h4>
+          <div class="form-row">
+            <textarea id="monthlyLessonInput" rows="2" placeholder="本月学到的最重要的一件事..."></textarea>
+          </div>
+          <button class="btn primary" onclick="addMonthlyLesson()">保存</button>
+        </div>
+        <div class="form-section">
+          <h4>📋 本月总结</h4>
+          <textarea id="monthlySummaryInput" rows="4" placeholder="本月总结..."></textarea>
+          <button class="btn primary" onclick="saveMonthlySummary()">保存</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('monthlyReviewModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：痛苦反思 ========== -->
+  <div class="modal" id="painReflectionModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>😔 痛苦反思</h3>
+        <button class="modal-close" onclick="closeModal('painReflectionModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <h4>📌 记录痛苦经历</h4>
+          <div class="form-row">
+            <label>发生了什么？</label>
+            <textarea id="painEventInput" rows="2" placeholder="描述让你痛苦的事情..."></textarea>
+          </div>
+          <div class="form-row">
+            <label>情绪</label>
+            <select id="painEmotionInput">
+              <option value="anger">😠 愤怒</option>
+              <option value="frustration">😤 沮丧</option>
+              <option value="sadness">😢 悲伤</option>
+              <option value="fear">😨 恐惧</option>
+              <option value="anxiety">😰 焦虑</option>
+              <option value="disappointment">😞 失望</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>强度 (1-10)</label>
+            <input type="range" id="painIntensityInput" value="5" min="1" max="10">
+            <span id="painIntensityValue">5</span>
+          </div>
+          <button class="btn primary" onclick="recordPain()">记录</button>
+        </div>
+        <div class="form-section">
+          <h4>🔍 痛苦反思列表</h4>
+          <div class="pain-list" id="painList"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('painReflectionModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：人生原则清单 ========== -->
+  <div class="modal" id="lifePrinciplesModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📜 人生原则清单</h3>
+        <button class="modal-close" onclick="closeModal('lifePrinciplesModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <h4>✏️ 添加新原则</h4>
+          <div class="form-row">
+            <input type="text" id="principleTextInput" placeholder="输入人生原则...">
+            <select id="principleCategoryInput">
+              <option value="values">价值观</option>
+              <option value="mindset">心态</option>
+              <option value="habit">习惯</option>
+              <option value="relationship">关系</option>
+              <option value="health">健康</option>
+              <option value="career">事业</option>
+              <option value="finance">财务</option>
+            </select>
+            <button class="btn primary" onclick="addPrinciple()">添加</button>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>📋 我的原则</h4>
+          <div class="principles-list" id="principlesList"></div>
+        </div>
+        <div class="form-section">
+          <h4>💪 践行案例</h4>
+          <div class="form-row">
+            <select id="principleExampleSelect"></select>
+          </div>
+          <div class="form-row">
+            <textarea id="principleExampleInput" rows="2" placeholder="记录你践行这个原则的案例..."></textarea>
+          </div>
+          <button class="btn primary" onclick="addPrincipleExample()">保存案例</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('lifePrinciplesModal')">关闭</button>
       </div>
     </div>
   </div>

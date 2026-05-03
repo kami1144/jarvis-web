@@ -1987,3 +1987,385 @@ window.WeeklyReview = WeeklyReview;
 window.HabitTracker = HabitTracker;
 window.ConflictResolution = ConflictResolution;
 window.InfluenceCheck = InfluenceCheck;
+
+// ==========================================
+// 月度复盘 (Monthly Review)
+// ==========================================
+
+const MonthlyReview = {
+  STORAGE_KEY: 'jarvis_monthly_review',
+
+  // 获取本月的起止日期
+  getMonthRange() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const start = new Date(year, month, 1);
+    const end = new Date(year, month + 1, 0);
+
+    return {
+      start: start.toISOString().split('T')[0],
+      end: end.toISOString().split('T')[0],
+      year: year,
+      month: month + 1
+    };
+  },
+
+  // 获取月度数据
+  load() {
+    const key = this.STORAGE_KEY;
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return this.getDefault();
+  },
+
+  // 保存月度数据
+  save(data) {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+  },
+
+  // 默认数据结构
+  getDefault() {
+    const month = this.getMonthRange();
+    return {
+      year: month.year,
+      month: month.month,
+      goals: [],
+      achievements: [],
+      lessons: [],
+      summary: '',
+      createdAt: new Date().toISOString()
+    };
+  },
+
+  // 添加目标
+  addGoal(text) {
+    const data = this.load();
+    const month = this.getMonthRange();
+
+    if (data.year !== month.year || data.month !== month.month) {
+      data = this.getDefault();
+    }
+
+    data.goals.unshift({
+      id: 'mgoal_' + Date.now(),
+      text: text,
+      completed: false,
+      note: '',
+      createdAt: new Date().toISOString()
+    });
+    this.save(data);
+    return data;
+  },
+
+  // 切换目标完成状态
+  toggleGoal(goalId) {
+    const data = this.load();
+    const goal = data.goals.find(g => g.id === goalId);
+    if (goal) {
+      goal.completed = !goal.completed;
+      this.save(data);
+    }
+    return data;
+  },
+
+  // 添加成就
+  addAchievement(text, category) {
+    const data = this.load();
+    const month = this.getMonthRange();
+
+    if (data.year !== month.year || data.month !== month.month) {
+      data = this.getDefault();
+    }
+
+    data.achievements.unshift({
+      id: 'achievement_' + Date.now(),
+      text: text,
+      category: category,
+      createdAt: new Date().toISOString()
+    });
+    this.save(data);
+    return data;
+  },
+
+  // 添加经验教训
+  addLesson(text) {
+    const data = this.load();
+    const month = this.getMonthRange();
+
+    if (data.year !== month.year || data.month !== month.month) {
+      data = this.getDefault();
+    }
+
+    data.lessons.unshift({
+      id: 'lesson_' + Date.now(),
+      text: text,
+      createdAt: new Date().toISOString()
+    });
+    this.save(data);
+    return data;
+  },
+
+  // 保存总结
+  saveSummary(summary) {
+    const data = this.load();
+    data.summary = summary;
+    this.save(data);
+    return data;
+  },
+
+  // 获取完成率
+  getCompletionRate() {
+    const data = this.load();
+    if (data.goals.length === 0) return 0;
+    const completed = data.goals.filter(g => g.completed).length;
+    return Math.round((completed / data.goals.length) * 100);
+  }
+};
+
+// ==========================================
+// 痛苦反思 (Pain Reflection)
+// ==========================================
+
+const PainReflection = {
+  STORAGE_KEY: 'jarvis_pain_reflection',
+
+  load() {
+    const key = this.STORAGE_KEY;
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return [];
+  },
+
+  save(reflections) {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(reflections));
+  },
+
+  // 记录痛苦经历
+  recordPain(event, emotion, intensity) {
+    const reflections = this.load();
+    reflections.unshift({
+      id: 'pain_' + Date.now(),
+      event: event,
+      emotion: emotion,
+      intensity: intensity, // 1-10
+      stage: 'recorded', // recorded | analyzed | resolved
+      analysis: '',
+      insight: '',
+      action: '',
+      createdAt: new Date().toISOString(),
+      resolvedAt: null
+    });
+    this.save(reflections);
+    return reflections;
+  },
+
+  // 分析痛苦经历
+  analyze(id, analysis, insight) {
+    const reflections = this.load();
+    const pain = reflections.find(p => p.id === id);
+    if (pain) {
+      pain.stage = 'analyzed';
+      pain.analysis = analysis;
+      pain.insight = insight;
+      this.save(reflections);
+    }
+    return reflections;
+  },
+
+  // 标记为已解决
+  resolve(id, action) {
+    const reflections = this.load();
+    const pain = reflections.find(p => p.id === id);
+    if (pain) {
+      pain.stage = 'resolved';
+      pain.action = action;
+      pain.resolvedAt = new Date().toISOString();
+      this.save(reflections);
+    }
+    return reflections;
+  },
+
+  // 删除记录
+  delete(id) {
+    const reflections = this.load().filter(p => p.id !== id);
+    this.save(reflections);
+    return reflections;
+  },
+
+  // 获取情绪图标
+  getEmotionIcon(emotion) {
+    const icons = {
+      'anger': '😠',
+      'frustration': '😤',
+      'sadness': '😢',
+      'fear': '😨',
+      'anxiety': '😰',
+      'disappointment': '😞',
+      'loneliness': '😔',
+      'confusion': '😵'
+    };
+    return icons[emotion] || '😔';
+  },
+
+  // 获取阶段图标
+  getStageIcon(stage) {
+    const icons = {
+      'recorded': '🔴',
+      'analyzed': '🟡',
+      'resolved': '🟢'
+    };
+    return icons[stage] || '⚪';
+  },
+
+  // 获取指导问题
+  getGuidanceQuestions() {
+    return [
+      '这件事为什么会让我痛苦？',
+      '我的核心需求是什么没有被满足？',
+      '我可以控制什么？不能控制什么？',
+      '一年后这还算事吗？',
+      '我学到了什么？',
+      '下一次我会怎么做不同？'
+    ];
+  }
+};
+
+// ==========================================
+// 人生原则清单 (Life Principles)
+// ==========================================
+
+const LifePrinciples = {
+  STORAGE_KEY: 'jarvis_life_principles',
+
+  load() {
+    const key = this.STORAGE_KEY;
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return this.getDefault();
+  },
+
+  save(principles) {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(principles));
+  },
+
+  getDefault() {
+    return {
+      principles: [
+        {
+          id: 'p1',
+          text: '诚信第一',
+          category: 'values',
+          source: 'initial',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'p2',
+          text: '行动驱动思考',
+          category: 'mindset',
+          source: 'initial',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'p3',
+          text: '以终为始',
+          category: 'habit',
+          source: 'initial',
+          createdAt: new Date().toISOString()
+        }
+      ],
+      examples: [],
+      versions: [],
+      lastUpdated: new Date().toISOString()
+    };
+  },
+
+  // 添加原则
+  addPrinciple(text, category) {
+    const data = this.load();
+    data.principles.unshift({
+      id: 'p_' + Date.now(),
+      text: text,
+      category: category,
+      source: 'custom',
+      createdAt: new Date().toISOString()
+    });
+    data.lastUpdated = new Date().toISOString();
+    this.save(data);
+    return data;
+  },
+
+  // 更新原则
+  updatePrinciple(id, text) {
+    const data = this.load();
+    const principle = data.principles.find(p => p.id === id);
+    if (principle) {
+      // 记录历史版本
+      data.versions.unshift({
+        principleId: id,
+        oldText: principle.text,
+        newText: text,
+        updatedAt: new Date().toISOString()
+      });
+      principle.text = text;
+      data.lastUpdated = new Date().toISOString();
+      this.save(data);
+    }
+    return data;
+  },
+
+  // 删除原则
+  deletePrinciple(id) {
+    const data = this.load();
+    data.principles = data.principles.filter(p => p.id !== id);
+    data.lastUpdated = new Date().toISOString();
+    this.save(data);
+    return data;
+  },
+
+  // 重新排序
+  reorder(orderedIds) {
+    const data = this.load();
+    const principlesMap = new Map(data.principles.map(p => [p.id, p]));
+    data.principles = orderedIds.map(id => principlesMap.get(id)).filter(Boolean);
+    data.lastUpdated = new Date().toISOString();
+    this.save(data);
+    return data;
+  },
+
+  // 添加践行案例
+  addExample(principleId, example) {
+    const data = this.load();
+    data.examples.unshift({
+      id: 'ex_' + Date.now(),
+      principleId: principleId,
+      text: example,
+      createdAt: new Date().toISOString()
+    });
+    data.lastUpdated = new Date().toISOString();
+    this.save(data);
+    return data;
+  },
+
+  // 获取分类
+  getCategories() {
+    return ['values', 'mindset', 'habit', 'relationship', 'health', 'career', 'finance'];
+  },
+
+  // 按分类获取
+  getByCategory(category) {
+    const data = this.load();
+    return data.principles.filter(p => p.category === category);
+  }
+};
+
+// 导出到全局
+window.MonthlyReview = MonthlyReview;
+window.PainReflection = PainReflection;
+window.LifePrinciples = LifePrinciples;
