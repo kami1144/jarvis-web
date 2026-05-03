@@ -344,6 +344,7 @@ function loadData() {
 
 function saveData(data) {
   try {
+    localStorage.setItem('jarvis_data_guest', JSON.stringify(data));
     localStorage.setItem(JAVIS_DATA_KEY, JSON.stringify(data));
   } catch (e) {}
 }
@@ -376,7 +377,8 @@ const ProfileData = {
 
 function loadData() {
   try {
-    const stored = localStorage.getItem(JAVIS_DATA_KEY);
+    // 优先读取游客数据（jarvis_data_guest），其次读正式数据（jarvis_data_v3）
+    const stored = localStorage.getItem('jarvis_data_guest') || localStorage.getItem(JAVIS_DATA_KEY);
     if (stored) {
       const data = JSON.parse(stored);
       // 确保新字段存在（迁移旧数据）
@@ -440,6 +442,7 @@ function loadData() {
 
 function saveData(data) {
   try {
+    localStorage.setItem('jarvis_data_guest', JSON.stringify(data));
     localStorage.setItem(JAVIS_DATA_KEY, JSON.stringify(data));
   } catch (e) {}
 }
