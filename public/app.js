@@ -269,7 +269,8 @@ function renderMindModel(mindData) {
 
   // 绑定练习点击事件（只针对当前案例）
   caseContainer.querySelectorAll('.current-case .exercise-item').forEach(item => {
-    item.addEventListener('click', () => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
       const id = item.dataset.id;
       const exercise = exercises.find(e => e.id === id);
       if (exercise) {
