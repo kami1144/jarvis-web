@@ -185,8 +185,8 @@ const MindModelData = {
     { id: 'cp5', name: '行动驱动', icon: '🚀', desc: '用行动创造正反馈，而非等正反馈才行动' }
   ],
 
-  // 历史记录
-  history: [],
+  // 历史案例
+  cases: [],
 
   // 计算思维模式得分
   calculateScore() {
@@ -194,6 +194,27 @@ const MindModelData = {
     const completedCount = exercises.filter(e => e.completed).length;
     const exerciseRate = exercises.length > 0 ? completedCount / exercises.length : 0;
     return Math.round(75 * (1 - exerciseRate * 0.3) + exerciseRate * 30);
+  },
+
+  // 归档当前案例到历史
+  archiveCurrentCase() {
+    if (!this.today.currentCase) return;
+    // 保留完整快照（含完成状态）
+    const snapshot = {
+      ...this.today.currentCase,
+      completedAt: new Date().toISOString(),
+      exercises: this.today.currentCase.exercises.map(e => ({ ...e }))
+    };
+    this.cases.unshift(snapshot);
+    if (this.cases.length > 30) this.cases = this.cases.slice(0, 30);
+    return snapshot;
+  },
+
+  // 切换到新案例
+  switchToNewCase(newCase) {
+    this.archiveCurrentCase();
+    this.today.currentCase = newCase;
+    this.today.date = new Date().toISOString().split('T')[0];
   }
 };
 
@@ -390,7 +411,8 @@ function loadData() {
           today: { ...MindModelData.today },
           wrongPatterns: [...MindModelData.wrongPatterns],
           correctPatterns: [...MindModelData.correctPatterns],
-          history: []
+          history: [],
+          cases: []
         };
       } else {
         // 增量迁移：新版本添加的 patterns 和 exercises
@@ -438,6 +460,13 @@ function loadData() {
             ...data.mindModel.today.currentCase,
             exercises: data.mindModel.today.currentCase.exercises || MindModelData.today.currentCase.exercises
           };
+        }
+
+        // 确保 cases 字段存在
+        if (!data.mindModel.cases) {
+          // 旧版用 history，新版用 cases
+          data.mindModel.cases = data.mindModel.history ? [...data.mindModel.history] : [];
+          delete data.mindModel.history;
         }
       }
       saveData(data);
@@ -693,8 +722,21 @@ const JARVIS = {
   },
 
   // 更新思维模式数据
-  updateMindModel(mindData) {
+  updateMindModel(mindData, options = {}) {
     const data = loadData();
+    if (!data.mindModel) return;
+
+    // 如果指定了 archiveCurrentCase，先归档当前案例
+    if (options.archiveCurrentCase && data.mindModel.today?.currentCase) {
+      data.mindModel.cases = data.mindModel.cases || [];
+      const snapshot = {
+        ...data.mindModel.today.currentCase,
+        completedAt: new Date().toISOString()
+      };
+      data.mindModel.cases.unshift(snapshot);
+      if (data.mindModel.cases.length > 30) data.mindModel.cases = data.mindModel.cases.slice(0, 30);
+    }
+
     if (mindData.today) data.mindModel.today = { ...data.mindModel.today, ...mindData.today };
     if (mindData.wrongPatterns) data.mindModel.wrongPatterns = mindData.wrongPatterns;
     if (mindData.correctPatterns) data.mindModel.correctPatterns = mindData.correctPatterns;

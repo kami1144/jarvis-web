@@ -146,13 +146,14 @@ function getEnergyColor(value) {
   return 'linear-gradient(90deg, #78909C, #607D8B)';
 }
 
-// 渲染思维模式仪表盘（叙事格式）
+// 渲染思维模式仪表盘（折叠式）
 function renderMindModel(mindData) {
   const card = document.querySelector('.mind-model-card');
   if (!card) return;
 
   const today = mindData?.today || MindModelData.today;
-  const cc = today.currentCase; // currentCase
+  const cc = today.currentCase;
+  const cases = mindData?.cases || [];
 
   // 更新得分
   const scoreEl = card.querySelector('.mind-score-value');
@@ -160,54 +161,137 @@ function renderMindModel(mindData) {
     scoreEl.textContent = today.score || 75;
   }
 
-  // 渲染叙事格式的思维案例
   const caseContainer = card.querySelector('.mind-case-narrative');
-  if (caseContainer && cc) {
-    const exercises = cc.exercises || [];
-    caseContainer.innerHTML = `
-      <div class="case-section">
-        <div class="case-label">💭 原来的思维</div>
-        <div class="case-content original-thought">"${cc.originalThought}"</div>
+  if (!caseContainer) return;
+
+  // 当前案例完成度
+  const exercises = cc?.exercises || [];
+  const completedCount = exercises.filter(e => e.completed).length;
+  const allDone = exercises.length > 0 && completedCount === exercises.length;
+
+  caseContainer.innerHTML = `
+    <!-- 当前案例（展开状态） -->
+    <div class="mind-case-item current-case" data-case-id="current">
+      <div class="case-header" onclick="toggleCase('current')">
+        <div class="case-meta">
+          <span class="case-badge current-badge">📌 进行中</span>
+          <span class="case-date">${today.date || new Date().toISOString().split('T')[0]}</span>
+        </div>
+        <div class="case-summary">
+          <span class="case-preview">${cc?.originalThought?.slice(0, 20) || ''}...</span>
+          <span class="case-progress">${completedCount}/${exercises.length} 完成</span>
+        </div>
+        <span class="case-toggle">▼</span>
       </div>
-      <div class="case-section">
-        <div class="case-label">🔍 识别出的漏洞</div>
-        <div class="case-content identified-flaw">${cc.identifiedFlaw}</div>
+      <div class="case-detail" id="case-detail-current">
+        ${cc ? `
+        <div class="case-section">
+          <div class="case-label">💭 原来的思维</div>
+          <div class="case-content original-thought">"${cc.originalThought}"</div>
+        </div>
+        <div class="case-section">
+          <div class="case-label">🔍 识别出的漏洞</div>
+          <div class="case-content identified-flaw">${cc.identifiedFlaw}</div>
+        </div>
+        <div class="case-section">
+          <div class="case-label">✅ 正确替代</div>
+          <div class="case-content correct-replacement">${cc.correctReplacement}</div>
+        </div>
+        <div class="case-section">
+          <div class="case-label">🎯 练习题 ${allDone ? '<span class="all-done-tag">✅ 全部完成</span>' : ''}</div>
+          <div class="exercises-list">
+            ${exercises.map((e, i) => `
+              <div class="exercise-item ${e.completed ? 'done' : ''}" data-id="${e.id}">
+                <span class="exercise-check">${e.completed ? '☑️' : '⬜'}</span>
+                <div class="exercise-info">
+                  <span class="exercise-title">${i + 1}. ${e.title}</span>
+                  <span class="exercise-desc">${e.desc}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : '<div class="case-empty">暂无进行中的案例</div>'}
       </div>
-      <div class="case-section">
-        <div class="case-label">✅ 正确替代</div>
-        <div class="case-content correct-replacement">${cc.correctReplacement}</div>
+    </div>
+
+    <!-- 历史案例列表（折叠） -->
+    ${cases.length > 0 ? `
+    <div class="mind-case-item archived-cases" data-case-id="history">
+      <div class="case-header" onclick="toggleCase('history')">
+        <div class="case-meta">
+          <span class="case-badge history-badge">📋 历史案例</span>
+          <span class="case-count">${cases.length}个</span>
+        </div>
+        <div class="case-summary">
+          <span class="case-preview">最近：${cases[0]?.originalThought?.slice(0, 15) || ''}...</span>
+        </div>
+        <span class="case-toggle" id="toggle-history">▶</span>
       </div>
-      <div class="case-section">
-        <div class="case-label">🎯 练习题</div>
-        <div class="exercises-list">
-          ${exercises.map((e, i) => `
-            <div class="exercise-item ${e.completed ? 'done' : ''}" data-id="${e.id}">
-              <span class="exercise-check">${e.completed ? '☑️' : '⬜'}</span>
-              <div class="exercise-info">
-                <span class="exercise-title">${i + 1}. ${e.title}</span>
-                <span class="exercise-desc">${e.desc}</span>
+      <div class="case-detail" id="case-detail-history" style="display:none;">
+        ${cases.map((c, idx) => `
+          <div class="history-case-item" onclick="toggleHistoryCase(${idx})">
+            <div class="history-case-header">
+              <span class="history-case-date">${c.completedAt ? new Date(c.completedAt).toLocaleDateString('zh') : '未知'}</span>
+              <span class="history-case-preview">${c.originalThought?.slice(0, 25) || ''}...</span>
+              <span class="history-case-toggle" id="hist-toggle-${idx}">▶</span>
+            </div>
+            <div class="history-case-detail" id="hist-detail-${idx}" style="display:none;">
+              <div class="case-section">
+                <div class="case-label">💭 原来的思维</div>
+                <div class="case-content">"${c.originalThought}"</div>
+              </div>
+              <div class="case-section">
+                <div class="case-label">🔍 漏洞</div>
+                <div class="case-content">${c.identifiedFlaw}</div>
+              </div>
+              <div class="case-section">
+                <div class="case-label">✅ 正确替代</div>
+                <div class="case-content">${c.correctReplacement}</div>
+              </div>
+              <div class="case-section">
+                <div class="case-label">🎯 练习 ${(c.exercises || []).filter(e => e.completed).length}/${(c.exercises || []).length}</div>
               </div>
             </div>
-          `).join('')}
-        </div>
+          </div>
+        `).join('')}
       </div>
-    `;
+    </div>
+    ` : ''}
+  `;
 
-    // 绑定练习点击事件
-    caseContainer.querySelectorAll('.exercise-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const id = item.dataset.id;
-        const exercise = exercises.find(e => e.id === id);
-        if (exercise) {
-          exercise.completed = !exercise.completed;
-          // 保存到 localStorage
-          JARVIS.updateMindModel({ today: { currentCase: { exercises } } });
-          // 重新渲染（更新 UI）
-          renderMindModel(JARVIS.getAllData().mindModel);
-        }
-      });
+  // 绑定练习点击事件（只针对当前案例）
+  caseContainer.querySelectorAll('.current-case .exercise-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const id = item.dataset.id;
+      const exercise = exercises.find(e => e.id === id);
+      if (exercise) {
+        exercise.completed = !exercise.completed;
+        JARVIS.updateMindModel({ today: { currentCase: { exercises } } });
+        renderMindModel(JARVIS.getAllData().mindModel);
+      }
     });
-  }
+  });
+}
+
+// 折叠/展开案例
+function toggleCase(caseId) {
+  const detail = document.getElementById(`case-detail-${caseId}`);
+  const toggle = document.querySelector(`[data-case-id="${caseId}"] .case-toggle`);
+  if (!detail) return;
+  const isHidden = detail.style.display === 'none';
+  detail.style.display = isHidden ? 'block' : 'none';
+  if (toggle) toggle.textContent = isHidden ? '▼' : '▶';
+}
+
+// 折叠/展开历史案例
+function toggleHistoryCase(idx) {
+  const detail = document.getElementById(`hist-detail-${idx}`);
+  const toggle = document.getElementById(`hist-toggle-${idx}`);
+  if (!detail) return;
+  const isHidden = detail.style.display === 'none';
+  detail.style.display = isHidden ? 'block' : 'none';
+  if (toggle) toggle.textContent = isHidden ? '▼' : '▶';
 }
 
 // 渲染任务（合并Obsidian项目和本地任务）
