@@ -395,6 +395,33 @@ function loadData() {
           correctPatterns: [...MindModelData.correctPatterns],
           history: []
         };
+      } else {
+        // 增量迁移：新版本添加的 patterns 和 exercises
+        const currentWrongIds = (data.mindModel.wrongPatterns || []).map(p => p.id);
+        const currentCorrectIds = (data.mindModel.correctPatterns || []).map(p => p.id);
+        const currentExerciseIds = (data.mindModel.today?.exercises || []).map(e => e.id);
+
+        // 补齐新的错误模式
+        MindModelData.wrongPatterns.forEach(newP => {
+          if (!currentWrongIds.includes(newP.id)) {
+            data.mindModel.wrongPatterns.push(newP);
+          }
+        });
+
+        // 补齐新的正确模式
+        MindModelData.correctPatterns.forEach(newP => {
+          if (!currentCorrectIds.includes(newP.id)) {
+            data.mindModel.correctPatterns.push(newP);
+          }
+        });
+
+        // 补齐新的练习
+        MindModelData.today.exercises.forEach(newE => {
+          if (!currentExerciseIds.includes(newE.id)) {
+            if (!data.mindModel.today.exercises) data.mindModel.today.exercises = [];
+            data.mindModel.today.exercises.push(newE);
+          }
+        });
       }
       saveData(data);
       return data;
