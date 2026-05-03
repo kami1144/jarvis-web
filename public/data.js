@@ -162,8 +162,9 @@ const MindModelData = {
     ],
     // 今日练习
     exercises: [
-      { id: 'e1', title: '3秒决策练习', desc: '对小事3秒内做决定', completed: false },
-      { id: 'e2', title: '行动优先', desc: '先做再优化', completed: true }
+      { id: 'e1', title: '3秒决策练习', desc: '对小事3秒内做决定，不许想太多', completed: false },
+      { id: 'e2', title: '行动优先', desc: '先做再优化，完成比完美重要', completed: true },
+      { id: 'e3', title: '先做5分钟', desc: '选一件"没感觉但该做的事"，先做5分钟再说', completed: false, targetPattern: 'wp4' }
     ]
   },
   
@@ -171,14 +172,21 @@ const MindModelData = {
   wrongPatterns: [
     { id: 'wp1', name: '过度思考', icon: '🤔', desc: '想太多，行动太少', frequency: 3 },
     { id: 'wp2', name: '非黑即白', icon: '⚫', desc: '思维二极管，没有中间地带', frequency: 2 },
-    { id: 'wp3', name: '灾难化', icon: '💥', desc: '小事想成大灾难', frequency: 1 }
+    { id: 'wp3', name: '灾难化', icon: '💥', desc: '小事想成大灾难', frequency: 1 },
+    { id: 'wp4', name: '成就感前置', icon: '🎯', desc: '没有成就感就不想做，把结果当前提', frequency: 1, conversation: {
+      date: '2026-05-03',
+      summary: '认为不符合自己预期的行动即使挣钱也没有成就感，用模糊预期当行动门槛，逃避不确定性',
+      identifiedIn: '关于 adult-shop 项目动力的对话'
+    }}
   ],
   
   // 正确思维模式
   correctPatterns: [
     { id: 'cp1', name: '概率思维', icon: '📊', desc: '用概率评估可能性，而非绝对' },
     { id: 'cp2', name: '成长心态', icon: '🌱', desc: '相信能力和智力可以发展' },
-    { id: 'cp3', name: '实验思维', icon: '🧪', desc: '把每个决定当作实验' }
+    { id: 'cp3', name: '实验思维', icon: '🧪', desc: '把每个决定当作实验' },
+    { id: 'cp4', name: '过程优先', icon: '⚡', desc: '先做了才有成就感，不是先有成就感才做', replaceFor: 'wp4' },
+    { id: 'cp5', name: '行动驱动', icon: '🚀', desc: '用行动创造正反馈，而非等正反馈才行动', replaceFor: 'wp4' }
   ],
   
   // 历史记录
