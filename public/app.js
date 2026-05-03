@@ -146,75 +146,58 @@ function getEnergyColor(value) {
   return 'linear-gradient(90deg, #78909C, #607D8B)';
 }
 
-// 渲染思维模式仪表盘
+// 渲染思维模式仪表盘（叙事格式）
 function renderMindModel(mindData) {
   const card = document.querySelector('.mind-model-card');
   if (!card) return;
-  
+
   const today = mindData?.today || MindModelData.today;
-  const wrongPatterns = mindData?.wrongPatterns || MindModelData.wrongPatterns;
-  const correctPatterns = mindData?.correctPatterns || MindModelData.correctPatterns;
-  
+  const cc = today.currentCase; // currentCase
+
   // 更新得分
   const scoreEl = card.querySelector('.mind-score-value');
   if (scoreEl) {
     scoreEl.textContent = today.score || 75;
   }
-  
-  // 渲染当前模式状态
-  const patternsContainer = card.querySelector('.mind-patterns');
-  if (patternsContainer) {
-    const statusIcon = { good: '✅', warning: '⚠️', bad: '❌' };
-    const statusText = { good: '良好', warning: '注意', bad: '需纠正' };
-    patternsContainer.innerHTML = today.patterns.map(p => `
-      <div class="pattern-item ${p.status}">
-        <span class="pattern-icon">${statusIcon[p.status] || '➡️'}</span>
-        <div class="pattern-info">
-          <span class="pattern-name">${p.name}</span>
-          <span class="pattern-status">${statusText[p.status] || ''}</span>
+
+  // 渲染叙事格式的思维案例
+  const caseContainer = card.querySelector('.mind-case-narrative');
+  if (caseContainer && cc) {
+    const exercises = cc.exercises || [];
+    caseContainer.innerHTML = `
+      <div class="case-section">
+        <div class="case-label">💭 原来的思维</div>
+        <div class="case-content original-thought">"${cc.originalThought}"</div>
+      </div>
+      <div class="case-section">
+        <div class="case-label">🔍 识别出的漏洞</div>
+        <div class="case-content identified-flaw">${cc.identifiedFlaw}</div>
+      </div>
+      <div class="case-section">
+        <div class="case-label">✅ 正确替代</div>
+        <div class="case-content correct-replacement">${cc.correctReplacement}</div>
+      </div>
+      <div class="case-section">
+        <div class="case-label">🎯 练习题</div>
+        <div class="exercises-list">
+          ${exercises.map((e, i) => `
+            <div class="exercise-item ${e.completed ? 'done' : ''}" data-id="${e.id}">
+              <span class="exercise-check">${e.completed ? '☑️' : '⬜'}</span>
+              <div class="exercise-info">
+                <span class="exercise-title">${i + 1}. ${e.title}</span>
+                <span class="exercise-desc">${e.desc}</span>
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>
-    `).join('');
-  }
-  
-  // 渲染错误模式
-  const wrongContainer = card.querySelector('.wrong-patterns');
-  if (wrongContainer) {
-    wrongContainer.innerHTML = wrongPatterns.map(p => `
-      <div class="pattern-tag wrong" title="${p.desc}">
-        ${p.icon} ${p.name} <span class="freq">×${p.frequency}</span>
-      </div>
-    `).join('');
-  }
-  
-  // 渲染正确模式
-  const correctContainer = card.querySelector('.correct-patterns');
-  if (correctContainer) {
-    correctContainer.innerHTML = correctPatterns.map(p => `
-      <div class="pattern-tag correct" title="${p.desc}">
-        ${p.icon} ${p.name}
-      </div>
-    `).join('');
-  }
-  
-  // 渲染今日练习
-  const exerciseContainer = card.querySelector('.mind-exercises');
-  if (exerciseContainer) {
-    exerciseContainer.innerHTML = today.exercises.map(e => `
-      <div class="exercise-item ${e.completed ? 'done' : ''}" data-id="${e.id}">
-        <span class="exercise-check">${e.completed ? '☑️' : '⬜'}</span>
-        <div class="exercise-info">
-          <span class="exercise-title">${e.title}</span>
-          <span class="exercise-desc">${e.desc}</span>
-        </div>
-      </div>
-    `).join('');
-    
+    `;
+
     // 绑定练习点击事件
-    exerciseContainer.querySelectorAll('.exercise-item').forEach(item => {
+    caseContainer.querySelectorAll('.exercise-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.dataset.id;
-        const exercise = today.exercises.find(e => e.id === id);
+        const exercise = exercises.find(e => e.id === id);
         if (exercise) {
           exercise.completed = !exercise.completed;
           saveCurrentUserData();

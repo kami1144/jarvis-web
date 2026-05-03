@@ -151,54 +151,49 @@ const FinanceData = {
 // ==========================================
 
 const MindModelData = {
-  // 今日思维模式分析
+  // 今日正在处理的案例（叙事格式）
   today: {
     date: new Date().toISOString().split('T')[0],
-    score: 75,              // 今日思维模式得分 0-100
-    patterns: [
-      { id: 'p1', name: '抽象建模', status: 'good', desc: '能够快速抓住本质' },
-      { id: 'p2', name: '过度思考', status: 'warning', desc: '想太多而行动不足' },
-      { id: 'p3', name: '模式识别', status: 'good', desc: '擅长发现规律和联系' }
-    ],
-    // 今日练习
-    exercises: [
-      { id: 'e1', title: '3秒决策练习', desc: '对小事3秒内做决定，不许想太多', completed: false },
-      { id: 'e2', title: '行动优先', desc: '先做再优化，完成比完美重要', completed: true },
-      { id: 'e3', title: '先做5分钟', desc: '选一件"没感觉但该做的事"，先做5分钟再说', completed: false, targetPattern: 'wp4' }
-    ]
+    score: 75,
+    currentCase: {
+      patternId: 'wp4',
+      originalThought: '不符合预期的行动，即使挣钱了也没有成就感，所以没有跟自己想法一致就提不起兴趣，即便生活有压力了，也不能改变',
+      identifiedFlaw: '用模糊的"预期"当行动门槛，其实是在逃避不确定性。不是先有成就感才做，是做了才有。',
+      correctReplacement: '一件事不是先有成就感才做，是做了才有。成就感来自过程，不是行动的前置条件。',
+      exercises: [
+        { id: 'e1', title: '3秒决策练习', desc: '选一件"没感觉但应该做的事"，3秒内决定做不做，不许想太多', completed: false },
+        { id: 'e2', title: '先做5分钟', desc: '选了之后立刻做5分钟，不许停，不许评判结果', completed: false },
+        { id: 'e3', title: '记录感受', desc: '做完之后记录：做了之后感觉如何？真的有预想的那么糟吗？', completed: false }
+      ]
+    }
   },
-  
+
   // 错误思维模式库
   wrongPatterns: [
     { id: 'wp1', name: '过度思考', icon: '🤔', desc: '想太多，行动太少', frequency: 3 },
     { id: 'wp2', name: '非黑即白', icon: '⚫', desc: '思维二极管，没有中间地带', frequency: 2 },
     { id: 'wp3', name: '灾难化', icon: '💥', desc: '小事想成大灾难', frequency: 1 },
-    { id: 'wp4', name: '成就感前置', icon: '🎯', desc: '没有成就感就不想做，把结果当前提', frequency: 1, conversation: {
-      date: '2026-05-03',
-      summary: '认为不符合自己预期的行动即使挣钱也没有成就感，用模糊预期当行动门槛，逃避不确定性',
-      identifiedIn: '关于 adult-shop 项目动力的对话'
-    }}
+    { id: 'wp4', name: '成就感前置', icon: '🎯', desc: '没有成就感就不想做，把结果当前提', frequency: 1 }
   ],
-  
+
   // 正确思维模式
   correctPatterns: [
     { id: 'cp1', name: '概率思维', icon: '📊', desc: '用概率评估可能性，而非绝对' },
     { id: 'cp2', name: '成长心态', icon: '🌱', desc: '相信能力和智力可以发展' },
     { id: 'cp3', name: '实验思维', icon: '🧪', desc: '把每个决定当作实验' },
-    { id: 'cp4', name: '过程优先', icon: '⚡', desc: '先做了才有成就感，不是先有成就感才做', replaceFor: 'wp4' },
-    { id: 'cp5', name: '行动驱动', icon: '🚀', desc: '用行动创造正反馈，而非等正反馈才行动', replaceFor: 'wp4' }
+    { id: 'cp4', name: '过程优先', icon: '⚡', desc: '先做了才有成就感，不是先有成就感才做' },
+    { id: 'cp5', name: '行动驱动', icon: '🚀', desc: '用行动创造正反馈，而非等正反馈才行动' }
   ],
-  
+
   // 历史记录
   history: [],
-  
+
   // 计算思维模式得分
   calculateScore() {
-    // 基于今日模式状态计算
-    const goodCount = this.today.patterns.filter(p => p.status === 'good').length;
-    const total = this.today.patterns.length;
-    const exerciseRate = this.today.exercises.filter(e => e.completed).length / this.today.exercises.length;
-    return Math.round((goodCount / total) * 70 + exerciseRate * 30);
+    const exercises = this.today.currentCase?.exercises || [];
+    const completedCount = exercises.filter(e => e.completed).length;
+    const exerciseRate = exercises.length > 0 ? completedCount / exercises.length : 0;
+    return Math.round(75 * (1 - exerciseRate * 0.3) + exerciseRate * 30);
   }
 };
 
@@ -399,7 +394,6 @@ function loadData() {
         // 增量迁移：新版本添加的 patterns 和 exercises
         const currentWrongIds = (data.mindModel.wrongPatterns || []).map(p => p.id);
         const currentCorrectIds = (data.mindModel.correctPatterns || []).map(p => p.id);
-        const currentExerciseIds = (data.mindModel.today?.exercises || []).map(e => e.id);
 
         // 补齐新的错误模式
         MindModelData.wrongPatterns.forEach(newP => {
@@ -415,13 +409,27 @@ function loadData() {
           }
         });
 
-        // 补齐新的练习
-        MindModelData.today.exercises.forEach(newE => {
-          if (!currentExerciseIds.includes(newE.id)) {
-            if (!data.mindModel.today.exercises) data.mindModel.today.exercises = [];
-            data.mindModel.today.exercises.push(newE);
-          }
-        });
+        // 新叙事格式迁移：如果有旧格式的 exercises，转到 currentCase
+        if (!data.mindModel.today?.currentCase) {
+          const oldExercises = data.mindModel.today?.exercises || [];
+          data.mindModel.today = {
+            ...(data.mindModel.today || {}),
+            currentCase: {
+              patternId: MindModelData.today.currentCase.patternId,
+              originalThought: MindModelData.today.currentCase.originalThought,
+              identifiedFlaw: MindModelData.today.currentCase.identifiedFlaw,
+              correctReplacement: MindModelData.today.currentCase.correctReplacement,
+              exercises: MindModelData.today.currentCase.exercises
+            }
+          };
+          // 旧 exercises 合并
+          const newExerciseIds = data.mindModel.today.currentCase.exercises.map(e => e.id);
+          oldExercises.forEach(oldE => {
+            if (!newExerciseIds.includes(oldE.id)) {
+              data.mindModel.today.currentCase.exercises.push(oldE);
+            }
+          });
+        }
       }
       saveData(data);
       return data;
