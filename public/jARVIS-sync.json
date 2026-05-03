@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-05-02T15:01:13.515Z",
+  "generatedAt": "2026-05-03T15:01:06.713Z",
   "source": "~/.shared/task-board.json",
   "projects": [
     {
@@ -13,7 +13,7 @@
       "description": "日本成人用品电商（Dropshipping模式）",
       "progress": 90,
       "link": "https://adult-shop-kami1144s-projects.vercel.app",
-      "lastUpdated": "2026-05-02 18:30",
+      "lastUpdated": "2026-05-03 08:35",
       "subTasks": [
         {
           "name": "website_tech",
@@ -108,7 +108,7 @@
       "description": "成人漫画AI排版工具",
       "progress": 30,
       "link": null,
-      "lastUpdated": "2026-05-02 18:30",
+      "lastUpdated": "2026-05-03 08:35",
       "subTasks": [
         {
           "name": "tech",
@@ -129,7 +129,7 @@
       "description": "里程碑约束型持续资助",
       "progress": 10,
       "link": null,
-      "lastUpdated": "2026-05-02 18:30",
+      "lastUpdated": "2026-05-03 08:35",
       "subTasks": [
         {
           "name": "strategy",
@@ -150,7 +150,7 @@
       "description": "J.A.R.V.I.S. 人生仪表盘 - 现实感知系统",
       "progress": 100,
       "link": "https://jarvis-web-ashen.vercel.app",
-      "lastUpdated": "2026-05-02 18:30",
+      "lastUpdated": "2026-05-03 08:35",
       "subTasks": [
         {
           "name": "v3_web_panel",
@@ -188,6 +188,13 @@
           "note": "已替换为每日日程模块，读取task-board.json按deadline展示，commit: 9246d0a"
         },
         {
+          "name": "daily_commander",
+          "owner": "小新",
+          "status": "✅ 完成并部署",
+          "nextStep": "-",
+          "note": "每日指挥官v1：角色选择/今日3件事/完成度/AI建议，commit: c2fc238"
+        },
+        {
           "name": "ai_advisor",
           "owner": "3号",
           "status": "✅ 完成",
@@ -200,6 +207,13 @@
           "status": "🔄 Phase1完成，Phase2进行中",
           "nextStep": "前端集成完成，信号评估界面可用",
           "note": "✅ 信号Schema ✅ 管道脚本 ✅ 前端卡片 ✅ 评估Modal ✅ cron已注册"
+        },
+        {
+          "name": "proactive_guidance_engine",
+          "owner": "3号",
+          "status": "✅ v1.0完成并部署",
+          "nextStep": "测试验证",
+          "note": "commit 1b00016，触发条件：HP<70/财务超20%/能量<50持续3天/任务阻塞3天，每天10:00-15:00检查推送，escalation最多3次"
         }
       ]
     }
@@ -210,5 +224,5 @@
     "blockedProjects": 1,
     "completedProjects": 0
   },
-  "lastUpdated": "2026-05-02 18:30"
+  "lastUpdated": "2026-05-03 08:35"
 }
