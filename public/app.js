@@ -200,8 +200,10 @@ function renderMindModel(mindData) {
         const exercise = exercises.find(e => e.id === id);
         if (exercise) {
           exercise.completed = !exercise.completed;
-          saveCurrentUserData();
-          renderMindModel(data?.mindModel);
+          // 保存到 localStorage
+          JARVIS.updateMindModel({ today: { currentCase: { exercises } } });
+          // 重新渲染（更新 UI）
+          renderMindModel(JARVIS.getAllData().mindModel);
         }
       });
     });

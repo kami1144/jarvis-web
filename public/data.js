@@ -681,7 +681,18 @@ const JARVIS = {
       computedGold: ComputeEngine.compute().gold
     };
   },
-  
+
+  // 更新思维模式数据
+  updateMindModel(mindData) {
+    const data = loadData();
+    if (mindData.today) data.mindModel.today = { ...data.mindModel.today, ...mindData.today };
+    if (mindData.wrongPatterns) data.mindModel.wrongPatterns = mindData.wrongPatterns;
+    if (mindData.correctPatterns) data.mindModel.correctPatterns = mindData.correctPatterns;
+    data.lastUpdate = new Date().toISOString();
+    saveData(data);
+    return data.mindModel;
+  },
+
   // 重置数据
   resetData() {
     localStorage.removeItem(JAVIS_DATA_KEY);
