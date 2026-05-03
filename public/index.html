@@ -173,6 +173,47 @@
         </section>
       </div>
 
+      <!-- Row 2.2: Daily Commander -->
+      <div class="row">
+        <section class="card commander-card">
+          <h2 class="card-title">🗓️ 今日指挥官</h2>
+          <div class="commander-content">
+            <!-- 角色选择 -->
+            <div class="role-selector">
+              <button class="role-btn" data-role="父亲" onclick="DC_setRole('父亲')">👨‍👧 父亲</button>
+              <button class="role-btn" data-role="创业者" onclick="DC_setRole('创业者')">💼 创业者</button>
+              <button class="role-btn" data-role="开发者" onclick="DC_setRole('开发者')">💻 开发者</button>
+              <button class="role-btn" data-role="休息者" onclick="DC_setRole('休息者')">🧘 休息者</button>
+            </div>
+            <!-- 今日3件事 -->
+            <div class="tasks-list">
+              <div class="task-item" id="dc-task-0">
+                <input type="checkbox" class="task-checkbox" id="dc-check-0" onchange="DC_toggleTask(0)">
+                <input type="text" class="task-input" id="dc-input-0" placeholder="输入今日第1件事..." onblur="DC_saveTask(0, this.value)">
+              </div>
+              <div class="task-item" id="dc-task-1">
+                <input type="checkbox" class="task-checkbox" id="dc-check-1" onchange="DC_toggleTask(1)">
+                <input type="text" class="task-input" id="dc-input-1" placeholder="输入今日第2件事..." onblur="DC_saveTask(1, this.value)">
+              </div>
+              <div class="task-item" id="dc-task-2">
+                <input type="checkbox" class="task-checkbox" id="dc-check-2" onchange="DC_toggleTask(2)">
+                <input type="text" class="task-input" id="dc-input-2" placeholder="输入今日第3件事..." onblur="DC_saveTask(2, this.value)">
+              </div>
+            </div>
+            <!-- 完成度 -->
+            <div class="completion-status">
+              <span class="completion-dots" id="dc-dots">○ ○ ○</span>
+              <span class="completion-count" id="dc-count">0/3</span>
+            </div>
+            <!-- AI建议 -->
+            <div class="ai-advice" id="dc-advice">
+              <span class="advice-main">先完成1件事，打破沉默 ⚡</span>
+              <span class="advice-sub">决策胜于完美 💡</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
       <!-- Row 2.5: Opportunity Radar -->
       <div class="row">
         <section class="card radar-card">

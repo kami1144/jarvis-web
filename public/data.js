@@ -1261,3 +1261,98 @@ window.AlertSystem = AlertSystem;
 window.TaskTracker = TaskTracker;
 window.HistoryTracker = HistoryTracker;
 window.EnvironmentTracker = EnvironmentTracker;
+
+// ==========================================
+// 每日指挥官数据
+// ==========================================
+
+const DailyCommander = {
+  STORAGE_KEY: 'jarvis_daily_commander',
+  
+  // 获取今日日期字符串
+  getTodayKey() {
+    return new Date().toISOString().split('T')[0];
+  },
+  
+  // 获取数据
+  load() {
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY);
+      const data = stored ? JSON.parse(stored) : {};
+      // 如果不是今天的数据，重置
+      if (data.date !== this.getTodayKey()) {
+        return this.getDefault();
+      }
+      return data;
+    } catch (e) {
+      return this.getDefault();
+    }
+  },
+  
+  // 保存数据
+  save(data) {
+    data.date = this.getTodayKey();
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+  },
+  
+  // 默认数据
+  getDefault() {
+    return {
+      date: this.getTodayKey(),
+      role: '创业者', // 父亲 | 创业者 | 开发者 | 休息者
+      tasks: ['', '', ''], // 3件事
+      completed: [false, false, false] // 完成状态
+    };
+  },
+  
+  // 切换角色
+  setRole(role) {
+    const data = this.load();
+    data.role = role;
+    this.save(data);
+  },
+  
+  // 设置任务
+  setTask(index, text) {
+    const data = this.load();
+    data.tasks[index] = text;
+    this.save(data);
+  },
+  
+  // 切换完成状态
+  toggleComplete(index) {
+    const data = this.load();
+    data.completed[index] = !data.completed[index];
+    this.save(data);
+  },
+  
+  // 获取完成数
+  getCompletedCount() {
+    const data = this.load();
+    return data.completed.filter(c => c).length;
+  },
+  
+  // 获取AI建议
+  getAIAdvice() {
+    const data = this.load();
+    const count = this.getCompletedCount();
+    const role = data.role;
+    
+    const roleMessages = {
+      '父亲': '陪伴是最好的投资 ✨',
+      '创业者': '决策胜于完美 💡',
+      '开发者': '代码是最好的表达 💻',
+      '休息者': '恢复是为了走更远 🧘'
+    };
+    
+    if (count === 0) {
+      return { main: '先完成1件事，打破沉默 ⚡', sub: roleMessages[role] || '' };
+    } else if (count === 1) {
+      return { main: '好的开始，继续推进 🚀', sub: roleMessages[role] || '' };
+    } else if (count === 2) {
+      return { main: '即将达成，再坚持一下 🎯', sub: roleMessages[role] || '' };
+    } else {
+      return { main: '🎉 今日任务完成！', sub: '你今天做得很好，明天继续！' };
+    }
+  }
+};

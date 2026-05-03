@@ -2052,6 +2052,115 @@ function configureN8NWebhook(url) {
   showNotification('✅ n8n webhook 已配置', 'success');
 }
 
+// ==========================================
+// Daily Commander - 每日指挥官
+// ==========================================
+
+// 初始化每日指挥官UI
+function initDailyCommander() {
+  const data = DailyCommander.load();
+  
+  // 设置角色按钮状态
+  document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.role === data.role);
+  });
+  
+  // 填充任务
+  for (let i = 0; i < 3; i++) {
+    const input = document.getElementById(`dc-input-${i}`);
+    const check = document.getElementById(`dc-check-${i}`);
+    if (input) input.value = data.tasks[i] || '';
+    if (check) {
+      check.checked = data.completed[i];
+      updateTaskStyle(i, data.completed[i]);
+    }
+  }
+  
+  // 更新完成度
+  updateCompletionDisplay();
+  
+  // 更新AI建议
+  updateAIAdvice();
+}
+
+// 角色切换
+function DC_setRole(role) {
+  DailyCommander.setRole(role);
+  document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.role === role);
+  });
+  updateAIAdvice();
+}
+
+// 保存任务
+function DC_saveTask(index, value) {
+  DailyCommander.setTask(index, value);
+}
+
+// 切换任务完成状态
+function DC_toggleTask(index) {
+  const check = document.getElementById(`dc-check-${index}`);
+  DailyCommander.toggleComplete(index);
+  updateTaskStyle(index, check.checked);
+  updateCompletionDisplay();
+  updateAIAdvice();
+  
+  // 如果全部完成，庆祝效果
+  if (DailyCommander.getCompletedCount() === 3) {
+    const status = document.querySelector('.completion-status');
+    if (status) {
+      status.classList.add('celebrate');
+      setTimeout(() => status.classList.remove('celebrate'), 600);
+    }
+  }
+}
+
+// 更新任务样式（划线效果）
+function updateTaskStyle(index, completed) {
+  const input = document.getElementById(`dc-input-${index}`);
+  const taskItem = document.getElementById(`dc-task-${index}`);
+  if (input) {
+    input.classList.toggle('completed', completed);
+  }
+  if (taskItem) {
+    taskItem.style.opacity = completed ? '0.7' : '1';
+  }
+}
+
+// 更新完成度显示
+function updateCompletionDisplay() {
+  const count = DailyCommander.getCompletedCount();
+  const dots = document.getElementById('dc-dots');
+  const counter = document.getElementById('dc-count');
+  
+  if (dots) {
+    const filled = '● '.repeat(count);
+    const empty = '○ '.repeat(3 - count);
+    dots.textContent = (filled + empty).trim();
+  }
+  
+  if (counter) {
+    counter.textContent = `${count}/3`;
+  }
+}
+
+// 更新AI建议
+function updateAIAdvice() {
+  const advice = DailyCommander.getAIAdvice();
+  const container = document.getElementById('dc-advice');
+  if (container) {
+    container.innerHTML = `
+      <span class="advice-main">${advice.main}</span>
+      <span class="advice-sub">${advice.sub}</span>
+    `;
+  }
+}
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initDailyCommander, 100);
+});
+
 // 响应式
 window.addEventListener('resize', () => {
   if (window.innerWidth >= 768) {
