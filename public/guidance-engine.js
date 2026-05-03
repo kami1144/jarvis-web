@@ -374,16 +374,18 @@ function createTaskFromGuidance(cardId) {
 // ==========================================
 
 function runDailyGuidanceCheck() {
-  // 记录检查日期
-  localStorage.setItem(GUIDANCE_LAST_CHECK, getTodayDateStr());
-
-  // 检查触发条件
+  // 先检查触发条件（hasCheckedToday 必须在 setItem 之前，否则永远返回 true）
   const triggered = checkGuidanceTriggers();
 
-  // 添加新卡片
-  triggered.forEach(card => {
-    addGuidanceCard(card);
-  });
+  // 触发后才记录检查日期，避免重复检查
+  if (triggered.length > 0) {
+    localStorage.setItem(GUIDANCE_LAST_CHECK, getTodayDateStr());
+
+    // 添加新卡片
+    triggered.forEach(card => {
+      addGuidanceCard(card);
+    });
+  }
 
   return triggered;
 }
