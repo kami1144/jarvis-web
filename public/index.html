@@ -175,43 +175,38 @@
         </section>
       </div>
 
-      <!-- Row 2.2: Daily Commander -->
+      <!-- Row 2: Meaningful Day Panel -->
       <div class="row">
-        <section class="card commander-card">
-          <h2 class="card-title">🗓️ 今日指挥官</h2>
-          <div class="commander-content">
-            <!-- 角色选择 -->
-            <div class="role-selector">
-              <button class="role-btn" data-role="父亲" onclick="DC_setRole('父亲')">👨‍👧 父亲</button>
-              <button class="role-btn" data-role="创业者" onclick="DC_setRole('创业者')">💼 创业者</button>
-              <button class="role-btn" data-role="开发者" onclick="DC_setRole('开发者')">💻 开发者</button>
-              <button class="role-btn" data-role="休息者" onclick="DC_setRole('休息者')">🧘 休息者</button>
-            </div>
-            <!-- 今日3件事 -->
-            <div class="tasks-list">
-              <div class="task-item" id="dc-task-0">
-                <input type="checkbox" class="task-checkbox" id="dc-check-0" onchange="DC_toggleTask(0)">
-                <input type="text" class="task-input" id="dc-input-0" placeholder="输入今日第1件事..." onblur="DC_saveTask(0, this.value)">
-              </div>
-              <div class="task-item" id="dc-task-1">
-                <input type="checkbox" class="task-checkbox" id="dc-check-1" onchange="DC_toggleTask(1)">
-                <input type="text" class="task-input" id="dc-input-1" placeholder="输入今日第2件事..." onblur="DC_saveTask(1, this.value)">
-              </div>
-              <div class="task-item" id="dc-task-2">
-                <input type="checkbox" class="task-checkbox" id="dc-check-2" onchange="DC_toggleTask(2)">
-                <input type="text" class="task-input" id="dc-input-2" placeholder="输入今日第3件事..." onblur="DC_saveTask(2, this.value)">
-              </div>
-            </div>
-            <!-- 完成度 -->
-            <div class="completion-status">
-              <span class="completion-dots" id="dc-dots">○ ○ ○</span>
-              <span class="completion-count" id="dc-count">0/3</span>
-            </div>
-            <!-- AI建议 -->
-            <div class="ai-advice" id="dc-advice">
-              <span class="advice-main">先完成1件事，打破沉默 ⚡</span>
-              <span class="advice-sub">决策胜于完美 💡</span>
-            </div>
+        <section class="card meaningful-day-card">
+          <h2 class="card-title">🌟 有意义的一天</h2>
+
+          <!-- 角色选择（横排） -->
+          <div class="md-role-selector">
+            <button class="md-role-btn" data-role="父亲" onclick="MD_setRole('父亲')">👨‍👧 父亲</button>
+            <button class="md-role-btn" data-role="创业者" onclick="MD_setRole('创业者')">💼 创业者</button>
+            <button class="md-role-btn" data-role="开发者" onclick="MD_setRole('开发者')">💻 开发者</button>
+            <button class="md-role-btn" data-role="休息者" onclick="MD_setRole('休息者')">🧘 休息者</button>
+          </div>
+
+          <!-- 今日任务列表 -->
+          <div class="md-tasks-list" id="mdTasksList">
+            <!-- 动态渲染 -->
+          </div>
+
+          <!-- 添加任务 -->
+          <div class="md-add-task">
+            <input type="text" id="mdNewTaskInput" placeholder="输入今日任务..." class="md-input">
+            <button class="btn primary" onclick="MD_showAddTaskModal()">➕ 添加</button>
+          </div>
+
+          <!-- 工具推荐（根据角色动态显示） -->
+          <div class="md-tool-recommendations" id="mdToolRecommendations">
+            <!-- 动态渲染 -->
+          </div>
+
+          <!-- 完成度 -->
+          <div class="md-completion">
+            <span id="mdCompletionText">0/0 完成</span>
           </div>
         </section>
       </div>
@@ -299,17 +294,7 @@
         </section>
       </div>
 
-      <!-- Row 5: Daily Schedule -->
-      <div class="row">
-        <section class="card chart-card">
-          <h2 class="card-title">📅 每日日程</h2>
-          <div class="chart-container">
-            <div id="historyChart" class="schedule-container"></div>
-          </div>
-        </section>
-      </div>
-
-        <!-- Row 6: Environment Perception -->
+      <!-- Row 6: Environment Perception -->
       <div class="row row-2col">
         <section class="card env-card">
           <h2 class="card-title">🌍 环境感知</h2>
@@ -654,6 +639,43 @@
       </div>
       <div class="modal-footer">
         <button class="btn secondary" onclick="closeModal('toolModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 模态框：添加任务 ========== -->
+  <div class="modal" id="mdAddTaskModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📝 添加今日任务</h3>
+        <button class="modal-close" onclick="closeModal('mdAddTaskModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <div class="form-row">
+            <label>任务内容</label>
+            <input type="text" id="mdTaskTextInput" placeholder="做什么？">
+          </div>
+          <div class="form-row" style="flex-direction: column; align-items: flex-start;">
+            <label>这个任务的意义（AI 建议）</label>
+            <input type="text" id="mdPurposeInput" placeholder="为什么做这件事？" style="width: 100%;">
+            <div class="form-hint" id="mdPurposeHint" style="font-size: 0.75rem; color: #888; margin-top: 4px;">AI 会根据任务内容自动提炼</div>
+          </div>
+          <div class="form-row">
+            <label>关联工具（可选）</label>
+            <select id="mdToolSelect">
+              <option value="">-- 不需要工具 --</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>时间段（可选）</label>
+            <input type="text" id="mdTimeSlotInput" placeholder="例如：09:00-12:00">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeModal('mdAddTaskModal')">取消</button>
+        <button class="btn primary" onclick="MD_confirmAddTask()">确认添加</button>
       </div>
     </div>
   </div>

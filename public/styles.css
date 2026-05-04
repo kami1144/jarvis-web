@@ -2182,3 +2182,188 @@ body {
   outline: none;
   border-color: var(--color-primary);
 }
+
+/* ==========================================
+   今日意义面板样式
+   ========================================== */
+
+.meaningful-day-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.md-role-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.md-role-btn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+}
+
+.md-role-btn:hover {
+  border-color: rgba(255,255,255,0.4);
+  color: white;
+}
+
+.md-role-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  color: white;
+}
+
+.md-tasks-list {
+  margin-bottom: 16px;
+}
+
+.md-empty {
+  text-align: center;
+  padding: 32px;
+  color: rgba(255,255,255,0.5);
+  font-size: 14px;
+}
+
+.md-task-item {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.05);
+  transition: all 0.2s;
+}
+
+.md-task-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.md-task-item.completed {
+  opacity: 0.6;
+}
+
+.md-task-item.completed .md-task-text {
+  text-decoration: line-through;
+  color: rgba(255,255,255,0.5);
+}
+
+.md-task-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.md-task-check {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.md-task-content {
+  flex: 1;
+}
+
+.md-task-text {
+  font-size: 14px;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.md-task-purpose {
+  font-size: 12px;
+  color: #667eea;
+  margin-bottom: 4px;
+}
+
+.md-task-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.md-task-tool, .md-task-time {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.md-task-delete {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.3);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 4px;
+}
+
+.md-task-delete:hover {
+  color: #ff6b6b;
+}
+
+.md-add-task {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.md-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 14px;
+}
+
+.md-input::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+.md-tool-recommendations {
+  padding: 12px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.md-tools-header {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 8px;
+}
+
+.md-tools-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.md-tool-tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+  color: #667eea;
+}
+
+.md-completion {
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  padding: 8px;
+}
+
+.card-title {
+  color: white;
+  border-bottom-color: rgba(255,255,255,0.1);
+}

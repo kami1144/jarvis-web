@@ -2369,3 +2369,107 @@ const LifePrinciples = {
 window.MonthlyReview = MonthlyReview;
 window.PainReflection = PainReflection;
 window.LifePrinciples = LifePrinciples;
+
+// ==========================================
+// 今日意义面板 (Meaningful Day Panel)
+// ==========================================
+
+const MeaningfulDayPanel = {
+  STORAGE_KEY: 'jarvis_meaningful_day',
+
+  // 今日角色
+  currentRole: '创业者',
+
+  // 工具推荐映射（按角色）
+  toolRecommendations: {
+    '父亲': ['心流匹配表', '冲突处理流程'],
+    '创业者': ['精益创业画布', '机会成本', '思考快与慢'],
+    '开发者': ['思考快与慢', '六顶思考帽', '每日快速复盘'],
+    '休息者': ['心流匹配表', '痛苦-反思-进步记录']
+  },
+
+  // 加载数据
+  load() {
+    const saved = localStorage.getItem(this.STORAGE_KEY);
+    const today = new Date().toISOString().split('T')[0];
+    const data = saved ? JSON.parse(saved) : {};
+    // 如果不是今天的数据，重置
+    if (data.date !== today) {
+      return { date: today, currentRole: '创业者', tasks: [] };
+    }
+    return data;
+  },
+
+  // 保存数据
+  save(data) {
+    data.date = new Date().toISOString().split('T')[0];
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+  },
+
+  // 设置角色
+  setRole(role) {
+    const data = this.load();
+    data.currentRole = role;
+    this.save(data);
+  },
+
+  // 添加任务
+  addTask(text, purpose, tool, timeSlot) {
+    const data = this.load();
+    data.tasks.push({
+      id: 'task_' + Date.now(),
+      text,
+      purpose: purpose || this._inferPurpose(text),
+      tool: tool || null,
+      timeSlot: timeSlot || null,
+      completed: false
+    });
+    this.save(data);
+    return data.tasks[data.tasks.length - 1];
+  },
+
+  // 推断 purpose（基于关键词）
+  _inferPurpose(text) {
+    const lower = text.toLowerCase();
+    if (lower.includes('运动') || lower.includes('跑步') || lower.includes('健身')) {
+      return '保持健康，有精力陪伴家人';
+    }
+    if (lower.includes('女儿') || lower.includes('儿子') || lower.includes('孩子')) {
+      return '在孩子需要我的时候在场';
+    }
+    if (lower.includes('学习') || lower.includes('日语') || lower.includes('英语')) {
+      return '提升自己，创造更多机会';
+    }
+    if (lower.includes('工作') || lower.includes('项目') || lower.includes('上线')) {
+      return '推进目标，建立事业';
+    }
+    return '做一件有意义的事';
+  },
+
+  // 切换完成状态
+  toggleComplete(taskId) {
+    const data = this.load();
+    const task = data.tasks.find(t => t.id === taskId);
+    if (task) {
+      task.completed = !task.completed;
+      this.save(data);
+    }
+    return data;
+  },
+
+  // 删除任务
+  removeTask(taskId) {
+    const data = this.load();
+    data.tasks = data.tasks.filter(t => t.id !== taskId);
+    this.save(data);
+    return data;
+  },
+
+  // 推荐工具（根据角色）
+  getRecommendedTools(role) {
+    return this.toolRecommendations[role] || [];
+  }
+};
+
+// 导出到全局
+window.MeaningfulDayPanel = MeaningfulDayPanel;

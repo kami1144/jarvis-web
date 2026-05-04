@@ -15,6 +15,7 @@ function initApp() {
   renderAll(); // async but non-blocking
   startRealtimeUpdates();
   bindEvents();
+  initMeaningfulDay(); // 初始化今日意义面板
   console.log('🎮 J.A.R.V.I.S. v3 初始化完成 - 手动输入 + Obsidian联动');
 }
 
@@ -1404,6 +1405,155 @@ function openToolKit() {
   openModal('toolModal');
 }
 
+// ==========================================
+// 今日意义面板 (MeaningfulDay)
+// ==========================================
+
+function initMeaningfulDay() {
+  const data = MeaningfulDayPanel.load();
+
+  // 设置角色按钮状态
+  document.querySelectorAll('.md-role-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.role === data.currentRole);
+  });
+
+  // 渲染任务列表
+  renderMDTasks(data.tasks);
+
+  // 渲染工具推荐
+  renderMDToolRecommendations(data.currentRole);
+
+  // 更新完成度
+  updateMDCompletion(data.tasks);
+}
+
+function MD_setRole(role) {
+  MeaningfulDayPanel.setRole(role);
+
+  document.querySelectorAll('.md-role-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.role === role);
+  });
+
+  renderMDToolRecommendations(role);
+  showNotification(`✅ 今日角色：${role}`, 'success');
+}
+
+function renderMDTasks(tasks) {
+  const container = document.getElementById('mdTasksList');
+  if (!container) return;
+
+  if (!tasks || tasks.length === 0) {
+    container.innerHTML = '<div class="md-empty">今日还没有任务，添加一个吧 ✨</div>';
+    return;
+  }
+
+  container.innerHTML = tasks.map(task => `
+    <div class="md-task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+      <div class="md-task-main">
+        <input type="checkbox" class="md-task-check"
+          ${task.completed ? 'checked' : ''}
+          onchange="MD_toggleTask('${task.id}')">
+        <div class="md-task-content">
+          <div class="md-task-text">${task.text}</div>
+          ${task.purpose ? `<div class="md-task-purpose">🎯 ${task.purpose}</div>` : ''}
+          <div class="md-task-meta">
+            ${task.tool ? `<span class="md-task-tool">🛠️ ${task.tool}</span>` : ''}
+            ${task.timeSlot ? `<span class="md-task-time">⏰ ${task.timeSlot}</span>` : ''}
+          </div>
+        </div>
+        <button class="md-task-delete" onclick="MD_deleteTask('${task.id}')">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMDToolRecommendations(role) {
+  const container = document.getElementById('mdToolRecommendations');
+  if (!container) return;
+
+  const tools = MeaningfulDayPanel.getRecommendedTools(role);
+  const toolOptions = MeaningfulDayPanel.toolRecommendations[role] || [];
+
+  // 渲染推荐工具标签
+  container.innerHTML = `
+    <div class="md-tools-header">🛠️ 建议工具</div>
+    <div class="md-tools-list">
+      ${tools.map(tool => `<span class="md-tool-tag">${tool}</span>`).join('')}
+    </div>
+  `;
+
+  // 更新下拉框选项
+  const select = document.getElementById('mdToolSelect');
+  if (select) {
+    select.innerHTML = `
+      <option value="">-- 不需要工具 --</option>
+      ${toolOptions.map(tool => `<option value="${tool}">${tool}</option>`).join('')}
+    `;
+  }
+}
+
+function MD_showAddTaskModal() {
+  // 根据当前角色填充推荐工具
+  const data = MeaningfulDayPanel.load();
+  renderMDToolRecommendations(data.currentRole);
+
+  // 清空输入
+  document.getElementById('mdTaskTextInput').value = '';
+  document.getElementById('mdPurposeInput').value = '';
+  document.getElementById('mdToolSelect').value = '';
+  document.getElementById('mdTimeSlotInput').value = '';
+
+  openModal('mdAddTaskModal');
+}
+
+function MD_confirmAddTask() {
+  const text = document.getElementById('mdTaskTextInput').value.trim();
+  const purpose = document.getElementById('mdPurposeInput').value.trim();
+  const tool = document.getElementById('mdToolSelect').value;
+  const timeSlot = document.getElementById('mdTimeSlotInput').value.trim();
+
+  if (!text) {
+    showNotification('请输入任务内容', 'warning');
+    return;
+  }
+
+  // 如果没有输入 purpose，用 AI 推断
+  const finalPurpose = purpose || MeaningfulDayPanel._inferPurpose(text);
+  document.getElementById('mdPurposeInput').value = finalPurpose;
+
+  const data = MeaningfulDayPanel.addTask(text, finalPurpose, tool || null, timeSlot || null);
+
+  closeModal('mdAddTaskModal');
+  renderMDTasks(data.tasks);
+  updateMDCompletion(data.tasks);
+  showNotification('✅ 任务已添加', 'success');
+}
+
+function MD_toggleTask(taskId) {
+  const data = MeaningfulDayPanel.toggleComplete(taskId);
+  renderMDTasks(data.tasks);
+  updateMDCompletion(data.tasks);
+}
+
+function MD_deleteTask(taskId) {
+  if (confirm('确定删除这个任务？')) {
+    const data = MeaningfulDayPanel.removeTask(taskId);
+    renderMDTasks(data.tasks);
+    updateMDCompletion(data.tasks);
+    showNotification('🗑️ 任务已删除', 'info');
+  }
+}
+
+function updateMDCompletion(tasks) {
+  if (!tasks) tasks = MeaningfulDayPanel.load().tasks;
+  const completed = tasks.filter(t => t.completed).length;
+  const total = tasks.length;
+  const text = total === 0 ? '今日还没有任务' : `${completed}/${total} 完成`;
+
+  const el = document.getElementById('mdCompletionText');
+  if (el) el.textContent = text;
+}
+
 // 渲染工具卡片
 function renderToolGrid(category) {
   const grid = document.getElementById('toolGrid');
@@ -1849,6 +1999,18 @@ function bindEvents() {
   });
   document.getElementById('relationshipInput')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') addRelationship();
+  });
+
+  // 任务内容变化时，AI 自动推断 purpose
+  document.getElementById('mdTaskTextInput')?.addEventListener('input', (e) => {
+    const text = e.target.value.trim();
+    if (text) {
+      const inferred = MeaningfulDayPanel._inferPurpose(text);
+      const purposeInput = document.getElementById('mdPurposeInput');
+      if (!purposeInput.value) {
+        purposeInput.placeholder = inferred;
+      }
+    }
   });
 }
 
