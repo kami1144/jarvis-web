@@ -1493,17 +1493,38 @@ function renderMDToolRecommendations(role) {
 }
 
 function MD_showAddTaskModal() {
-  // 根据当前角色填充推荐工具
-  const data = MeaningfulDayPanel.load();
-  renderMDToolRecommendations(data.currentRole);
+  // 优先使用 mdTaskTextInput（弹窗模式），否则用 mdNewTaskInput（内联模式）
+  const textInput = document.getElementById('mdTaskTextInput');
+  const purposeInput = document.getElementById('mdPurposeInput');
+  const toolSelect = document.getElementById('mdToolSelect');
+  const timeSlotInput = document.getElementById('mdTimeSlotInput');
+  const newTaskInput = document.getElementById('mdNewTaskInput');
 
-  // 清空输入
-  document.getElementById('mdTaskTextInput').value = '';
-  document.getElementById('mdPurposeInput').value = '';
-  document.getElementById('mdToolSelect').value = '';
-  document.getElementById('mdTimeSlotInput').value = '';
-
-  openModal('mdAddTaskModal');
+  if (textInput) {
+    // 弹窗模式 - 根据当前角色填充推荐工具
+    const data = MeaningfulDayPanel.load();
+    renderMDToolRecommendations(data.currentRole);
+    textInput.value = '';
+    if (purposeInput) purposeInput.value = '';
+    if (toolSelect) toolSelect.value = '';
+    if (timeSlotInput) timeSlotInput.value = '';
+    openModal('mdAddTaskModal');
+  } else if (newTaskInput) {
+    // 内联模式 - 直接添加
+    const text = newTaskInput.value.trim();
+    if (!text) {
+      showNotification('请输入任务内容', 'warning');
+      return;
+    }
+    const data = MeaningfulDayPanel.load();
+    const purpose = MeaningfulDayPanel._inferPurpose(text);
+    MeaningfulDayPanel.addTask(text, purpose, null, null);
+    newTaskInput.value = '';
+    const updatedData = MeaningfulDayPanel.load();
+    renderMDTasks(updatedData.tasks);
+    updateMDCompletion(updatedData.tasks);
+    showNotification('✅ 任务已添加', 'success');
+  }
 }
 
 function MD_confirmAddTask() {
@@ -2973,6 +2994,7 @@ function addPrincipleExample() {
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(initDailyCommander, 100);
+  setTimeout(initMeaningfulDay, 150); // 初始化有意义的一天面板
 });
 
 // 响应式
