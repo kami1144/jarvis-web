@@ -652,23 +652,19 @@
       <div class="modal-body">
         <div class="form-section">
           <div class="form-row">
-            <label>任务内容</label>
+            <label>任务</label>
             <input type="text" id="mdTaskTextInput" placeholder="做什么？">
           </div>
           <div class="form-row" style="flex-direction: column; align-items: flex-start;">
-            <label>这个任务的意义（AI 建议）</label>
-            <input type="text" id="mdPurposeInput" placeholder="为什么做这件事？" style="width: 100%;">
-            <div class="form-hint" id="mdPurposeHint" style="font-size: 0.75rem; color: #888; margin-top: 4px;">AI 会根据任务内容自动提炼</div>
+            <label>为什么做？（意义）</label>
+            <input type="text" id="mdPurposeInput" placeholder="AI会自动推断">
+            <div class="form-hint" style="font-size: 0.75rem; color: #888; margin-top: 4px;">不填则AI自动根据任务内容推断</div>
           </div>
           <div class="form-row">
             <label>关联工具（可选）</label>
             <select id="mdToolSelect">
               <option value="">-- 不需要工具 --</option>
             </select>
-          </div>
-          <div class="form-row">
-            <label>时间段（可选）</label>
-            <input type="text" id="mdTimeSlotInput" placeholder="例如：09:00-12:00">
           </div>
         </div>
       </div>
