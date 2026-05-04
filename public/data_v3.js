@@ -2453,7 +2453,7 @@ const MeaningfulDayPanel = {
   },
 
   // 添加任务（限制最多3个）
-  addTask(text, purpose, tool) {
+  addTask(text, purpose, tool, role) {
     const data = this.load();
 
     if (data.tasks.length >= this.MAX_TASKS) {
@@ -2465,6 +2465,7 @@ const MeaningfulDayPanel = {
       text: text.trim(),
       purpose: purpose || this._inferPurpose(text),
       tool: tool || null,
+      role: role || data.role,  // 关联角色，默认为今日角色
       completed: false
     };
 

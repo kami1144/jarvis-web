@@ -2357,6 +2357,14 @@ body {
   border-radius: 10px;
 }
 
+.md-task-role-badge {
+  font-size: 11px;
+  color: #9b59b6;
+  background: rgba(155, 89, 182, 0.2);
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+
 .md-task-done-badge {
   font-size: 11px;
   color: #5cb85c;

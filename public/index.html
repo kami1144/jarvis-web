@@ -652,16 +652,27 @@
       <div class="modal-body">
         <div class="form-section">
           <div class="form-row">
-            <label>任务</label>
-            <input type="text" id="mdTaskTextInput" placeholder="做什么？">
+            <label>以什么角色做？</label>
+            <select id="mdRoleSelect">
+              <option value="">-- 选择角色 --</option>
+              <option value="👨‍👧 父亲">👨‍👧 父亲</option>
+              <option value="💼 创业者">💼 创业者</option>
+              <option value="💻 开发者">💻 开发者</option>
+              <option value="🧘 休息者">🧘 休息者</option>
+            </select>
+            <div class="form-hint" style="font-size: 0.75rem; color: #888; margin-top: 4px;">不选则使用今日角色</div>
+          </div>
+          <div class="form-row">
+            <label>做什么？</label>
+            <input type="text" id="mdTaskTextInput" placeholder="任务内容">
           </div>
           <div class="form-row" style="flex-direction: column; align-items: flex-start;">
-            <label>为什么做？（意义）</label>
+            <label>💡 为什么做？（意义）</label>
             <input type="text" id="mdPurposeInput" placeholder="AI会自动推断">
             <div class="form-hint" style="font-size: 0.75rem; color: #888; margin-top: 4px;">不填则AI自动根据任务内容推断</div>
           </div>
           <div class="form-row">
-            <label>关联工具（可选）</label>
+            <label>🛠️ 用什么工具？（可选）</label>
             <select id="mdToolSelect">
               <option value="">-- 不需要工具 --</option>
             </select>
