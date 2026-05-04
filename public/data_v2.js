@@ -1366,6 +1366,7 @@ window.TaskTracker = TaskTracker;
 window.HistoryTracker = HistoryTracker;
 window.EnvironmentTracker = EnvironmentTracker;
 window.AIEvaluator = AIEvaluator;
+window.NotificationService = NotificationService;
 
 // ==========================================
 // 每日指挥官数据
@@ -1497,9 +1498,6 @@ const NotificationService = {
     }
   }
 };
-
-// 导出到全局
-window.NotificationService = NotificationService;
 
 const DailyCommander = {
   STORAGE_KEY: 'jarvis_daily_commander',
@@ -2378,27 +2376,61 @@ window.LifePrinciples = LifePrinciples;
 
 const MeaningfulDayPanel = {
   STORAGE_KEY: 'jarvis_meaningful_day',
-
-  // 今日角色
-  currentRole: '创业者',
+  MAX_TASKS: 3,  // 最多3个任务
 
   // 工具推荐映射（按角色）
   toolRecommendations: {
-    '父亲': ['心流匹配表', '冲突处理流程'],
-    '创业者': ['精益创业画布', '机会成本', '思考快与慢'],
-    '开发者': ['思考快与慢', '六顶思考帽', '每日快速复盘'],
-    '休息者': ['心流匹配表', '痛苦-反思-进步记录']
+    '👨‍👧 父亲': ['心流匹配表', '冲突处理流程', '影响力六原则'],
+    '💼 创业者': ['精益创业画布', '机会成本', '思考快与慢'],
+    '💻 开发者': ['六顶思考帽', '每日快速复盘', '思考快与慢'],
+    '🧘 休息者': ['心流匹配表', '痛苦-反思-进步记录', '月度系统复盘']
   },
 
-  // 加载数据
+  // 角色图标映射
+  roleEmoji: {
+    '👨‍👧 父亲': '👨‍👧',
+    '💼 创业者': '💼',
+    '💻 开发者': '💻',
+    '🧘 休息者': '🧘'
+  },
+
+  // 角色映射（旧格式 → 新格式）
+  roleMigration: {
+    '父亲': '👨‍👧 父亲',
+    '创业者': '💼 创业者',
+    '开发者': '💻 开发者',
+    '休息者': '🧘 休息者'
+  },
+
+  // 加载数据（每天自动清空 + 旧数据迁移）
   load() {
     const saved = localStorage.getItem(this.STORAGE_KEY);
     const today = new Date().toISOString().split('T')[0];
     const data = saved ? JSON.parse(saved) : {};
-    // 如果不是今天的数据，重置
+
+    // 如果不是今天的数据，完全重置
     if (data.date !== today) {
-      return { date: today, currentRole: '创业者', tasks: [] };
+      return {
+        date: today,
+        role: '💼 创业者',
+        tasks: []  // 新的一天，任务清空
+      };
     }
+
+    // 迁移旧数据格式（currentRole → role with emoji）
+    if (data.currentRole && !data.role) {
+      const oldRole = data.currentRole;
+      data.role = this.roleMigration[oldRole] || '💼 创业者';
+      delete data.currentRole;
+      this.save(data);
+    }
+
+    // 确保 role 有 emoji 前缀
+    if (data.role && !data.role.includes(' ')) {
+      data.role = this.roleMigration[data.role] || '💼 创业者';
+      this.save(data);
+    }
+
     return data;
   },
 
@@ -2411,26 +2443,38 @@ const MeaningfulDayPanel = {
   // 设置角色
   setRole(role) {
     const data = this.load();
-    data.currentRole = role;
+    data.role = role;
     this.save(data);
   },
 
-  // 添加任务
-  addTask(text, purpose, tool, timeSlot) {
+  // 验证能否添加任务
+  canAddTask() {
     const data = this.load();
-    data.tasks.push({
+    return data.tasks.length < this.MAX_TASKS;
+  },
+
+  // 添加任务（限制最多3个）
+  addTask(text, purpose, tool) {
+    const data = this.load();
+
+    if (data.tasks.length >= this.MAX_TASKS) {
+      return { error: '最多只能添加3个任务，专注最重要的事' };
+    }
+
+    const task = {
       id: 'task_' + Date.now(),
-      text,
+      text: text.trim(),
       purpose: purpose || this._inferPurpose(text),
       tool: tool || null,
-      timeSlot: timeSlot || null,
       completed: false
-    });
+    };
+
+    data.tasks.push(task);
     this.save(data);
-    return data;  // 返回完整 data（不是单个task）
+    return { data, task };
   },
 
-  // 推断 purpose（基于关键词）
+  // 推断 purpose
   _inferPurpose(text) {
     const lower = text.toLowerCase();
     if (lower.includes('运动') || lower.includes('跑步') || lower.includes('健身')) {
@@ -2444,6 +2488,12 @@ const MeaningfulDayPanel = {
     }
     if (lower.includes('工作') || lower.includes('项目') || lower.includes('上线')) {
       return '推进目标，建立事业';
+    }
+    if (lower.includes('adult') || lower.includes('shop')) {
+      return '建立被动收入渠道';
+    }
+    if (lower.includes('manga') || lower.includes('漫画')) {
+      return '完成作品，建立内容资产';
     }
     return '做一件有意义的事';
   },
@@ -2467,11 +2517,17 @@ const MeaningfulDayPanel = {
     return data;
   },
 
-  // 推荐工具（根据角色）
+  // 获取推荐工具
   getRecommendedTools(role) {
     return this.toolRecommendations[role] || [];
+  },
+
+  // 获取今日主题（所有purpose合并）
+  getTodayThemes(data) {
+    const purposes = data.tasks.map(t => t.purpose).filter(Boolean);
+    return [...new Set(purposes)];
   }
 };
 
-// 导出到全局
+// 导出
 window.MeaningfulDayPanel = MeaningfulDayPanel;
