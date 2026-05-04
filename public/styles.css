@@ -2219,26 +2219,20 @@ body {
   color: rgba(255,255,255,0.6);
 }
 
-.md-summary-purpose {
+.md-summary-themes {
   margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.md-summary-purpose-label {
-  font-size: 12px;
-  color: rgba(255,255,255,0.5);
-  display: block;
-  margin-bottom: 6px;
-}
-
-.md-purpose-tag {
+.md-theme-tag {
   display: inline-block;
   font-size: 11px;
   padding: 4px 10px;
   background: rgba(102, 126, 234, 0.3);
   border-radius: 12px;
   color: #a8c0ff;
-  margin-right: 6px;
-  margin-bottom: 4px;
 }
 
 .md-summary-progress {

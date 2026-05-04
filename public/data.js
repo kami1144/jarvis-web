@@ -2394,7 +2394,15 @@ const MeaningfulDayPanel = {
     '🧘 休息者': '🧘'
   },
 
-  // 加载数据（每天自动清空）
+  // 角色映射（旧格式 → 新格式）
+  roleMigration: {
+    '父亲': '👨‍👧 父亲',
+    '创业者': '💼 创业者',
+    '开发者': '💻 开发者',
+    '休息者': '🧘 休息者'
+  },
+
+  // 加载数据（每天自动清空 + 旧数据迁移）
   load() {
     const saved = localStorage.getItem(this.STORAGE_KEY);
     const today = new Date().toISOString().split('T')[0];
@@ -2408,6 +2416,21 @@ const MeaningfulDayPanel = {
         tasks: []  // 新的一天，任务清空
       };
     }
+
+    // 迁移旧数据格式（currentRole → role with emoji）
+    if (data.currentRole && !data.role) {
+      const oldRole = data.currentRole;
+      data.role = this.roleMigration[oldRole] || '💼 创业者';
+      delete data.currentRole;
+      this.save(data);
+    }
+
+    // 确保 role 有 emoji 前缀
+    if (data.role && !data.role.includes(' ')) {
+      data.role = this.roleMigration[data.role] || '💼 创业者';
+      this.save(data);
+    }
+
     return data;
   },
 

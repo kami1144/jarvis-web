@@ -1414,17 +1414,17 @@ function initMeaningfulDay() {
 
   // 设置角色按钮状态
   document.querySelectorAll('.md-role-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.role === data.role);
+    btn.classList.toggle('active', btn.dataset.role === data.currentRole);
   });
 
   // 渲染今日意义总结
-  renderMDDaySummary(data.tasks, data.role);
+  renderMDDaySummary(data.tasks);
 
   // 渲染任务列表
   renderMDTasks(data.tasks);
 
   // 渲染工具推荐
-  renderMDToolRecommendations(data.role);
+  renderMDToolRecommendations(data.currentRole);
 
   // 更新完成度
   updateMDCompletion(data.tasks);
@@ -1438,11 +1438,6 @@ function MD_setRole(role) {
   });
 
   renderMDToolRecommendations(role);
-
-  // 更新顶部总结的角色显示
-  const data = MeaningfulDayPanel.load();
-  renderMDDaySummary(data.tasks, data.role);
-
   showNotification(`✅ 今日角色：${role}`, 'success');
 }
 
@@ -1451,63 +1446,77 @@ function renderMDTasks(tasks) {
   if (!container) return;
 
   if (!tasks || tasks.length === 0) {
-    container.innerHTML = '<div class="md-empty">还没有任务<br>专注做最重要的事</div>';
+    container.innerHTML = '<div class="md-empty">今日还没有任务，添加一个吧 ✨</div>';
     return;
   }
 
-  container.innerHTML = tasks.map(task => `
+  // 按时间段排序（没有时间段的放最后）
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if (!a.timeSlot && !b.timeSlot) return 0;
+    if (!a.timeSlot) return 1;
+    if (!b.timeSlot) return -1;
+    return a.timeSlot.localeCompare(b.timeSlot);
+  });
+
+  container.innerHTML = sortedTasks.map(task => `
     <div class="md-task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+      <div class="md-task-header">
+        <div class="md-task-time-badge">
+          ${task.timeSlot ? `<span class="md-time">⏰ ${task.timeSlot}</span>` : '<span class="md-time-empty">📋 待安排</span>'}
+        </div>
+        ${task.tool ? `<span class="md-task-tool-badge">🛠️ ${task.tool}</span>` : ''}
+        ${task.completed ? '<span class="md-task-done-badge">✅ 完成</span>' : ''}
+      </div>
       <div class="md-task-content">
         <div class="md-task-text">${task.text}</div>
         ${task.purpose ? `<div class="md-task-purpose">💡 ${task.purpose}</div>` : ''}
-        ${task.tool ? `<div class="md-task-tool">🛠️ ${task.tool}</div>` : ''}
       </div>
       <div class="md-task-actions">
         <input type="checkbox" class="md-task-check"
           ${task.completed ? 'checked' : ''}
           onchange="MD_toggleTask('${task.id}')">
-        <button class="md-task-delete" onclick="MD_deleteTask('${task.id}')">×</button>
+        <button class="md-task-delete" onclick="MD_deleteTask('${task.id}')">🗑️</button>
       </div>
     </div>
   `).join('');
 
   // 渲染今日意义总结
-  const data = MeaningfulDayPanel.load();
-  renderMDDaySummary(tasks, data.role);
+  renderMDDaySummary(sortedTasks);
 }
 
-// 渲染今日意义总结
-function renderMDDaySummary(tasks, role) {
+// 渲染今日意义总结（面板顶部）
+function renderMDDaySummary(tasks) {
   const container = document.getElementById('mdDaySummary');
   if (!container) return;
 
+  const data = MeaningfulDayPanel.load();
   const completedCount = tasks.filter(t => t.completed).length;
   const totalCount = tasks.length;
-  const themes = MeaningfulDayPanel.getTodayThemes({ tasks });
 
-  const dateStr = new Date().toLocaleDateString('zh-CN', {
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long'
-  });
+  // 提炼今日主题（合并所有 purpose）
+  const purposes = tasks.map(t => t.purpose).filter(Boolean);
+  const uniquePurposes = [...new Set(purposes)];
 
-  container.innerHTML = `
+  const summaryHTML = `
     <div class="md-summary-header">
-      <span class="md-summary-role">${role}</span>
-      <span class="md-summary-date">${dateStr}</span>
+      <span class="md-summary-role">${data.currentRole}</span>
+      <span class="md-summary-date">${new Date().toLocaleDateString('zh-CN', {month:'long', day:'numeric', weekday:'long'})}</span>
     </div>
-    ${themes.length > 0 ? `
-    <div class="md-summary-themes">
-      ${themes.map(t => `<span class="md-theme-tag">${t}</span>`).join('')}
+    ${uniquePurposes.length > 0 ? `
+    <div class="md-summary-purpose">
+      <span class="md-summary-purpose-label">今日主题：</span>
+      ${uniquePurposes.map(p => `<span class="md-purpose-tag">${p}</span>`).join('')}
     </div>
     ` : ''}
     <div class="md-summary-progress">
-      <span>${completedCount}/${totalCount} 完成</span>
+      <span>进度 ${completedCount}/${totalCount}</span>
       <div class="md-progress-bar">
         <div class="md-progress-fill" style="width: ${totalCount > 0 ? (completedCount/totalCount*100) : 0}%"></div>
       </div>
     </div>
   `;
+
+  container.innerHTML = summaryHTML;
 }
 
 function renderMDToolRecommendations(role) {
@@ -1515,12 +1524,9 @@ function renderMDToolRecommendations(role) {
   if (!container) return;
 
   const tools = MeaningfulDayPanel.getRecommendedTools(role);
+  const toolOptions = MeaningfulDayPanel.toolRecommendations[role] || [];
 
-  if (tools.length === 0) {
-    container.innerHTML = '';
-    return;
-  }
-
+  // 渲染推荐工具标签
   container.innerHTML = `
     <div class="md-tools-header">🛠️ 建议工具</div>
     <div class="md-tools-list">
@@ -1533,27 +1539,21 @@ function renderMDToolRecommendations(role) {
   if (select) {
     select.innerHTML = `
       <option value="">-- 不需要工具 --</option>
-      ${tools.map(tool => `<option value="${tool}">${tool}</option>`).join('')}
+      ${toolOptions.map(tool => `<option value="${tool}">${tool}</option>`).join('')}
     `;
   }
 }
 
 function MD_showAddTaskModal() {
-  const data = MeaningfulDayPanel.load();
-
-  // 检查是否已达上限
-  if (!MeaningfulDayPanel.canAddTask()) {
-    showNotification('⚠️ 最多只能添加3个任务，专注最重要的事', 'warning');
-    return;
-  }
-
   // 根据当前角色填充推荐工具
-  renderMDToolRecommendations(data.role);
+  const data = MeaningfulDayPanel.load();
+  renderMDToolRecommendations(data.currentRole);
 
   // 清空输入
   document.getElementById('mdTaskTextInput').value = '';
   document.getElementById('mdPurposeInput').value = '';
   document.getElementById('mdToolSelect').value = '';
+  document.getElementById('mdTimeSlotInput').value = '';
 
   openModal('mdAddTaskModal');
 }
@@ -1562,6 +1562,7 @@ function MD_confirmAddTask() {
   const text = document.getElementById('mdTaskTextInput').value.trim();
   const purpose = document.getElementById('mdPurposeInput').value.trim();
   const tool = document.getElementById('mdToolSelect').value;
+  const timeSlot = document.getElementById('mdTimeSlotInput').value.trim();
 
   if (!text) {
     showNotification('请输入任务内容', 'warning');
@@ -1570,23 +1571,13 @@ function MD_confirmAddTask() {
 
   // 如果没有输入 purpose，用 AI 推断
   const finalPurpose = purpose || MeaningfulDayPanel._inferPurpose(text);
+  document.getElementById('mdPurposeInput').value = finalPurpose;
 
-  const result = MeaningfulDayPanel.addTask(text, finalPurpose, tool || null);
-
-  if (result.error) {
-    showNotification('⚠️ ' + result.error, 'warning');
-    return;
-  }
+  const data = MeaningfulDayPanel.addTask(text, finalPurpose, tool || null, timeSlot || null);
 
   closeModal('mdAddTaskModal');
-
-  const data = result.data;
   renderMDTasks(data.tasks);
   updateMDCompletion(data.tasks);
-
-  // 更新工具推荐（根据角色）
-  renderMDToolRecommendations(data.role);
-
   showNotification('✅ 任务已添加', 'success');
 }
 
@@ -1597,17 +1588,19 @@ function MD_toggleTask(taskId) {
 }
 
 function MD_deleteTask(taskId) {
-  const data = MeaningfulDayPanel.removeTask(taskId);
-  renderMDTasks(data.tasks);
-  updateMDCompletion(data.tasks);
-  showNotification('🗑️ 任务已删除', 'info');
+  if (confirm('确定删除这个任务？')) {
+    const data = MeaningfulDayPanel.removeTask(taskId);
+    renderMDTasks(data.tasks);
+    updateMDCompletion(data.tasks);
+    showNotification('🗑️ 任务已删除', 'info');
+  }
 }
 
 function updateMDCompletion(tasks) {
   if (!tasks) tasks = MeaningfulDayPanel.load().tasks;
   const completed = tasks.filter(t => t.completed).length;
   const total = tasks.length;
-  const text = total === 0 ? '添加任务开始有意义的一天' : `${completed}/${total} 完成`;
+  const text = total === 0 ? '今日还没有任务' : `${completed}/${total} 完成`;
 
   const el = document.getElementById('mdCompletionText');
   if (el) el.textContent = text;
