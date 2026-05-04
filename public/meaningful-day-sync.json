@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-05-04T11:12:09.442Z",
+  "generatedAt": "2026-05-04T11:17:15.276Z",
   "date": "2026-05-04",
   "role": "💼 创业者",
   "tasks": [
@@ -16,14 +16,14 @@
       "id": "sync_task_11",
       "text": "05/10 等样品确认后上架",
       "purpose": "完成产品上架",
-      "tool": "思考快与慢",
+      "tool": "精益创业画布",
       "project": "adult-shop",
       "completed": false
     },
     {
       "id": "sync_task_21",
       "text": "05/10 工厂确认后代发对接",
-      "purpose": "建立稳定供应链",
+      "purpose": "建立代发渠道",
       "tool": "精益创业画布",
       "project": "adult-shop",
       "completed": false
