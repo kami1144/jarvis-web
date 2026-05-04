@@ -2427,7 +2427,7 @@ const MeaningfulDayPanel = {
       completed: false
     });
     this.save(data);
-    return data.tasks[data.tasks.length - 1];
+    return data;  // 返回完整 data（不是单个task）
   },
 
   // 推断 purpose（基于关键词）
