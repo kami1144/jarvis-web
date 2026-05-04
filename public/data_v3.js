@@ -1366,7 +1366,6 @@ window.TaskTracker = TaskTracker;
 window.HistoryTracker = HistoryTracker;
 window.EnvironmentTracker = EnvironmentTracker;
 window.AIEvaluator = AIEvaluator;
-window.NotificationService = NotificationService;
 
 // ==========================================
 // 每日指挥官数据
