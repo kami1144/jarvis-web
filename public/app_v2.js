@@ -1410,6 +1410,11 @@ function openToolKit() {
 // ==========================================
 
 function initMeaningfulDay() {
+  if (typeof MeaningfulDayPanel === 'undefined') {
+    console.warn('⚠️ MeaningfulDayPanel not loaded yet, retrying...');
+    setTimeout(initMeaningfulDay, 200);
+    return;
+  }
   const data = MeaningfulDayPanel.load();
 
   // 设置角色按钮状态
@@ -1428,6 +1433,10 @@ function initMeaningfulDay() {
 }
 
 function MD_setRole(role) {
+  if (typeof MeaningfulDayPanel === 'undefined') {
+    showNotification('⚠️ 系统加载中，请稍后...', 'warning');
+    return;
+  }
   MeaningfulDayPanel.setRole(role);
 
   document.querySelectorAll('.md-role-btn').forEach(btn => {
@@ -1493,6 +1502,10 @@ function renderMDToolRecommendations(role) {
 }
 
 function MD_showAddTaskModal() {
+  if (typeof MeaningfulDayPanel === 'undefined') {
+    showNotification('⚠️ 系统加载中，请稍后...', 'warning');
+    return;
+  }
   // 优先使用 mdTaskTextInput（弹窗模式），否则用 mdNewTaskInput（内联模式）
   const textInput = document.getElementById('mdTaskTextInput');
   const purposeInput = document.getElementById('mdPurposeInput');
@@ -1528,6 +1541,10 @@ function MD_showAddTaskModal() {
 }
 
 function MD_confirmAddTask() {
+  if (typeof MeaningfulDayPanel === 'undefined') {
+    showNotification('⚠️ 系统加载中', 'warning');
+    return;
+  }
   const text = document.getElementById('mdTaskTextInput').value.trim();
   const purpose = document.getElementById('mdPurposeInput').value.trim();
   const tool = document.getElementById('mdToolSelect').value;
@@ -1551,12 +1568,14 @@ function MD_confirmAddTask() {
 }
 
 function MD_toggleTask(taskId) {
+  if (typeof MeaningfulDayPanel === 'undefined') return;
   const data = MeaningfulDayPanel.toggleComplete(taskId);
   renderMDTasks(data.tasks);
   updateMDCompletion(data.tasks);
 }
 
 function MD_deleteTask(taskId) {
+  if (typeof MeaningfulDayPanel === 'undefined') return;
   if (confirm('确定删除这个任务？')) {
     const data = MeaningfulDayPanel.removeTask(taskId);
     renderMDTasks(data.tasks);
