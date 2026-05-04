@@ -1366,7 +1366,6 @@ window.TaskTracker = TaskTracker;
 window.HistoryTracker = HistoryTracker;
 window.EnvironmentTracker = EnvironmentTracker;
 window.AIEvaluator = AIEvaluator;
-window.NotificationService = NotificationService;
 
 // ==========================================
 // 每日指挥官数据
@@ -1498,6 +1497,9 @@ const NotificationService = {
     }
   }
 };
+
+// 导出到全局
+window.NotificationService = NotificationService;
 
 const DailyCommander = {
   STORAGE_KEY: 'jarvis_daily_commander',
