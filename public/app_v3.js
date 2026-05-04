@@ -1607,6 +1607,49 @@ function updateMDCompletion(tasks) {
   if (el) el.textContent = text;
 }
 
+// 同步到早报：将今日任务复制为飞书推送格式
+function MD_syncToBrief() {
+  const data = MeaningfulDayPanel.load();
+  if (!data.tasks || data.tasks.length === 0) {
+    showNotification('📋 先添加任务再同步', 'warning');
+    return;
+  }
+
+  // 生成飞书格式文本
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
+  const tasksText = data.tasks.map(t => {
+    const checkbox = t.completed ? '✅' : '⬜';
+    const purpose = t.purpose ? `\n      🎯 意义：${t.purpose}` : '';
+    const tool = t.tool ? `\n      🧰 工具：${t.tool}` : '';
+    return `${checkbox} ${t.text}${purpose}${tool}`;
+  }).join('\n\n');
+
+  const brief = `📋 **有意义的一天 — ${dateStr}**
+
+🎭 **今日角色：** ${data.role}
+
+📅 **今日任务：**
+${tasksText}
+
+---
+💡 提示：回复「调整」可修改任务`;
+
+  // 复制到剪贴板
+  navigator.clipboard.writeText(brief).then(() => {
+    showNotification('📋 已复制到剪贴板，粘贴到飞书发送', 'success');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = brief;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showNotification('📋 已复制到剪贴板，粘贴到飞书发送', 'success');
+  });
+}
+
 // 渲染工具卡片
 function renderToolGrid(category) {
   const grid = document.getElementById('toolGrid');
