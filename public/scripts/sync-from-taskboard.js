@@ -10,6 +10,185 @@ const path = require('path');
 
 const TASK_BOARD_PATH = '/Users/jinyonghao/.shared/task-board.json';
 const OUTPUT_PATH = path.join(__dirname, '../jARVIS-sync.json');
+const MEANINGFUL_DAY_OUTPUT = path.join(__dirname, '../meaningful-day-sync.json');
+
+// 解析日期（支持 5/4, 05/04, 5月4日 等格式）
+function parseDate(dateStr) {
+  if (!dateStr) return null;
+  const currentYear = new Date().getFullYear();
+
+  // 匹配 M/D 或 MM/DD 格式
+  let match = dateStr.match(/(\d{1,2})\/(\d{1,2})/);
+  if (match) {
+    return new Date(currentYear, parseInt(match[1]) - 1, parseInt(match[2]));
+  }
+
+  // 匹配 M月D日 格式
+  match = dateStr.match(/(\d{1,2})月(\d{1,2})日/);
+  if (match) {
+    return new Date(currentYear, parseInt(match[1]) - 1, parseInt(match[2]));
+  }
+
+  return null;
+}
+
+// 判断任务是否应该纳入今日任务
+function isTodayOrRecent(nextStep, daysWindow = 7) {
+  if (!nextStep) return false;
+
+  const taskDate = parseDate(nextStep);
+  if (!taskDate) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.floor((taskDate - today) / (1000 * 60 * 60 * 24));
+  return diffDays >= 0 && diffDays <= daysWindow;
+}
+
+// 从任务推断 purpose
+function inferPurpose(taskName, nextStep) {
+  const text = (taskName + ' ' + nextStep).toLowerCase();
+
+  if (text.includes('工厂') || text.includes('1688') || text.includes('供应链')) {
+    return '建立稳定供应链';
+  }
+  if (text.includes('品牌') || text.includes('域名') || text.includes('domain')) {
+    return '确定品牌身份';
+  }
+  if (text.includes('内容') || text.includes('小红书') || text.includes('发布')) {
+    return '获取流量';
+  }
+  if (text.includes('支付') || text.includes('paypal') || text.includes('付款')) {
+    return '支持跨境支付';
+  }
+  if (text.includes('产品') || text.includes('上架') || text.includes('listing')) {
+    return '完成产品上架';
+  }
+  if (text.includes('代发') || text.includes('dropship')) {
+    return '建立代发渠道';
+  }
+  if (text.includes('隐私') || text.includes('包装')) {
+    return '保护客户隐私';
+  }
+  if (text.includes('服务器') || text.includes('server') || text.includes('hosting')) {
+    return '保障服务稳定';
+  }
+  if (text.includes('技术') || text.includes('tech') || text.includes('网站')) {
+    return '技术实现';
+  }
+  if (text.includes('养号') || text.includes('运营')) {
+    return '账号运营';
+  }
+  if (text.includes('排版') || text.includes('JSON')) {
+    return '产品优化';
+  }
+
+  return '推进目标，建立事业';
+}
+
+// 推断工具
+function inferTool(taskName, nextStep) {
+  const text = (taskName + ' ' + nextStep).toLowerCase();
+
+  if (text.includes('工厂') || text.includes('1688') || text.includes('供应链')) {
+    return '精益创业画布';
+  }
+  if (text.includes('品牌') || text.includes('域名')) {
+    return '精益创业画布';
+  }
+  if (text.includes('内容') || text.includes('小红书') || text.includes('发布')) {
+    return '影响力六原则';
+  }
+  if (text.includes('技术') || text.includes('排版') || text.includes('JSON')) {
+    return '六顶思考帽';
+  }
+  if (text.includes('运营') || text.includes('养号')) {
+    return '每日快速复盘';
+  }
+
+  return '思考快与慢';
+}
+
+// 生成有意义的一天同步数据
+function syncMeaningfulDay(taskBoard) {
+  const today = new Date().toISOString().split('T')[0];
+  const todayStr = new Date().toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' });
+
+  // 获取默认角色（从 adult-shop 的当前阶段）
+  let defaultRole = '💼 创业者';
+
+  // 收集今���任务
+  const tasks = [];
+
+  // 处理 adult-shop
+  if (taskBoard['adult-shop']) {
+    const sub = taskBoard['adult-shop']._subtasks || {};
+    const adultShop = taskBoard['adult-shop'];
+
+    // 获取 role（如果有 meaningful_day 字段）
+    if (adultShop.meaningful_day?.role) {
+      defaultRole = adultShop.meaningful_day.role;
+    }
+
+    for (const [taskName, task] of Object.entries(sub)) {
+      const nextStep = task['下一步'];
+
+      if (isTodayOrRecent(nextStep)) {
+        // 如果 task 有 meaningful_day 数据，用它；否则自动推断
+        const taskMd = task.meaningful_day || {};
+
+        tasks.push({
+          id: 'sync_task_' + tasks.length + 1,
+          text: nextStep || taskName,
+          purpose: taskMd.purpose || inferPurpose(taskName, nextStep),
+          tool: taskMd.tool || inferTool(taskName, nextStep),
+          project: 'adult-shop',
+          completed: false
+        });
+      }
+    }
+  }
+
+  // 处理 MangaStudio
+  if (taskBoard['MangaStudio']) {
+    const sub = taskBoard['MangaStudio']._subtasks || {};
+
+    for (const [taskName, task] of Object.entries(sub)) {
+      const nextStep = task['下一步'];
+
+      if (isTodayOrRecent(nextStep)) {
+        const taskMd = task.meaningful_day || {};
+
+        tasks.push({
+          id: 'sync_task_' + tasks.length + 1,
+          text: nextStep || taskName,
+          purpose: taskMd.purpose || inferPurpose(taskName, nextStep),
+          tool: taskMd.tool || inferTool(taskName, nextStep),
+          project: 'MangaStudio',
+          completed: false
+        });
+      }
+    }
+  }
+
+  // 生成同步数据
+  const syncData = {
+    version: '1.0',
+    generatedAt: new Date().toISOString(),
+    date: today,
+    role: defaultRole,
+    tasks: tasks.slice(0, 3)  // 最多3个任务
+  };
+
+  // 写入文件
+  fs.writeFileSync(MEANINGFUL_DAY_OUTPUT, JSON.stringify(syncData, null, 2), 'utf8');
+  console.log(`\n📥 有意义的一天同步: ${MEANINGFUL_DAY_OUTPUT}`);
+  console.log(`   - 角色: ${defaultRole}`);
+  console.log(`   - 任务数: ${tasks.length}`);
+
+  return syncData;
+}
 
 function sync() {
   // 1. 读取 task-board.json
@@ -167,6 +346,9 @@ function sync() {
   console.log(`   - 项目数: ${projects.length}`);
   console.log(`   - 进行中: ${syncData.summary.activeProjects}`);
   console.log(`   - 阻塞: ${syncData.summary.blockedProjects}`);
+
+  // 5. 生成有意义的一天同步数据
+  syncMeaningfulDay(taskBoard);
 }
 
 sync();

@@ -2526,6 +2526,43 @@ const MeaningfulDayPanel = {
   getTodayThemes(data) {
     const purposes = data.tasks.map(t => t.purpose).filter(Boolean);
     return [...new Set(purposes)];
+  },
+
+  // 从远程 JSON 同步（当 localStorage 为空或远程更新时）
+  async syncFromRemote() {
+    try {
+      const res = await fetch('/meaningful-day-sync.json?t=' + Date.now());
+      if (!res.ok) return null;
+
+      const remote = await res.json();
+      const local = this.load();
+      const today = new Date().toISOString().split('T')[0];
+
+      // 如果远程是今天的新数据且比本地新，同步到 localStorage
+      if (remote.date === today && remote.generatedAt !== local.generatedAt) {
+        // 合并：远程的 tasks + 本地的 completed 状态
+        const mergedTasks = remote.tasks.map(rt => {
+          const existing = local.tasks.find(t => t.text === rt.text);
+          return {
+            ...rt,
+            completed: existing ? existing.completed : false
+          };
+        });
+
+        const merged = {
+          ...local,
+          date: today,
+          role: remote.role || local.role,
+          tasks: mergedTasks,
+          generatedAt: remote.generatedAt
+        };
+        this.save(merged);
+        return { synced: true, count: mergedTasks.length };
+      }
+    } catch (e) {
+      console.warn('同步失败:', e);
+    }
+    return null;
   }
 };
 

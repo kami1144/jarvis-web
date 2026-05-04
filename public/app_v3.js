@@ -16,6 +16,15 @@ function initApp() {
   startRealtimeUpdates();
   bindEvents();
   initMeaningfulDay(); // 初始化今日意义面板
+
+  // 尝试从远程同步有意义的一天数据
+  MeaningfulDayPanel.syncFromRemote().then(result => {
+    if (result?.synced) {
+      console.log(`📥 已同步 ${result.count} 个任务到有意义的一天`);
+      renderMeaningfulDay(); // 刷新显示
+    }
+  });
+
   console.log('🎮 J.A.R.V.I.S. v3 初始化完成 - 手动输入 + Obsidian联动');
 }
 

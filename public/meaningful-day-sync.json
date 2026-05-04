@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-05-04T11:12:09.442Z",
+  "date": "2026-05-04",
+  "role": "💼 创业者",
+  "tasks": [
+    {
+      "id": "sync_task_01",
+      "text": "05/07 配置",
+      "purpose": "支持跨境支付",
+      "tool": "思考快与慢",
+      "project": "adult-shop",
+      "completed": false
+    },
+    {
+      "id": "sync_task_11",
+      "text": "05/10 等样品确认后上架",
+      "purpose": "完成产品上架",
+      "tool": "思考快与慢",
+      "project": "adult-shop",
+      "completed": false
+    },
+    {
+      "id": "sync_task_21",
+      "text": "05/10 工厂确认后代发对接",
+      "purpose": "建立稳定供应链",
+      "tool": "精益创业画布",
+      "project": "adult-shop",
+      "completed": false
+    }
+  ]
+}
