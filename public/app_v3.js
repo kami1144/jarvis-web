@@ -1414,7 +1414,7 @@ function initMeaningfulDay() {
 
   // 设置角色按钮状态
   document.querySelectorAll('.md-role-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.role === data.currentRole);
+    btn.classList.toggle('active', btn.dataset.role === data.role);
   });
 
   // 渲染今日意义总结
@@ -1424,7 +1424,7 @@ function initMeaningfulDay() {
   renderMDTasks(data.tasks);
 
   // 渲染工具推荐
-  renderMDToolRecommendations(data.currentRole);
+  renderMDToolRecommendations(data.role);
 
   // 更新完成度
   updateMDCompletion(data.tasks);
@@ -1461,9 +1461,7 @@ function renderMDTasks(tasks) {
   container.innerHTML = sortedTasks.map(task => `
     <div class="md-task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
       <div class="md-task-header">
-        <div class="md-task-time-badge">
-          ${task.timeSlot ? `<span class="md-time">⏰ ${task.timeSlot}</span>` : '<span class="md-time-empty">📋 待安排</span>'}
-        </div>
+        <div class="md-task-role-badge">${task.role || '💼 创业者'}</div>
         ${task.tool ? `<span class="md-task-tool-badge">🛠️ ${task.tool}</span>` : ''}
         ${task.completed ? '<span class="md-task-done-badge">✅ 完成</span>' : ''}
       </div>
@@ -1499,7 +1497,7 @@ function renderMDDaySummary(tasks) {
 
   const summaryHTML = `
     <div class="md-summary-header">
-      <span class="md-summary-role">${data.currentRole}</span>
+      <span class="md-summary-role">${data.role}</span>
       <span class="md-summary-date">${new Date().toLocaleDateString('zh-CN', {month:'long', day:'numeric', weekday:'long'})}</span>
     </div>
     ${uniquePurposes.length > 0 ? `
@@ -1547,13 +1545,16 @@ function renderMDToolRecommendations(role) {
 function MD_showAddTaskModal() {
   // 根据当前角色填充推荐工具
   const data = MeaningfulDayPanel.load();
-  renderMDToolRecommendations(data.currentRole);
+  renderMDToolRecommendations(data.role);
+
+  // 设置角色下拉框默认值为今日角色
+  const roleSelect = document.getElementById('mdRoleSelect');
+  if (roleSelect) roleSelect.value = data.role;
 
   // 清空输入
   document.getElementById('mdTaskTextInput').value = '';
   document.getElementById('mdPurposeInput').value = '';
   document.getElementById('mdToolSelect').value = '';
-  document.getElementById('mdTimeSlotInput').value = '';
 
   openModal('mdAddTaskModal');
 }
@@ -1562,7 +1563,7 @@ function MD_confirmAddTask() {
   const text = document.getElementById('mdTaskTextInput').value.trim();
   const purpose = document.getElementById('mdPurposeInput').value.trim();
   const tool = document.getElementById('mdToolSelect').value;
-  const timeSlot = document.getElementById('mdTimeSlotInput').value.trim();
+  const role = document.getElementById('mdRoleSelect').value;
 
   if (!text) {
     showNotification('请输入任务内容', 'warning');
@@ -1573,7 +1574,7 @@ function MD_confirmAddTask() {
   const finalPurpose = purpose || MeaningfulDayPanel._inferPurpose(text);
   document.getElementById('mdPurposeInput').value = finalPurpose;
 
-  const data = MeaningfulDayPanel.addTask(text, finalPurpose, tool || null, timeSlot || null);
+  const data = MeaningfulDayPanel.addTask(text, finalPurpose, tool || null, role);
 
   closeModal('mdAddTaskModal');
   renderMDTasks(data.tasks);
