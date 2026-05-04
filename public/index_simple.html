@@ -18,6 +18,7 @@
       --accent-dim: #5a4acc;
       --success: #4ade80;
       --warning: #fbbf24;
+      --danger: #f87171;
     }
     
     body {
@@ -31,348 +32,229 @@
       padding: 20px;
     }
     
-    /* === 通用容器 === */
-    .container {
-      width: 100%;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-    
-    /* === 隐藏状态 === */
+    /* === 通用 === */
+    .container { width: 100%; max-width: 520px; margin: 0 auto; }
     .hidden { display: none !important; }
     
     /* === Logo === */
-    .logo {
-      text-align: center;
-      margin: 40px 0 30px;
-    }
-    .logo h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 2px;
-    }
-    .logo p {
-      color: var(--text-dim);
-      font-size: 0.85rem;
-      margin-top: 4px;
-    }
+    .logo { text-align: center; margin: 30px 0 24px; }
+    .logo h1 { font-size: 1.7rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
+    .logo p { color: var(--text-dim); font-size: 0.82rem; margin-top: 4px; }
     
-    /* === 欢迎语 === */
-    .welcome {
-      text-align: center;
-      padding: 60px 20px;
+    /* === 通用按钮 === */
+    .back-btn {
+      background: none; border: none; color: var(--text-dim);
+      cursor: pointer; font-size: 0.85rem; margin-bottom: 14px;
+      padding: 6px 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;
     }
-    .welcome h2 {
-      font-size: 1.6rem;
-      margin-bottom: 12px;
-    }
-    .welcome p {
-      color: var(--text-dim);
-      line-height: 1.6;
-      margin-bottom: 30px;
-    }
+    .back-btn:hover { background: var(--card); }
+    
+    /* === 欢迎页 === */
+    .welcome { text-align: center; padding: 50px 20px; }
+    .welcome h2 { font-size: 1.5rem; margin-bottom: 10px; }
+    .welcome p { color: var(--text-dim); line-height: 1.6; margin-bottom: 28px; font-size: 0.95rem; }
     .welcome-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 14px 40px;
-      border-radius: 12px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.2s;
+      background: var(--accent); color: #fff; border: none;
+      padding: 14px 36px; border-radius: 12px; font-size: 1rem;
+      cursor: pointer; transition: background 0.2s; font-weight: 600;
     }
     .welcome-btn:hover { background: var(--accent-dim); }
     
     /* === 角色选择 === */
-    .role-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 20px;
-    }
+    .section-title { text-align: center; font-size: 1rem; color: var(--text-dim); margin-bottom: 14px; }
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .role-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 14px; text-align: center;
+      cursor: pointer; transition: all 0.2s;
     }
-    .role-card:hover {
-      border-color: var(--accent);
-      background: var(--card-hover);
-    }
-    .role-card .icon { font-size: 2rem; margin-bottom: 8px; }
-    .role-card .name { font-weight: 600; font-size: 1rem; }
-    .role-card .desc { color: var(--text-dim); font-size: 0.75rem; margin-top: 4px; }
+    .role-card:hover { border-color: var(--accent); background: var(--card-hover); }
+    .role-card .icon { font-size: 1.9rem; margin-bottom: 6px; }
+    .role-card .name { font-weight: 600; font-size: 0.95rem; }
+    .role-card .desc { color: var(--text-dim); font-size: 0.72rem; margin-top: 3px; }
     
-    .section-title {
-      text-align: center;
-      font-size: 1.1rem;
-      color: var(--text-dim);
-      margin-bottom: 16px;
-    }
-    .back-btn {
-      background: none;
-      border: none;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-size: 0.85rem;
-      margin-bottom: 16px;
-      padding: 6px 12px;
-      border-radius: 8px;
-    }
-    .back-btn:hover { background: var(--card); }
-    
-    /* === 对话区域 === */
-    .chat-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-      max-height: 340px;
-      overflow-y: auto;
-    }
-    .chat-msg {
-      margin-bottom: 14px;
-      animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
-    .chat-msg.ai .bubble {
-      background: var(--card-hover);
-      border-radius: 14px 14px 14px 4px;
-      padding: 12px 16px;
-      max-width: 90%;
-      display: inline-block;
-      line-height: 1.5;
-      font-size: 0.95rem;
-    }
-    .chat-msg.user .bubble {
-      background: var(--accent);
-      color: #fff;
-      border-radius: 14px 14px 4px 14px;
-      padding: 10px 14px;
-      max-width: 85%;
-      margin-left: auto;
-      display: block;
-      font-size: 0.95rem;
-    }
-    .chat-msg .role-tag {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      margin-bottom: 4px;
-    }
-    
-    /* === 输入区域 === */
-    .input-area {
-      display: flex;
-      gap: 8px;
-    }
+    .custom-role { margin-top: 18px; }
+    .input-area { display: flex; gap: 8px; }
     .input-area input {
-      flex: 1;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: var(--text);
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
+      flex: 1; background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 14px; color: var(--text);
+      font-size: 0.92rem; outline: none; transition: border-color 0.2s;
     }
     .input-area input:focus { border-color: var(--accent); }
     .input-area input::placeholder { color: var(--text-dim); }
     .send-btn {
-      background: var(--accent);
-      border: none;
-      border-radius: 12px;
-      width: 48px;
-      color: #fff;
-      font-size: 1.2rem;
-      cursor: pointer;
+      background: var(--accent); border: none; border-radius: 10px;
+      width: 46px; color: #fff; font-size: 1.1rem; cursor: pointer;
       transition: background 0.2s;
     }
     .send-btn:hover { background: var(--accent-dim); }
     .send-btn:disabled { background: var(--border); cursor: not-allowed; }
     
-    /* === 工具推荐 === */
-    .tool-suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
+    /* === 对话 === */
+    .quota-banner {
+      background: linear-gradient(135deg, var(--accent-dim), #4a3080);
+      border-radius: 10px; padding: 10px 14px; text-align: center;
+      font-size: 0.8rem; color: #e0d0ff; margin-bottom: 12px;
     }
+    .quota-banner strong { color: #fff; }
+    
+    .chat-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; margin-bottom: 12px;
+      max-height: 340px; overflow-y: auto;
+    }
+    .chat-msg { margin-bottom: 12px; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
+    .chat-msg.ai .bubble {
+      background: var(--card-hover); border-radius: 12px 12px 12px 3px;
+      padding: 10px 14px; max-width: 88%; display: inline-block;
+      line-height: 1.55; font-size: 0.93rem;
+    }
+    .chat-msg.user .bubble {
+      background: var(--accent); color: #fff;
+      border-radius: 12px 12px 3px 12px;
+      padding: 9px 13px; max-width: 82%; margin-left: auto; display: block;
+      font-size: 0.93rem;
+    }
+    .chat-msg .role-tag { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 3px; }
+    
+    .tool-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .tool-chip {
-      background: var(--card-hover);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 0.78rem;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: var(--card-hover); border: 1px solid var(--border);
+      border-radius: 20px; padding: 5px 11px; font-size: 0.76rem;
+      cursor: pointer; transition: all 0.2s;
     }
     .tool-chip:hover { border-color: var(--accent); background: var(--card); }
     .tool-chip.selected { border-color: var(--accent); background: var(--accent-dim); color: #fff; }
     
-    /* === 今日概览 === */
-    .overview-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .overview-date {
-      color: var(--text-dim);
-      font-size: 0.85rem;
-    }
-    .overview-progress {
-      font-size: 0.85rem;
-      color: var(--success);
-    }
-    .overview-role {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-    }
-    
-    .task-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .task-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .task-item.completed { opacity: 0.6; }
-    .task-item.completed .task-name { text-decoration: line-through; }
-    .task-checkbox {
-      width: 22px;
-      height: 22px;
-      border: 2px solid var(--border);
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 2px;
-      transition: all 0.2s;
-    }
-    .task-checkbox.checked {
-      background: var(--success);
-      border-color: var(--success);
-      color: #000;
-      font-size: 0.85rem;
-    }
-    .task-content { flex: 1; }
-    .task-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
-    .task-meaning { color: var(--warning); font-size: 0.8rem; }
-    .task-meaning::before { content: '💡 '; }
-    .task-tool { color: var(--accent); font-size: 0.78rem; margin-top: 4px; }
-    .task-tool::before { content: '🛠️ '; }
-    .task-delete {
-      background: none;
-      border: none;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 4px;
-    }
-    .task-delete:hover { color: #f87171; }
-    
-    /* === 底部按钮 === */
-    .action-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .btn-primary {
-      flex: 1;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover { background: var(--accent-dim); }
-    .btn-secondary {
-      flex: 1;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-secondary:hover { border-color: var(--accent); }
-    
-    /* === Quota Banner === */
-    .quota-banner {
-      background: linear-gradient(135deg, var(--accent-dim), #4a3080);
-      border-radius: 12px;
-      padding: 12px 16px;
-      text-align: center;
-      font-size: 0.82rem;
-      color: #e0d0ff;
-      margin-bottom: 16px;
-    }
-    .quota-banner strong { color: #fff; }
-    
     /* === Loading === */
-    .loading-dots {
-      display: inline-flex;
-      gap: 4px;
-      margin-left: 8px;
-    }
+    .loading-dots { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; }
     .loading-dots span {
-      width: 6px;
-      height: 6px;
-      background: var(--text-dim);
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out;
+      width: 5px; height: 5px; background: var(--text-dim);
+      border-radius: 50%; animation: bounce 1.2s infinite ease-in-out;
     }
     .loading-dots span:nth-child(1) { animation-delay: 0s; }
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; }
       40% { transform: scale(1); opacity: 1; }
     }
     
-    /* === 空状态 === */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-dim);
+    /* === 专家建议 === */
+    .expert-panel {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; margin-bottom: 14px;
+      border-left: 3px solid var(--accent);
     }
-    .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .expert-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .expert-title { font-size: 0.85rem; font-weight: 600; color: var(--accent); }
+    .expert-refresh {
+      background: none; border: none; color: var(--text-dim);
+      font-size: 0.78rem; cursor: pointer; padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .expert-refresh:hover { background: var(--card-hover); }
+    .expert-refresh.loading { opacity: 0.5; }
     
-    /* === 完成总结 === */
+    .expert-content { font-size: 0.88rem; line-height: 1.65; color: var(--text); }
+    .expert-content .task-item-advice {
+      background: var(--card-hover); border-radius: 8px; padding: 10px 12px;
+      margin-bottom: 8px; border-left: 2px solid var(--success);
+    }
+    .expert-content .task-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 3px; }
+    .expert-content .task-reason { color: var(--text-dim); font-size: 0.8rem; }
+    .expert-loading { color: var(--text-dim); font-size: 0.85rem; text-align: center; padding: 10px 0; }
+    
+    /* === 今日概览 === */
+    .overview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .overview-role { font-size: 1.1rem; font-weight: 600; }
+    .overview-progress { font-size: 0.85rem; color: var(--success); }
+    .overview-date { color: var(--text-dim); font-size: 0.82rem; margin-bottom: 14px; }
+    
+    /* === 任务列表 === */
+    .task-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .task-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 13px;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .task-item.completed { opacity: 0.55; }
+    .task-item.completed .task-name { text-decoration: line-through; color: var(--text-dim); }
+    .task-item.ai-suggested { border-left: 3px solid var(--accent); }
+    .task-checkbox {
+      width: 20px; height: 20px; border: 2px solid var(--border);
+      border-radius: 5px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+      transition: all 0.2s; font-size: 0.78rem;
+    }
+    .task-checkbox.checked { background: var(--success); border-color: var(--success); color: #000; }
+    .task-content { flex: 1; }
+    .task-name { font-weight: 600; font-size: 0.93rem; margin-bottom: 3px; }
+    .task-meaning { color: var(--warning); font-size: 0.78rem; }
+    .task-meaning::before { content: '💡 '; }
+    .task-tool { color: var(--accent); font-size: 0.75rem; margin-top: 3px; }
+    .task-tool::before { content: '🛠️ '; }
+    .task-source { font-size: 0.68rem; color: var(--text-dim); margin-top: 2px; }
+    .task-source::before { content: '🤖 '; }
+    .task-delete { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.95rem; padding: 3px; }
+    .task-delete:hover { color: var(--danger); }
+    
+    /* === 底部按钮 === */
+    .action-row { display: flex; gap: 10px; margin-top: 14px; }
+    .btn-primary {
+      flex: 1; background: var(--accent); color: #fff; border: none;
+      border-radius: 12px; padding: 13px; font-size: 0.93rem;
+      cursor: pointer; transition: background 0.2s; font-weight: 600;
+    }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-primary:disabled { background: var(--border); cursor: not-allowed; }
+    .btn-secondary {
+      flex: 1; background: var(--card); color: var(--text);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 13px; font-size: 0.93rem; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .btn-expert {
+      background: linear-gradient(135deg, var(--accent-dim), #3a2070);
+      color: #e0d0ff; border: none;
+      border-radius: 12px; padding: 13px; font-size: 0.93rem;
+      cursor: pointer; transition: all 0.2s; flex: 1;
+    }
+    .btn-expert:hover { opacity: 0.9; }
+    .btn-expert:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    /* === 空状态 / 完成状态 === */
+    .empty-state { text-align: center; padding: 36px 20px; color: var(--text-dim); }
+    .empty-state .icon { font-size: 2.4rem; margin-bottom: 10px; }
+    .empty-state p { font-size: 0.88rem; line-height: 1.5; }
     .summary-card {
       background: linear-gradient(135deg, #1a2a1a, #0f1f0f);
-      border: 1px solid #2a4a2a;
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      margin-bottom: 16px;
+      border: 1px solid #2a4a2a; border-radius: 14px;
+      padding: 18px; text-align: center; margin-bottom: 14px;
     }
-    .summary-card .emoji { font-size: 2.5rem; margin-bottom: 8px; }
-    .summary-card h3 { color: var(--success); margin-bottom: 6px; }
-    .summary-card p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+    .summary-card .emoji { font-size: 2.2rem; margin-bottom: 6px; }
+    .summary-card h3 { color: var(--success); margin-bottom: 5px; font-size: 1rem; }
+    .summary-card p { color: var(--text-dim); font-size: 0.82rem; line-height: 1.5; }
+    
+    .reset-link { text-align: center; margin-top: 18px; }
+    .reset-link button {
+      background: none; border: none; color: var(--text-dim);
+      font-size: 0.8rem; cursor: pointer; padding: 6px 12px;
+      border-radius: 6px;
+    }
+    .reset-link button:hover { background: var(--card); }
+    
+    /* === API Key 提示 === */
+    .api-key-notice {
+      background: rgba(255,152,0,0.08); border: 1px solid rgba(255,152,0,0.2);
+      border-radius: 8px; padding: 8px 12px; font-size: 0.75rem;
+      color: #FF9800; margin-bottom: 10px; text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -382,56 +264,43 @@
   <!-- Logo -->
   <div class="logo">
     <h1>⚔️ J.A.R.V.I.S.</h1>
-    <p>有意义的一天</p>
+    <p>有意义的一天 · Phase 2</p>
   </div>
 
   <!-- === 状态1: 欢迎页 === -->
-  <div id="view-welcome">
+  <div id="view-welcome" class="hidden">
     <div class="welcome">
       <h2>今天，你是谁？</h2>
-      <p>不是时间管理，是意义管理。<br>选一个角色，开始有意义的一天。</p>
+      <p>不是时间管理，是意义管理。<br>选一个角色，AI 给你安排有意义的一天。</p>
       <button class="welcome-btn" onclick="showRoleSelect()">开始 →</button>
     </div>
   </div>
 
   <!-- === 状态2: 角色选择 === -->
   <div id="view-role" class="hidden">
-    <button class="back-btn" onclick="showWelcome()">← 返回</button>
+    <button class="back-btn" onclick="showWelcome()">←</button>
     <p class="section-title">今天你主要在扮演什么角色？</p>
     <div class="role-grid">
       <div class="role-card" onclick="selectRole('父亲', '为家人创造安全感和未来')">
-        <div class="icon">👨👧</div>
-        <div class="name">父亲</div>
-        <div class="desc">为家人创造安全感和未来</div>
+        <div class="icon">👨👧</div><div class="name">父亲</div><div class="desc">为家人创造安全感和未来</div>
       </div>
       <div class="role-card" onclick="selectRole('创业者', '打造第一个收入来源')">
-        <div class="icon">💼</div>
-        <div class="name">创业者</div>
-        <div class="desc">打造第一个收入来源</div>
+        <div class="icon">💼</div><div class="name">创业者</div><div class="desc">打造第一个收入来源</div>
       </div>
       <div class="role-card" onclick="selectRole('开发者', '用代码创造价值')">
-        <div class="icon">💻</div>
-        <div class="name">开发者</div>
-        <div class="desc">用代码创造价值</div>
+        <div class="icon">💻</div><div class="name">开发者</div><div class="desc">用代码创造价值</div>
       </div>
       <div class="role-card" onclick="selectRole('休息者', '真正地恢复能量')">
-        <div class="icon">🧘</div>
-        <div class="name">休息者</div>
-        <div class="desc">真正地恢复能量</div>
+        <div class="icon">🧘</div><div class="name">休息者</div><div class="desc">真正地恢复能量</div>
       </div>
       <div class="role-card" onclick="selectRole('学习者', '今天又理解了一件事')">
-        <div class="icon">📚</div>
-        <div class="name">学习者</div>
-        <div class="desc">今天又理解了一件事</div>
+        <div class="icon">📚</div><div class="name">学习者</div><div class="desc">今天又理解了一件事</div>
       </div>
       <div class="role-card" onclick="selectRole('朋友', '珍惜身边的人')">
-        <div class="icon">🤝</div>
-        <div class="name">朋友</div>
-        <div class="desc">珍惜身边的人</div>
+        <div class="icon">🤝</div><div class="name">朋友</div><div class="desc">珍惜身边的人</div>
       </div>
     </div>
-    
-    <div style="margin-top: 20px;">
+    <div class="custom-role">
       <p class="section-title">或者，描述你自己的角色：</p>
       <div class="input-area">
         <input type="text" id="custom-role-input" placeholder="例如：产品经理、丈夫..." onkeypress="if(event.key==='Enter')submitCustomRole()">
@@ -440,62 +309,71 @@
     </div>
   </div>
 
-  <!-- === 状态3: 对话 + 添加任务 === -->
+  <!-- === 状态3: 对话添加任务 === -->
   <div id="view-chat" class="hidden">
     <button class="back-btn" onclick="showOverview()">← 返回概览</button>
-    
     <div id="quota-banner" class="quota-banner hidden">
-      今日剩余：<strong id="quota-count">3</strong> 次 AI 对话（每天免费 3 次）
+      今日剩余：<strong id="quota-count">3</strong> 次对话
     </div>
-    
-    <div class="chat-box" id="chat-box">
-      <!-- 动态生成 -->
-    </div>
-    
+    <div class="chat-box" id="chat-box"></div>
     <div class="input-area">
       <input type="text" id="chat-input" placeholder="输入你的回答..." onkeypress="if(event.key==='Enter')sendChat()">
       <button class="send-btn" id="send-btn" onclick="sendChat()">→</button>
     </div>
-    
-    <div class="tool-suggestions hidden" id="tool-suggestions">
-      <!-- 动态生成 -->
-    </div>
+    <div class="tool-suggestions hidden" id="tool-suggestions"></div>
   </div>
 
   <!-- === 状态4: 今日概览 === -->
   <div id="view-overview" class="hidden">
     <div class="overview-header">
       <div class="overview-role" id="overview-role">💼 创业者</div>
-      <div class="overview-progress" id="overview-progress">0/3 完成</div>
+      <div class="overview-progress" id="overview-progress"></div>
     </div>
     <div class="overview-date" id="overview-date">5月4日 星期一</div>
     
+    <!-- 专家建议区域 -->
+    <div id="expert-section">
+      <div class="expert-panel">
+        <div class="expert-header">
+          <span class="expert-title">🧙 专家建议</span>
+          <button class="expert-refresh" id="expert-refresh-btn" onclick="fetchExpertAdvice()">
+            🔄 获取今日建议
+          </button>
+        </div>
+        <div id="expert-content">
+          <div class="expert-loading">点击按钮，AI 根据你的情况给出今日建议</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 今日任务 -->
     <div id="quota-banner-ov" class="quota-banner hidden">
-      今日剩余：<strong id="quota-count-ov">3</strong> 次 AI 对话
+      今日剩余：<strong id="quota-count-ov">3</strong> 次对话
     </div>
     
-    <div class="task-list" id="task-list">
-      <!-- 动态生成 -->
-    </div>
-    
+    <div class="task-list" id="task-list"></div>
     <div id="empty-state" class="empty-state hidden">
       <div class="icon">✨</div>
-      <p>今天还没有任务<br>添加一个吧</p>
+      <p>今天还没有任务<br>点击「添加任务」或「获取专家建议」开始</p>
     </div>
-    
     <div id="all-done" class="summary-card hidden">
       <div class="emoji">🎉</div>
       <h3>太棒了！今天很有意义</h3>
-      <p id="summary-text">你完成了所有任务。<br>每件事都在定义你想成为的人。</p>
+      <p id="summary-text">你完成了所有任务。每件事都在定义你想成为的人。</p>
     </div>
     
+    <!-- 操作按钮 -->
     <div class="action-row">
+      <button class="btn-expert" id="expert-btn" onclick="fetchExpertAdvice()">🧙 专家建议</button>
       <button class="btn-primary" id="add-task-btn" onclick="startConversation()">+ 添加任务</button>
+    </div>
+    <div class="action-row">
       <button class="btn-secondary" id="sync-btn" onclick="syncToMorning()">📺 同步早报</button>
+      <button class="btn-secondary" id="reset-btn" onclick="resetDay()">🗑️ 重置</button>
     </div>
     
-    <div style="text-align:center; margin-top:20px;">
-      <button class="back-btn" onclick="resetDay()">🗑️ 重置今天</button>
+    <div class="reset-link">
+      <button onclick="resetDay()">🗑️ 清空今天，重新开始</button>
     </div>
   </div>
 
@@ -506,28 +384,67 @@
 // 常量
 // ============================================
 const MAX_DAILY_TASKS = 3;
-const STORAGE_KEY = 'jarvis_meaningful_day';
+const STORAGE_KEY = 'jarvis_meaningful_day_v2';
 const TOOLS = [
-  '精益创业画布', 'OKR 设定', '思考快与慢', 
+  '精益创业画布', 'OKR 设定', '思考快与慢',
   '番茄工作法', '复盘模板', 'SWOT 分析',
   '5W1H 追问', '机会成本分析', '习惯追踪表'
 ];
 
-// MiniMax API（via代理）
-const API_URL = 'https://api.minimax.chat/v1/text/chatcompletion_pro';
+// MiniMax API
+// MiniMax API - 通过后端代理，避免暴露 key
+const MINIMAX_API_URL = '/api/suggest';
 
+// 用户上下文（Phase 2: 从 task-board 读取）
+const USER_CONTEXT = {
+  name: 'Kim Kami',
+  projects: [
+    {
+      name: 'adult-shop',
+      role: '💼 创业者',
+      status: 'dropshipping 电商日本市场，成人用品',
+      blockers: ['等工厂样品确认', '品牌名未确定', '等待域名注册'],
+      progress: '网站已上线，PayPal 配置中，05/07 配置',
+      pending: [
+        { task: 'PayPal 配置', deadline: '05/07', purpose: '支持跨境支付', tool: '思考快与慢' },
+        { task: '产品上架', deadline: '05/10', purpose: '完成产品上架', tool: '精益创业画布' },
+        { task: '代发渠道对接', deadline: '05/10', purpose: '建立代发渠道', tool: '精益创业画布' }
+      ],
+      openIssues: '工厂样品还没确认，品牌名卡住了'
+    },
+    {
+      name: 'MangaStudio',
+      role: '📚 开发者',
+      status: '成人漫画 AI 排版工具，Windows 开发环境',
+      blockers: ['JSON 格式不统一'],
+      pending: []
+    },
+    {
+      name: '星火人才',
+      role: '🔥 创业者',
+      status: '里程碑约束型持续资助',
+      blockers: ['等待老大指示'],
+      pending: []
+    }
+  ],
+  energy: '71/100 (良好)',
+  hp: '68/100 (需要注意)',
+  lastProjects: 'adult-shop 网站技术完成，等待工厂样品'
+};
 
 // ============================================
-// 状态管理
+// 状态
 // ============================================
 let state = {
-  view: 'welcome',          // welcome | role | chat | overview
-  role: null,                // 当前角色
+  view: 'welcome',
+  role: null,
   date: new Date().toDateString(),
-  quota: MAX_DAILY_TASKS,    // 今日剩余次数
-  tasks: [],                 // [{ id, name, meaning, tool, done }]
-  chatStep: 0,              // 0=问任务, 1=问意义, 2=问工具, 3=完成
-  currentTask: { name: '', meaning: '', tool: '' }
+  quota: MAX_DAILY_TASKS,
+  tasks: [],
+  chatStep: 0,
+  currentTask: { name: '', meaning: '', tool: '' },
+  expertAdvice: null,
+  expertAdviceDate: null
 };
 
 // ============================================
@@ -535,16 +452,15 @@ let state = {
 // ============================================
 function init() {
   loadState();
-  // 检查日期是否新的一天
   if (state.date !== new Date().toDateString()) {
     state.date = new Date().toDateString();
     state.quota = MAX_DAILY_TASKS;
     state.tasks = [];
     state.role = null;
-    state.view = 'welcome';
+    state.expertAdvice = null;
+    state.expertAdviceDate = null;
     saveState();
   }
-  // 刷新的决定因素：有没有角色+任务
   if (state.role) {
     showOverview();
   } else {
@@ -569,32 +485,26 @@ function loadState() {
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      role: state.role,
-      date: state.date,
-      quota: state.quota,
-      tasks: state.tasks
+      role: state.role, date: state.date, quota: state.quota,
+      tasks: state.tasks, expertAdvice: state.expertAdvice,
+      expertAdviceDate: state.expertAdviceDate
     }));
   } catch (e) {}
 }
 
 // ============================================
-// 视图切换
+// 视图
 // ============================================
 function showView(view) {
   state.view = view;
-  ['welcome', 'role', 'chat', 'overview'].forEach(v => {
-    document.getElementById('view-' + v).classList.toggle('hidden', v !== view);
-  });
+  ['welcome', 'role', 'chat', 'overview'].forEach(v =>
+    document.getElementById('view-' + v).classList.toggle('hidden', v !== view)
+  );
 }
 
 function showWelcome() { showView('welcome'); }
 function showRoleSelect() { showView('role'); }
-
-function showOverview() {
-  showView('overview');
-  renderOverview();
-}
-
+function showOverview() { showView('overview'); renderOverview(); }
 function showChat() {
   showView('chat');
   updateQuotaDisplay();
@@ -603,18 +513,20 @@ function showChat() {
 // ============================================
 // 角色选择
 // ============================================
-function selectRole(role, defaultMeaning) {
+function selectRole(role) {
   state.role = role;
   saveState();
-  startConversation();
+  // Phase 2: 去概览页，AI 建议在这里出现
+  showOverview();
 }
 
 function submitCustomRole() {
-  const input = document.getElementById('custom-role-input');
-  const val = input.value.trim();
+  const val = document.getElementById('custom-role-input').value.trim();
   if (!val) return;
-  selectRole(val, '');
-  input.value = '';
+  state.role = val;
+  saveState();
+  document.getElementById('custom-role-input').value = '';
+  showOverview();
 }
 
 // ============================================
@@ -629,10 +541,7 @@ function startConversation() {
   state.currentTask = { name: '', meaning: '', tool: '' };
   showChat();
   document.getElementById('chat-box').innerHTML = '';
-  
-  const roleLabel = state.role + '：';
-  addChatMsg('ai', getAIMsg(0), roleLabel);
-  
+  addChatMsg('ai', getAIMsg(0), state.role + '：');
   document.getElementById('chat-input').focus();
   updateQuotaDisplay();
 }
@@ -641,37 +550,26 @@ function getAIMsg(step) {
   const msgs = [
     `作为 ${state.role}，今天你最想做的一件事是什么？`,
     `做这件事对你来说意味着什么？为什么它重要？`,
-    `完成这件事，你需要什么工具或方法？（选一个，或跳过）`,
-    null // 完成
+    `完成这件事，你需要什么工具或方法？（选一个，或跳过）`
   ];
   return msgs[step];
 }
 
 function getToolSuggestions() {
-  const suggestions = [];
   const role = state.role;
-  
-  if (role === '创业者') {
-    suggestions.push('精益创业画布', 'OKR 设定', '机会成本分析');
-  } else if (role === '开发者') {
-    suggestions.push('番茄工作法', '复盘模板', '5W1H 追问');
-  } else if (role === '学习者') {
-    suggestions.push('复盘模板', '习惯追踪表', '思考快与慢');
-  } else if (role === '父亲') {
-    suggestions.push('5W1H 追问', '习惯追踪表', '复盘模板');
-  } else {
-    suggestions.push('OKR 设定', '番茄工作法', '复盘模板');
-  }
-  return suggestions;
+  if (role === '创业者') return ['精益创业画布', 'OKR 设定', '机会成本分析'];
+  if (role === '开发者') return ['番茄工作法', '复盘模板', '5W1H 追问'];
+  if (role === '学习者') return ['复盘模板', '习惯追踪表', '思考快与慢'];
+  if (role === '父亲') return ['5W1H 追问', '习惯追踪表', '复盘模板'];
+  return ['OKR 设定', '番茄工作法', '复盘模板'];
 }
 
 function addChatMsg(type, text, roleLabel = 'J.A.R.V.I.S.：') {
   const box = document.getElementById('chat-box');
   const div = document.createElement('div');
   div.className = 'chat-msg ' + type;
-  
   if (type === 'ai') {
-    div.innerHTML = `<div class="role-tag">${roleLabel}</div><div class="bubble">${text}</div>`;
+    div.innerHTML = `<div class="role-tag">${roleLabel}</div><div class="bubble">${text.replace(/\n/g, '<br>')}</div>`;
   } else {
     div.innerHTML = `<div class="bubble">${text}</div>`;
   }
@@ -684,7 +582,7 @@ function addLoadingDots() {
   const div = document.createElement('div');
   div.className = 'chat-msg ai';
   div.id = 'loading-msg';
-  div.innerHTML = `<div class="role-tag">${state.role}：</div><div class="bubble"><span class="loading-dots"><span></span><span></span><span></span></span></div>`;
+  div.innerHTML = `<div class="role-tag">${state.role || 'J.A.R.V.I.S.'}：</div><div class="bubble"><span class="loading-dots"><span></span><span></span><span></span></span></div>`;
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }
@@ -700,17 +598,13 @@ async function sendChat() {
   const text = input.value.trim();
   if (!text) return;
   
-  // 显示用户输入
   addChatMsg('user', text);
   input.value = '';
   sendBtn.disabled = true;
-  
-  // 消费配额
   state.quota--;
   saveState();
   updateQuotaDisplay();
   
-  // 处理输入
   if (state.chatStep === 0) {
     state.currentTask.name = text;
     state.chatStep = 1;
@@ -725,24 +619,19 @@ async function sendChat() {
     await delay(600);
     removeLoadingDots();
     addChatMsg('ai', getAIMsg(2));
-    
-    // 显示工具建议
     const suggestions = getToolSuggestions();
     const toolDiv = document.getElementById('tool-suggestions');
     toolDiv.classList.remove('hidden');
-    toolDiv.innerHTML = suggestions.map(t => 
+    toolDiv.innerHTML = suggestions.map(t =>
       `<span class="tool-chip" onclick="selectTool('${t}')">${t}</span>`
     ).join('') + `<span class="tool-chip" onclick="selectTool('')">跳过</span>`;
-    
-    // 触发AI深度追问（可选）
-    // await askAIDeeper(text);
   } else if (state.chatStep === 2) {
     if (text) state.currentTask.tool = text;
     finishTask();
   }
   
   sendBtn.disabled = false;
-  document.getElementById('chat-input').focus();
+  input.focus();
 }
 
 function selectTool(tool) {
@@ -752,98 +641,255 @@ function selectTool(tool) {
     state.currentTask.tool = tool;
   }
   document.getElementById('tool-suggestions').classList.add('hidden');
-  
-  // 如果已经有输入，直接完成
-  if (document.getElementById('chat-input').value.trim()) {
-    state.currentTask.tool = document.getElementById('chat-input').value.trim();
-  }
   finishTask();
 }
 
-async function askAIDeeper(userMeaning) {
-  // 可选：调用 MiniMax 深度追问
-  // 目前用预设问题，不调用API省配额
-}
-
 function finishTask() {
-  // 保存任务
   state.tasks.push({
     id: Date.now(),
     name: state.currentTask.name,
-    meaning: state.currentTask.meaning || getDefaultMeaning(state.role, state.currentTask.name),
+    meaning: state.currentTask.meaning || '完成它让你离目标更近一步',
     tool: state.currentTask.tool,
-    done: false
+    done: false,
+    source: 'user'
   });
   saveState();
-  
-  // 清空工具建议
-  document.getElementById('tool-suggestions').classList.add('hidden');
-  
-  // 显示完成消息
   addLoadingDots();
   setTimeout(() => {
     removeLoadingDots();
-    addChatMsg('ai', `「${state.currentTask.name}」已添加 ✅\n\n这件事对你来说：${state.currentTask.meaning || '值得做'}\n\n今天还要添加其他任务吗？`);
-    
-    // 2秒后返回概览
-    setTimeout(() => {
-      showOverview();
-    }, 2000);
+    addChatMsg('ai', `「${state.currentTask.name}」已添加 ✅\n\n这件事对你来说：${state.currentTask.meaning}\n\n今天还要添加其他任务吗？`);
+    setTimeout(() => showOverview(), 2200);
   }, 400);
 }
 
-function getDefaultMeaning(role, taskName) {
-  return '完成它让你离目标更近一步';
+// ============================================
+// 专家建议（Phase 2 核心功能）
+// ============================================
+async function fetchExpertAdvice() {
+  const btn = document.getElementById('expert-refresh-btn');
+  const content = document.getElementById('expert-content');
+  const btnOv = document.getElementById('expert-btn');
+  
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.textContent = '思考中...';
+  if (btnOv) btnOv.disabled = true;
+  content.innerHTML = `<div class="expert-loading"><span class="loading-dots"><span></span><span></span><span></span></span> AI 正在分析你的情况...</div>`;
+  
+  try {
+    const advice = await callExpertAI();
+    
+    state.expertAdvice = advice;
+    state.expertAdviceDate = new Date().toDateString();
+    saveState();
+    
+    renderExpertAdvice(advice);
+  } catch (e) {
+    content.innerHTML = `<div class="expert-loading">⚠️ 建议获取失败，请稍后再试</div>`;
+  }
+  
+  btn.disabled = false;
+  btn.classList.remove('loading');
+  btn.textContent = '🔄 重新获取';
+  if (btnOv) btnOv.disabled = false;
+}
+
+function renderExpertAdvice(advice) {
+  const content = document.getElementById('expert-content');
+  if (!advice || (!advice.summary && (!advice.tasks || advice.tasks.length === 0))) {
+    content.innerHTML = `<div class="expert-loading">今天没有需要推进的事项，继续保持！</div>`;
+    return;
+  }
+  
+  let html = `<div class="expert-content" style="font-size:0.88rem;line-height:1.6;">`;
+  
+  // advice.summary 可能是 markdown 格式，直接渲染
+  if (advice.summary) {
+    // 把 markdown 转成 HTML（简化版）
+    const md = advice.summary
+      .replace(/^### (.+)$/gm, '<h3 style="margin:10px 0 5px;color:var(--accent);">$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2 style="margin:12px 0 6px;color:var(--accent);">$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1 style="margin:14px 0 7px;">$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:10px 0;">')
+      .replace(/\n\n/g, '</p><p style="margin:8px 0;">')
+      .replace(/\n/g, '<br>');
+    html += `<p style="margin:8px 0;">${md}</p>`;
+  }
+  
+  if (advice.tasks && advice.tasks.length > 0) {
+    advice.tasks.forEach(t => {
+      html += `
+        <div class="task-item-advice">
+          <div class="task-name">→ ${t.task}</div>
+          <div class="task-reason">原因：${t.reason}</div>
+          ${t.tool ? `<div style="font-size:0.75rem;color:var(--accent);margin-top:3px;">🛠️ ${t.tool}</div>` : ''}
+          <div style="margin-top:6px;">
+            <button class="btn-primary" style="font-size:0.78rem;padding:6px 14px;" onclick="addExpertTask('${t.task.replace(/'/g, "\\'")}', '${t.reason.replace(/'/g, "\\'")}', '${t.tool || ''}')">+ 添加到今日</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+function addExpertTask(taskName, taskReason, taskTool) {
+  // 检查是否已添加
+  if (state.tasks.find(t => t.name === taskName)) {
+    alert('这个任务已经添加了！');
+    return;
+  }
+  // 检查配额
+  if (state.tasks.length >= MAX_DAILY_TASKS) {
+    alert('今日任务已满（3个），请先完成现有任务！');
+    return;
+  }
+  state.tasks.push({
+    id: Date.now(),
+    name: taskName,
+    meaning: taskReason,
+    tool: taskTool,
+    done: false,
+    source: 'expert'
+  });
+  saveState();
+  renderOverview();
+  // 高亮新任务
+  setTimeout(() => {
+    const items = document.querySelectorAll('.task-item');
+    const last = items[items.length - 1];
+    if (last) {
+      last.style.borderColor = 'var(--accent)';
+      last.style.boxShadow = '0 0 12px rgba(124,106,255,0.3)';
+    }
+  }, 100);
+}
+
+async function callExpertAI() {
+  // 调用我们的后端 API（通过后端代理调用 MiniMax）
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' });
+  
+  const response = await fetch(MINIMAX_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      role: state.role || '父亲',
+      tasks: state.tasks || [],
+      energy: state.energy || '未知',
+      coins: state.coins || 0,
+      hp: state.hp || '未知',
+      date: dateStr
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('API error: ' + response.status);
+  }
+
+  const data = await response.json();
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  
+  // 后端返回 {advice: "markdown string"}
+  // 转换成前端期望的格式
+  return {
+    summary: data.advice, // markdown 格式的完整建议
+    tasks: [] // 暂时不解析结构化任务，整个建议作为 summary 展示
+  };
+}
+
+function buildUserContext() {
+  const roleProject = USER_CONTEXT.projects.find(p => p.role.includes(state.role) || state.role && (
+    (state.role === '创业者' && (p.name === 'adult-shop' || p.name === '星火人才')) ||
+    (state.role === '开发者' && p.name === 'MangaStudio') ||
+    (state.role === '父亲')
+  )) || USER_CONTEXT.projects[0];
+  
+  const blockers = roleProject.blockers.length > 0
+    ? '当前阻塞点：' + roleProject.blockers.join('、')
+    : '无已知阻塞点';
+  
+  const pending = roleProject.pending.length > 0
+    ? '待推进事项：' + roleProject.pending.map(p => `${p.task}(${p.deadline})`).join('、')
+    : '无待推进事项';
+  
+  return `用户角色：${state.role}
+用户名：${USER_CONTEXT.name}
+
+当前项目「${roleProject.name}」：
+- 项目状态：${roleProject.status}
+- ${blockers}
+- ${pending}
+- 能量状态：${USER_CONTEXT.energy}
+- 健康状态：${USER_CONTEXT.hp}
+
+今日已完成任务：${state.tasks.filter(t => t.done).length}/${state.tasks.length}
+今日任务列表：${state.tasks.map(t => t.name + (t.done ? '✓' : '○')).join('、') || '暂无'}
+
+请根据以上情况，作为专家给出：
+1. 今天最应该推进的 1-3 件事（基于角色、项目状态、阻塞点）
+2. 每件事的原因
+3. 推荐的工具
+
+只考虑用户当前角色的项目。不要给模糊建议，要给明确可执行的具体任务。
+返回 JSON 格式。`;
 }
 
 // ============================================
 // 概览渲染
 // ============================================
 function renderOverview() {
-  const roleLabel = { '父亲':'👨👧','创业者':'💼','开发者':'💻','休息者':'🧘','学习者':'📚','朋友':'🤝' };
-  document.getElementById('overview-role').textContent = 
-    (roleLabel[state.role] || '🎭') + ' ' + state.role;
+  const roleIcon = { '父亲':'👨👧','创业者':'💼','开发者':'💻','休息者':'🧘','学习者':'📚','朋友':'🤝' };
+  document.getElementById('overview-role').textContent =
+    (roleIcon[state.role] || '🎭') + ' ' + state.role;
   
   const today = new Date();
   const weekdays = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
-  document.getElementById('overview-date').textContent = 
+  document.getElementById('overview-date').textContent =
     `${today.getMonth()+1}月${today.getDate()}日 ${weekdays[today.getDay()]}`;
   
   const done = state.tasks.filter(t => t.done).length;
   const total = state.tasks.length;
-  document.getElementById('overview-progress').textContent = 
+  document.getElementById('overview-progress').textContent =
     total > 0 ? `${done}/${total} 完成` : '';
+  
+  // 渲染专家建议（如果有缓存且是今天）
+  if (state.expertAdvice && state.expertAdviceDate === new Date().toDateString()) {
+    renderExpertAdvice(state.expertAdvice);
+  }
   
   const taskList = document.getElementById('task-list');
   const emptyState = document.getElementById('empty-state');
   const allDone = document.getElementById('all-done');
-  
   taskList.innerHTML = '';
   
   if (state.tasks.length === 0) {
     emptyState.classList.remove('hidden');
     allDone.classList.add('hidden');
-    document.getElementById('add-task-btn').textContent = '+ 添加第一个任务';
+    document.getElementById('add-task-btn').textContent = '+ 添加任务';
   } else {
     emptyState.classList.add('hidden');
     state.tasks.forEach(task => {
       const div = document.createElement('div');
-      div.className = 'task-item' + (task.done ? ' completed' : '');
+      div.className = 'task-item' + (task.done ? ' completed' : '') + (task.source === 'expert' ? ' ai-suggested' : '');
       div.innerHTML = `
-        <div class="task-checkbox${task.done ? ' checked' : ''}" onclick="toggleTask(${task.id})">
-          ${task.done ? '✓' : ''}
-        </div>
+        <div class="task-checkbox${task.done ? ' checked' : ''}" onclick="toggleTask(${task.id})">${task.done ? '✓' : ''}</div>
         <div class="task-content">
           <div class="task-name">${task.name}</div>
           <div class="task-meaning">${task.meaning}</div>
           ${task.tool ? `<div class="task-tool">${task.tool}</div>` : ''}
+          ${task.source === 'expert' ? `<div class="task-source">AI 专家建议</div>` : ''}
         </div>
         <button class="task-delete" onclick="deleteTask(${task.id})">🗑️</button>
       `;
       taskList.appendChild(div);
     });
     
-    // 如果全部完成
     if (done === total && total > 0) {
       allDone.classList.remove('hidden');
       document.getElementById('add-task-btn').textContent = '+ 再加一个';
@@ -859,11 +905,7 @@ function renderOverview() {
 // ============================================
 function toggleTask(id) {
   const task = state.tasks.find(t => t.id === id);
-  if (task) {
-    task.done = !task.done;
-    saveState();
-    renderOverview();
-  }
+  if (task) { task.done = !task.done; saveState(); renderOverview(); }
 }
 
 function deleteTask(id) {
@@ -873,7 +915,7 @@ function deleteTask(id) {
 }
 
 // ============================================
-// Quota 显示
+// Quota
 // ============================================
 function updateQuotaDisplay() {
   const banner = document.getElementById('quota-banner');
@@ -893,33 +935,22 @@ function updateQuotaDisplay() {
 }
 
 // ============================================
-// 同步早报（占位）
+// 其他
 // ============================================
 function syncToMorning() {
-  // 未来可以同步到飞书/日历
-  alert('📺 早报功能开发中，敬请期待！\n\n目前可以将任务截图分享给朋友。');
+  alert('📺 早报功能开发中！\n\n目前可以将任务截图分享。');
 }
 
-// ============================================
-// 重置
-// ============================================
 function resetDay() {
-  if (confirm('确定要重置今天吗？所有任务都会清空。')) {
-    state.tasks = [];
-    state.role = null;
-    state.quota = MAX_DAILY_TASKS;
-    state.date = new Date().toDateString();
-    saveState();
-    showWelcome();
-  }
+  if (!confirm('确定重置今天吗？所有任务清空。')) return;
+  state.tasks = []; state.role = null; state.quota = MAX_DAILY_TASKS;
+  state.date = new Date().toDateString();
+  state.expertAdvice = null; state.expertAdviceDate = null;
+  saveState();
+  showWelcome();
 }
 
-// ============================================
-// 工具函数
-// ============================================
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ============================================
 // 启动
