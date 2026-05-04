@@ -1635,19 +1635,24 @@ ${tasksText}
 ---
 💡 提示：回复「调整」可修改任务`;
 
-  // 复制到剪贴板
-  navigator.clipboard.writeText(brief).then(() => {
-    showNotification('📋 已复制到剪贴板，粘贴到飞书发送', 'success');
-  }).catch(() => {
-    // Fallback
-    const ta = document.createElement('textarea');
-    ta.value = brief;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    showNotification('📋 已复制到剪贴板，粘贴到飞书发送', 'success');
-  });
+  // 复制到剪贴板（兼容所有浏览器）
+  const ta = document.createElement('textarea');
+  ta.value = brief;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  let copied = false;
+  try { copied = document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+
+  if (copied) {
+    showNotification('📋 已复制到剪贴板 → 粘贴到飞书发送', 'success');
+  } else {
+    // 极端情况：复制失败，把文本显示在通知里
+    showNotification('📋 复制失败，请手动全选任务内容', 'warning');
+    console.log('=== 同步内容 ===\n' + brief);
+  }
 }
 
 // 渲染工具卡片
