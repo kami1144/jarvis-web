@@ -70,12 +70,10 @@ async function renderAll() {
   renderFamily(data.profile);
   renderMindModel(data.mindModel);
   renderQuests(syncData?.projects || null);
-  renderRadar(syncData?.projects || data.opportunities);
   renderAlerts(computed, data);
   renderSkills(data.skills);
   renderEnvironment();
   renderDailySchedule();
-  renderSignals();
   initAIAdvice();
   updateMeaningBadge();
 }
