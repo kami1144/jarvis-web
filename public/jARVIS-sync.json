@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-05-04T15:01:07.301Z",
+  "generatedAt": "2026-05-05T15:02:42.187Z",
   "source": "~/.shared/task-board.json",
   "projects": [
     {
@@ -110,6 +110,34 @@
       "link": null,
       "lastUpdated": "2026-05-04",
       "subTasks": [
+        {
+          "name": "capability_1_script_to_storyboard",
+          "owner": "3号",
+          "status": "✅ 完成",
+          "nextStep": "集成到主流程",
+          "note": "core/storyboard_generator.py 已创建并修复，rule-based romantic检测正确"
+        },
+        {
+          "name": "capability_2_image_analysis",
+          "owner": "小新",
+          "status": "✅ 完成",
+          "nextStep": "集成到主流程",
+          "note": "ImageAnalyzer + mmx vision 已集成到 ImageMatcher"
+        },
+        {
+          "name": "capability_3_clip_matching",
+          "owner": "小新",
+          "status": "✅ 完成",
+          "nextStep": "集成到主流程",
+          "note": "ImageMatcher 已使用 ImageAnalyzer 做图片分析，LLM匹配可用"
+        },
+        {
+          "name": "capability_4_layout_scoring",
+          "owner": "小新",
+          "status": "✅ 完成 - 已集成到代码",
+          "nextStep": "GUI实际测试（macOS版本限制，需真机验证）",
+          "note": "layout_engine.py: SHOT_SIZE_WEIGHT/TONE_PRIORITY_WEIGHT/SHOT_FIT_MODE + assign_scenes_with_scoring(); canvas.py: per-panel fit_mode渲染; Panel.fit_mode字段; QPS=17076"
+        },
         {
           "name": "tech",
           "owner": "3号",
